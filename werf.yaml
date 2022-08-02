@@ -1,0 +1,15 @@
+{{ $_ := set . "project" "translator" }}
+
+project: {{ .project }}
+configVersion: 1
+deploy:
+  namespace: {{ env "NAMESPACE" }}-{{ env "ENVNAME" }}
+  namespaceSlug: false
+
+{{ $_ := set . "BaseImage" "node:18" }}
+{{ $_ := env "ENVNAME" | set . "env" }}
+---
+{{ range $path, $content := .Files.Glob ".werf-partial/*.yaml" }}
+{{ tpl $content $ }}
+{{ end }}
+

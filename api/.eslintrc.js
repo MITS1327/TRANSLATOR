@@ -1,0 +1,102 @@
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+    'prettier',
+  ],
+  env: {
+    es6: true,
+    node: true,
+  },
+  overrides: [
+    {
+      files: ['*.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+  ],
+  rules: {
+    // Suggestions
+    'no-var': 'error',
+    'one-var': [2, "never"],
+    'prefer-const': 'error',
+    // Possible Problems
+    'no-duplicate-imports': 'error',
+    'no-self-compare': 'error',
+    'no-use-before-define': 'error',
+    // Layout & Formatting
+    semi: 'warn',
+    curly: 2,
+    indent: [
+      'warn',
+      2,
+      {
+        MemberExpression: 1,
+        SwitchCase: 1,
+        ignoredNodes: [
+          'FunctionExpression > .params[decorators.length > 0]',
+          'FunctionExpression > .params > :matches(Decorator, :not(:first-child))',
+          'ClassBody.body > PropertyDefinition[decorators.length > 0] > .key',
+        ],
+      },
+    ],
+    'no-multi-spaces': 'warn',
+    'no-multiple-empty-lines': 'warn',
+    'space-in-parens': 'warn',
+    'no-trailing-spaces': 'warn',
+    'newline-per-chained-call': 'warn',
+    'array-element-newline': [
+      'warn',
+      {
+        ArrayExpression: 'consistent',
+        ArrayPattern: { minItems: 3 },
+      },
+    ],
+    'arrow-spacing': 'warn',
+    'key-spacing': [
+      'warn',
+      {
+        beforeColon: false,
+        afterColon: true,
+      },
+    ],
+    'keyword-spacing': [
+      'warn',
+      {
+        before: true,
+        after: true,
+      },
+    ],
+    'new-parens': ['warn', 'always'],
+    'padding-line-between-statements': [
+      'warn',
+      {
+        blankLine: 'always',
+        prev: '*',
+        next: 'return',
+      },
+    ],
+    'rest-spread-spacing': ['warn', 'never'],
+    quotes: ['warn', 'single'],
+    'template-curly-spacing': ['warn', 'never'],
+    "max-lines-per-function": ["warn", { max: 50, skipComments: true, skipBlankLines: true }],
+    'prettier/prettier': [
+      'warn',
+      {
+        singleQuote: true,
+        tabWidth: 2,
+        trailingComma: 'all',
+        bracketSpacing: true,
+        semi: true,
+        useTabs: false,
+        arrowParens: 'always',
+        printWidth: 120
+      },
+    ],
+  },
+};

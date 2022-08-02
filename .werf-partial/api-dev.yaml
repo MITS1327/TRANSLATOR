@@ -1,0 +1,38 @@
+{{- if (eq .env "dev") }}
+---
+image: {{ .project }}-{{ .env }}
+from: node:18
+docker:
+  WORKDIR: /workspace/
+  USER: root
+  EXPOSE: "3000"
+
+ansible:
+ install:
+ - name: Setting up ssh
+   shell: |
+     printf "Host github.com\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
+     echo 'export SSH_AUTH_SOCK=/ssh-agent' >> ~/.bashrc
+ - name: "Install additional packages"
+   apt:
+     state: present
+     update_cache: yes
+     pkg:
+       - locales
+       - mc
+       - vim
+       - neovim
+ - name: StrictHostKeyChecking no
+   shell: |
+     printf "Host github.com\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
+---
+image: {{ .project }}-api-{{ .env }}
+fromImage: {{ .project }}-{{ .env }}
+git:
+- add: /api/prepare-scripts
+  to: /install/prepare-scripts
+docker:
+  CMD: ["/bin/sleep", "infinity"]
+  WORKDIR: /workspace
+---
+{{- end }}

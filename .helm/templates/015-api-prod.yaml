@@ -1,0 +1,5 @@
+{{- if or (eq .Values.global.env "stage") (eq .Values.global.env "prod") (eq .Values.global.env "euprod") }}
+
+{{- include "api-deploy" (list $ .) }}
+
+{{- end }}

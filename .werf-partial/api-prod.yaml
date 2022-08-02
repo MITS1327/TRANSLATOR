@@ -1,0 +1,31 @@
+{{- if or (eq .env "stage") (eq .env "prod") (eq .env "euprod") }}
+
+---
+image: {{ .project }}-{{ .env }}
+from: node:18
+git:
+- add: /api/
+  to: /workspace/translator/api
+  stageDependencies:
+    setup:
+    - "*/**"
+    install:
+    - "package.json"
+    - "package-lock.json"
+ansible:
+  install:
+  - name: "Install libs"
+    shell: npm ci
+    args:
+     chdir: /workspace/translator/api
+  setup:
+  - name: "Compile"
+    shell: npm run build
+    args:
+     chdir: /workspace/translator/api
+docker:
+  WORKDIR: /workspace/translator/api
+  EXPOSE: ["3000"]
+  ENTRYPOINT: "npm run start"
+
+{{- end }}
