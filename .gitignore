@@ -1,0 +1,12 @@
+.idea/
+config.json
+node_modules/
+ssl/cert.key
+ssl/cert.crt
+core
+daemon2/web/public/w/
+daemon2/geoip_data/GeoLite2-City.mmd
+.vsls.json
+.helm/.helm_core
+.helm/templates/core
+.helm/secret-values.yaml

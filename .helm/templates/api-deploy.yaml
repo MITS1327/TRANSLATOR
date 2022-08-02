@@ -1,0 +1,31 @@
+{{- define "api-deploy" }} {{- $ := index . 0 }} {{- with index . 1 }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-api
+  labels:
+    app: {{ .Chart.Name }}-api
+spec:
+  replicas: 1
+  serviceName: {{ .Chart.Name }}-api
+  selector:
+      matchLabels:
+        app: {{ .Chart.Name }}-api
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-api
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}-api
+{{ tuple (printf "%s-%s" .Chart.Name (env "ENVNAME")) . | include "werf_container_image" | indent 8 }}
+        env:
+        livenessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 3000
+          initialDelaySeconds: 30
+
+{{- end }} {{- end }}

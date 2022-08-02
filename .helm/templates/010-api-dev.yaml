@@ -1,0 +1,41 @@
+{{- if  (eq .Values.global.env "dev") }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}-api
+  labels:
+    app: {{ .Chart.Name }}-api
+spec:
+  replicas: 1
+  serviceName: {{ .Chart.Name }}-api
+  selector:
+      matchLabels:
+        app: {{ .Chart.Name }}-api
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-api
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}-api
+{{ tuple (printf "%s-%s-%s" .Chart.Name "api" (env "ENVNAME")) . | include "werf_container_image" | indent 8 }}
+        env:
+        - name: SSH_AUTH_SOCK
+          value: /ssh-agent
+        - name: IS_DEV
+          value: "'true'"
+        volumeMounts:
+        - mountPath: /workspace
+          name: workspace
+        - name: ssh-agent-sock
+          mountPath: /ssh-agent
+      volumes:
+      - name: workspace
+        hostPath:
+          path: /.volumes/workspace-{{ .Chart.Name }}-api
+      - name: ssh-agent-sock
+        hostPath:
+          path: /ssh-agent
+          type: Socket
+{{- end }}
