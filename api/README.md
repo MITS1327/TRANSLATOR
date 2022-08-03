@@ -4,7 +4,7 @@
 
 ## Description
 
-Addressbook API
+Translator API
 
 ## Installation
 

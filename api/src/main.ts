@@ -12,8 +12,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(cookieParser());
   const config = new DocumentBuilder()
-    .setTitle('Services API')
-    .setDescription('API for working with services, packages and resources')
+    .setTitle('Translator API')
+    .setDescription('API for translations and scripts')
     .setVersion('0.1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
