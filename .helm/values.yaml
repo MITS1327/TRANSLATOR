@@ -1,0 +1,16 @@
+dev:
+  redisHost: redis-dev
+  redisPort: 6379
+  pootleApiUrl: https://translate.mcn.ru/
+stage:
+  redisHost: redis-stage
+  redisPort: 6379
+  pootleApiUrl: https://translate.mcn.ru/
+prod:
+  redisHost: redis-prod
+  redisPort: 6379
+  pootleApiUrl: https://translate.mcn.ru/
+euprod:
+  redisHost: redis-euprod
+  redisPort: 6379
+  pootleApiUrl: https://translate.mcn.ru/

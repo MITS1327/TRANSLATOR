@@ -2,7 +2,7 @@
 #   prod - конфигурация "Продакшн", приложение смотрит на боевой сервер.
 #   dev* - конфигурация для разработки, запускаются база и пгадмин 
 
-export TAG=1.000
+export TAG=1.004
 EU_DNS=mcntele
 export APPNAME=translator
 export NAMESPACE=translator
