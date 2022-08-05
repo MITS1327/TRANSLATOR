@@ -25,6 +25,10 @@ spec:
           value: /ssh-agent
         - name: IS_DEV
           value: "'true'"
+        {{- range $key, $val := index .Values .Values.global.env }}
+        - name: {{ $key | snakecase | upper }}
+          value: {{ quote $val }}
+        {{- end }}
         volumeMounts:
         - mountPath: /workspace
           name: workspace

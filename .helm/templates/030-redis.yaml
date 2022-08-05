@@ -1,0 +1,80 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: translator-redis
+spec:
+  selector:
+    matchLabels:
+      service: translator-redis
+  revisionHistoryLimit: 3
+  replicas: 1
+  serviceName: translator-redis
+  template:
+    metadata:
+      labels:
+        ingressInternal: "yes"
+        ingressExternal: "no"
+        service: translator-redis
+    spec:
+      containers:
+        - name: translator-redis
+          image: quay.io/continuouspipe/redis3:latest
+          command: ['redis-server']
+          ports:
+            - containerPort: {{ with (index .Values (env "ENVNAME")) }}{{ .redisPort }}{{ end }}
+              protocol: TCP
+          volumeMounts:
+            - name: store-redis
+              mountPath: /data
+
+      volumes:
+        - name: store-redis
+          persistentVolumeClaim:
+            claimName: pvc-redis-store-translator
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-redis-store-translator
+spec:
+{{- if (eq (env "ENVNAME") "dev") }}
+  storageClassName: redis-storage-{{ .Chart.Name }}
+{{- else }}
+  storageClassName: csi-rbd-sc
+{{- end }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+---
+{{- if (eq (env "ENVNAME") "dev") }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-redis-store-translator
+spec:
+  storageClassName: redis-storage-{{ .Chart.Name }}
+  capacity:
+    storage: 30Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: '/tmp/pv-redis'
+---
+{{- end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name:  {{ with (index .Values (env "ENVNAME")) }}{{ .redisHost }}{{ end }}
+  labels:
+    service: translator-redis
+spec:
+  ports:
+    - name: {{ with (index .Values (env "ENVNAME")) }}{{ .redisHost }}{{ end }}
+      port: {{ with (index .Values (env "ENVNAME")) }}{{ .redisPort }}{{ end }}
+  selector:
+    service: translator-redis
