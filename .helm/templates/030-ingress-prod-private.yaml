@@ -1,0 +1,34 @@
+{{- if or (eq .Values.global.env "stage") (eq .Values.global.env "prod") (eq .Values.global.env "euprod") }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Chart.Name }}-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/whitelist-source-range: >-
+      85.94.49.31,  {{- /* pootle */}}
+      85.94.32.0/24, {{- /* msk office */}}
+      178.48.22.33, 185.66.52.41, {{- /* bdp office */}}
+      185.66.53.70, {{- /* bdp k8 sites entry point */}}
+      185.18.110.250, {{- /* krasnodar office */}}
+      46.228.0.5, {{- /* spb office */}}
+      5.129.54.18, {{- /* novosib office */}}
+    ingress.kubernetes.io/rewrite-target: /
+
+spec:
+  rules:
+  - host: {{ .Values.ci_url }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: /api/private
+        backend:
+          service:
+            name:  {{ .Chart.Name }}-api
+            port:
+              number:  3000
+---
+{{- end }}

@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
@@ -10,6 +10,10 @@ async function bootstrap() {
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.enableVersioning({
+    type: VersioningType.URI,
+    prefix: ''
+  });
   app.use(cookieParser());
   const config = new DocumentBuilder()
     .setTitle('Translator API')
@@ -17,7 +21,7 @@ async function bootstrap() {
     .setVersion('0.1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/swagger', app, document);
   const port = process.env.port || 3000;
   await app.listen(port, () => console.log(`listening at http://localhost:${port}`));
 }

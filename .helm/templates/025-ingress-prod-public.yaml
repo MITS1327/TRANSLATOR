@@ -9,6 +9,17 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: 100m
     nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
+{{- if (eq .Values.global.env "prod") }}
+    nginx.ingress.kubernetes.io/auth-url: "http://base-service-smallauth.base-prod.svc.cluster.local/auth"
+{{ end }}
+{{- if (eq .Values.global.env "stage") }}
+    nginx.ingress.kubernetes.io/auth-url: "http://base-service-smallauth.base-stage.svc.cluster.local/auth"
+{{ end }}
+{{- if (eq .Values.global.env "euprod") }}
+    nginx.ingress.kubernetes.io/auth-url: "http://base-service-smallauth.base-euprod.svc.cluster.local/auth"
+{{ end }}
+    nginx.ingress.kubernetes.io/auth-method: "GET"
+    nginx.ingress.kubernetes.io/auth-response-headers: "MCN-ACCOUNT-ID, MCN-USER-ID, MCN-USER-LANG"
     ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/configuration-snippet: |
       if ($http_origin ~ '^https:\/\/(.*)?\.?(chatofon|mcn|mcntele|kompaas)\.(ru|com|tech)$' ) {
@@ -29,7 +40,14 @@ spec:
     http:
       paths:
       - pathType: Prefix
-        path: /api
+        path: /api/public
+        backend:
+          service:
+            name:  {{ .Chart.Name }}-api
+            port:
+              number:  3000
+      - pathType: Prefix
+        path: /api/swagger
         backend:
           service:
             name:  {{ .Chart.Name }}-api

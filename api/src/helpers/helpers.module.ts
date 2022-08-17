@@ -6,4 +6,4 @@ import { HelpersService } from './helpers.service';
   providers: [HelpersService],
   exports: [HelpersService],
 })
-export class HelpersModule { }
+export class HelpersModule {}
