@@ -3,7 +3,7 @@ import { HealthCheck, HealthCheckService, HttpHealthIndicator } from '@nestjs/te
 
 @Controller('healthz')
 export class HealthController {
-  constructor(private health: HealthCheckService, private http: HttpHealthIndicator) { }
+  constructor(private health: HealthCheckService, private http: HttpHealthIndicator) {}
 
   @Get()
   @HealthCheck()

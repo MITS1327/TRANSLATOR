@@ -5,8 +5,6 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-    'prettier',
   ],
   env: {
     es6: true,
@@ -84,19 +82,7 @@ module.exports = {
     'rest-spread-spacing': ['warn', 'never'],
     quotes: ['warn', 'single'],
     'template-curly-spacing': ['warn', 'never'],
-    "max-lines-per-function": ["warn", { max: 50, skipComments: true, skipBlankLines: true }],
-    'prettier/prettier': [
-      'warn',
-      {
-        singleQuote: true,
-        tabWidth: 2,
-        trailingComma: 'all',
-        bracketSpacing: true,
-        semi: true,
-        useTabs: false,
-        arrowParens: 'always',
-        printWidth: 120
-      },
-    ],
+    'max-lines-per-function': ['warn', { max: 50, skipComments: true, skipBlankLines: true }],
+    'newline-per-chained-call': ['warn', { "ignoreChainWithDepth": 3 }],
   },
 };

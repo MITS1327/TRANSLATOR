@@ -1,31 +1,28 @@
+import { Projects } from '@common/enums/projects.enum';
 import { Cookies } from '@decorators/cookie.decorator';
 import { Project } from '@decorators/project.decorator';
-import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query, Res } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ProjectsEnum } from './common/projects.enum';
-import { UpdateDictsDTO } from './common/translates.dto';
+import { ChangeKeyDTO, GetDictDTO } from './common/translates.dto';
 import { TranslatesService } from './translates.service';
 
-@Controller('translates')
+@ApiTags('translates')
+@Controller({
+  version: 'public',
+  path: 'translates'
+})
 export class TranslatesController {
   constructor(private readonly translatesService: TranslatesService) { }
 
-  @Post("updateDicts")
-  async updateDicts(@Body() data: UpdateDictsDTO) {
-    console.log("updateDicts");
-    this.translatesService.updateDicts(data);
-  }
-
-  @Get("getDicts")
-  async getDicts(@Cookies("mcn_status") mcnStatus: string, @Res() response: Response, @Project() project: string) {
-    const projectPootleName = ProjectsEnum[project];
-    const { hash, filesData } = await this.translatesService.getDicts(projectPootleName) || {};
-
-    console.log(mcnStatus, project, hash);
-
+  @Get('getDicts')
+  @ApiOkResponse({ description: 'Successfully returned dict' })
+  @ApiBadRequestResponse({ description: 'Undefined project' })
+  async getDicts(@Query() data: GetDictDTO, @Cookies('mcn_status') mcnStatus: string, @Res() response: Response, @Project() project: Projects) {
+    const { hash, filesData } = (await this.translatesService.getDicts(data, project)) || {};
 
     if (hash && hash !== mcnStatus) {
-      response.cookie('mcn_status', hash, {
+      response.cookie('mcn_translator_hash', hash, {
         sameSite: 'strict',
         httpOnly: true,
       });
@@ -34,5 +31,12 @@ export class TranslatesController {
       response.send();
     }
   }
-}
 
+  @Patch('changeKey')
+  @ApiOkResponse({ description: 'Successfully changed key' })
+  @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
+  @ApiBadRequestResponse({ description: 'Undefined project' })
+  async changeKey(@Body() data: ChangeKeyDTO, @Project() project: Projects) {
+    return this.translatesService.changeKey(data, project);
+  }
+}
