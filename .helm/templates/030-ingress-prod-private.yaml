@@ -6,7 +6,7 @@ metadata:
   name: {{ .Chart.Name }}-ingress-private
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: 100m
     nginx.ingress.kubernetes.io/whitelist-source-range: >-
       85.94.49.31,  {{- /* pootle */}}
@@ -19,6 +19,10 @@ metadata:
     ingress.kubernetes.io/rewrite-target: /
 
 spec:
+  tls:
+    - hosts:
+        - {{ .Values.ci_url | quote }}
+      secretName: mcn-tls-secret
   rules:
   - host: {{ .Values.ci_url }}
     http:
