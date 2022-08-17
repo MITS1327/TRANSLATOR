@@ -5,23 +5,29 @@ kind: Ingress
 metadata:
   name: {{ .Chart.Name }}-ingress-private
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+   kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: 0
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: 6000
+    nginx.ingress.kubernetes.io/proxy-read-timeout: 18000
+    nginx.ingress.kubernetes.io/proxy-send-timeout: 18000
+#    NNPLK-5: Сделать так, чтобы работали одновременно nnp и apigw
+#    nginx.ingress.kubernetes.io/enable-cors: 'true'
     nginx.ingress.kubernetes.io/whitelist-source-range: >-
-      85.94.49.31,  {{- /* pootle */}}
+      172.16.0.0/16,192.168.0.0/16,10.0.0.0/8,
       85.94.32.0/24, {{- /* msk office */}}
       178.48.22.33, 185.66.52.41, {{- /* bdp office */}}
       185.66.53.70, {{- /* bdp k8 sites entry point */}}
       185.18.110.250, {{- /* krasnodar office */}}
       46.228.0.5, {{- /* spb office */}}
       5.129.54.18, {{- /* novosib office */}}
-    ingress.kubernetes.io/rewrite-target: /
+      127.0.0.0/24
 
 spec:
   tls:
     - hosts:
-        - {{ .Values.ci_url | quote }}
+        - {{ .Values.ci_url }}
       secretName: mcn-tls-secret
   rules:
   - host: {{ .Values.ci_url }}
