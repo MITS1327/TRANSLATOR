@@ -6,10 +6,10 @@ import { PootleService } from './pootle.service';
 @ApiTags('pootle')
 @Controller({
   version: 'private',
-  path: 'pootle'
+  path: 'pootle',
 })
 export class PootleController {
-  constructor(private readonly translatesService: PootleService) { }
+  constructor(private readonly translatesService: PootleService) {}
 
   @Post('updateDicts')
   @ApiCreatedResponse()

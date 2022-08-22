@@ -19,7 +19,7 @@ export class PootleService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly helpersService: HelpersService,
-  ) { }
+  ) {}
 
   async updateDicts(data: UpdateDictsDTO) {
     const { project } = data;

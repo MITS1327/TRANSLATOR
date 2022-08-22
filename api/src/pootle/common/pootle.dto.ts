@@ -6,7 +6,7 @@ export class UpdateDictsDTO {
   @IsNotEmpty()
   @IsEnum(Object.keys(Projects))
   @ApiProperty({
-    enum: Object.keys(Projects)
+    enum: Object.keys(Projects),
   })
   project: keyof typeof Projects;
 }

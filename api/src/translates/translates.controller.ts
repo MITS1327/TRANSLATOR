@@ -1,4 +1,5 @@
 import { Projects } from '@common/enums/projects.enum';
+import { ProductsHash } from '@common/types/productsHash.type';
 import { Cookies } from '@decorators/cookie.decorator';
 import { Project } from '@decorators/project.decorator';
 import { Body, Controller, Get, Patch, Query, Res } from '@nestjs/common';
@@ -10,19 +11,26 @@ import { TranslatesService } from './translates.service';
 @ApiTags('translates')
 @Controller({
   version: 'public',
-  path: 'translates'
+  path: 'translates',
 })
 export class TranslatesController {
-  constructor(private readonly translatesService: TranslatesService) { }
+  constructor(private readonly translatesService: TranslatesService) {}
 
   @Get('getDicts')
-  @ApiOkResponse({ description: 'Successfully returned dict' })
+  @ApiOkResponse({ description: 'Successfully returned dict or emptry response if hash equals cookie hash' })
   @ApiBadRequestResponse({ description: 'Undefined project' })
-  async getDicts(@Query() data: GetDictDTO, @Cookies('mcn_status') mcnStatus: string, @Res() response: Response, @Project() project: Projects) {
-    const { hash, filesData } = (await this.translatesService.getDicts(data, project)) || {};
+  async getDicts(
+    @Query() data: GetDictDTO,
+    @Cookies('mcn_status') mcnStatus: string,
+    @Res() response: Response,
+    @Project() project: Projects,
+    @Cookies('mcn_translator_products_hash') requestTranslatorProductsHash: ProductsHash,
+  ) {
+    const { projectName, hash, filesData } = await this.translatesService.getDicts(data, project);
+    const responseTranslatorProductsHash = { ...requestTranslatorProductsHash, [projectName]: hash };
 
-    if (hash && hash !== mcnStatus) {
-      response.cookie('mcn_translator_hash', hash, {
+    if (hash && hash[projectName] !== mcnStatus) {
+      response.cookie('mcn_translator_products_hash', responseTranslatorProductsHash, {
         sameSite: 'strict',
         httpOnly: true,
       });

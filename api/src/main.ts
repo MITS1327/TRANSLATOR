@@ -18,7 +18,11 @@ async function bootstrap() {
     prefix: '',
   });
   app.useGlobalInterceptors(
-    new GraylogInterceptor(configService.get('graylog.host'), configService.get('graylog.port'), configService.get('common.project')),
+    new GraylogInterceptor(
+      configService.get('graylog.host'),
+      configService.get('graylog.port'),
+      configService.get('common.project'),
+    ),
   );
   app.use(cookieParser());
   const config = new DocumentBuilder()
