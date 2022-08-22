@@ -1,3 +1,4 @@
+import { LoggerInterceptor } from '@common/interceptors/logger.interceptor';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -12,8 +13,9 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableVersioning({
     type: VersioningType.URI,
-    prefix: ''
+    prefix: '',
   });
+  app.useGlobalInterceptors(new LoggerInterceptor());
   app.use(cookieParser());
   const config = new DocumentBuilder()
     .setTitle('Translator API')
