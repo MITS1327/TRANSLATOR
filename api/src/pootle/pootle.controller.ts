@@ -11,7 +11,7 @@ import { PootleService } from './pootle.service';
 export class PootleController {
   constructor(private readonly translatesService: PootleService) {}
 
-  @Post('updateDicts')
+  @Post('update-dicts')
   @ApiCreatedResponse()
   async updateDicts(@Body() data: UpdateDictsDTO) {
     this.translatesService.updateDicts(data);
