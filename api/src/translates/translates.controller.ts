@@ -16,7 +16,7 @@ import { TranslatesService } from './translates.service';
 export class TranslatesController {
   constructor(private readonly translatesService: TranslatesService) {}
 
-  @Get('getDicts')
+  @Get('get-dicts')
   @ApiOkResponse({ description: 'Successfully returned dict or emptry response if hash equals cookie hash' })
   @ApiBadRequestResponse({ description: 'Undefined project' })
   async getDicts(
@@ -39,7 +39,7 @@ export class TranslatesController {
     }
   }
 
-  @Patch('changeKey')
+  @Patch('change-key')
   @ApiOkResponse({ description: 'Successfully changed key' })
   @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
   @ApiBadRequestResponse({ description: 'Undefined project' })
