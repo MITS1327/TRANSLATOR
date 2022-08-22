@@ -28,7 +28,7 @@ export class TranslatesController {
     const { projectName, hash, filesData } = await this.translatesService.getDicts(data, project);
     const responseTranslatorProductsHash = { ...requestTranslatorProductsHash, [projectName]: hash };
 
-    if (hash && hash !== requestTranslatorProductsHash[projectName]) {
+    if (hash && hash !== requestTranslatorProductsHash?.[projectName]) {
       response.cookie('mcn_translator_products_hash', responseTranslatorProductsHash, {
         sameSite: 'strict',
         httpOnly: true,
