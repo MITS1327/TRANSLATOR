@@ -35,4 +35,4 @@ import graylogConfig from './config/graylog.config';
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

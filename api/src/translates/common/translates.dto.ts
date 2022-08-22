@@ -7,7 +7,7 @@ export class GetDictDTO {
   @IsOptional()
   @IsEnum(Projects)
   @ApiProperty({
-    enum: Projects
+    enum: Projects,
   })
   project: Projects;
 }
@@ -17,7 +17,7 @@ export class ChangeKeyDTO {
   @IsEnum(PootleLangs)
   @ApiProperty({
     default: 'en',
-    enum: PootleLangs
+    enum: PootleLangs,
   })
   lang: PootleLangs;
 
@@ -25,7 +25,7 @@ export class ChangeKeyDTO {
   @IsEnum(Projects)
   @ApiProperty({
     default: 'services',
-    enum: Projects
+    enum: Projects,
   })
   project: Projects;
 

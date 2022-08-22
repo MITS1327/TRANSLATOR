@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { HelpersService } from 'src/helpers/helpers.service';
 import { AxiosResponse } from 'axios';
 import { RedisData } from '@common/interfaces/redisData.interface';
+import { GetDictsRO } from './common/translates.interfaces';
 
 @Injectable()
 export class TranslatesService {
@@ -16,14 +17,16 @@ export class TranslatesService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly helpersService: HelpersService,
-  ) { }
+  ) {}
 
-  async getDicts(data: GetDictDTO, project: Projects) {
+  async getDicts(data: GetDictDTO, project: Projects): Promise<GetDictsRO> {
     const { project: queryProject } = data;
 
-    const projectPootleName = this.getProject(queryProject ?? project);
+    const projectName = queryProject ?? project;
+    const projectPootleName = this.getProject(projectName);
+    const redisData = await this.cacheManager.get<RedisData>(projectPootleName);
 
-    return this.cacheManager.get<RedisData>(projectPootleName);
+    return { ...redisData, projectName };
   }
 
   getProject(project: Projects) {
@@ -39,7 +42,6 @@ export class TranslatesService {
 
   async changeKey(data: ChangeKeyDTO, project: Projects) {
     const url = `${this.configService.get('pootle.url')}api/v1/lang-key`;
-
     const projectPootleName = this.getProject(data.project ?? project);
 
     return lastValueFrom(
