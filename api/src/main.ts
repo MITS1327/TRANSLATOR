@@ -1,5 +1,6 @@
-import { LoggerInterceptor } from '@common/interceptors/logger.interceptor';
+import { GraylogInterceptor } from '@common/interceptors/graylog.interceptor';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
@@ -8,6 +9,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
@@ -15,7 +17,9 @@ async function bootstrap() {
     type: VersioningType.URI,
     prefix: '',
   });
-  app.useGlobalInterceptors(new LoggerInterceptor());
+  app.useGlobalInterceptors(
+    new GraylogInterceptor(configService.get('graylog.host'), configService.get('graylog.port'), configService.get('common.project')),
+  );
   app.use(cookieParser());
   const config = new DocumentBuilder()
     .setTitle('Translator API')
