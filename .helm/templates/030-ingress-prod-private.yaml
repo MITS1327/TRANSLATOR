@@ -13,7 +13,8 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-read-timeout: 18000
     nginx.ingress.kubernetes.io/proxy-send-timeout: 18000
     nginx.ingress.kubernetes.io/whitelist-source-range: >-
-      172.16.0.0/16,192.168.0.0/16,10.0.0.0/8, 85.94.49.31,
+      172.16.0.0/16,192.168.0.0/16,10.0.0.0/8,
+      85.94.49.0/26,
       85.94.32.0/24, {{- /* msk office */}}
       178.48.22.33, 185.66.52.41, {{- /* bdp office */}}
       185.66.53.70, {{- /* bdp k8 sites entry point */}}
