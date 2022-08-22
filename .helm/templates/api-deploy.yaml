@@ -23,7 +23,7 @@ spec:
 {{ tuple (printf "%s-%s" .Chart.Name (env "ENVNAME")) . | include "werf_container_image" | indent 8 }}
         env:
         - name: PROJECT
-          value: {{ .Chart.Name }}
+          value: {{ printf "%s-%s" .Chart.Name (env "ENVNAME")}}
         {{- range $key, $val := index .Values .Values.global.env }}
         - name: {{ $key | snakecase | upper }}
           value: {{ quote $val }}
