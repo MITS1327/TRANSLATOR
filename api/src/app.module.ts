@@ -7,12 +7,13 @@ import { PootleModule } from './pootle/pootle.module';
 import redisConfig from './config/redis.config';
 import pootleConfig from './config/pootle.config';
 import * as redisStore from 'cache-manager-redis-store';
+import graylogConfig from './config/graylog.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [redisConfig, pootleConfig],
+      load: [redisConfig, pootleConfig, graylogConfig],
     }),
     CacheModule.registerAsync({
       imports: [ConfigModule],

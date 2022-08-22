@@ -22,6 +22,8 @@ spec:
       - name: {{ .Chart.Name }}-api
 {{ tuple (printf "%s-%s" .Chart.Name (env "ENVNAME")) . | include "werf_container_image" | indent 8 }}
         env:
+        - name: PROJECT
+          value: {{ .Chart.Name }}
         {{- range $key, $val := index .Values .Values.global.env }}
         - name: {{ $key | snakecase | upper }}
           value: {{ quote $val }}
