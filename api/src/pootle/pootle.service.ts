@@ -1,16 +1,15 @@
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { HttpService } from '@nestjs/axios';
-import { forkJoin, lastValueFrom, map, Observable } from 'rxjs';
+import { lastValueFrom, map } from 'rxjs';
 import { Projects } from '../common/enums/projects.enum';
 import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
-import { HelpersService } from 'src/helpers/helpers.service';
 import { UpdateDictsDTO } from './common/pootle.dto';
 import { RedisData } from '@common/interfaces/redisData.interface';
 import { Dict } from '@common/interfaces/dict.interface';
 import { PootleFile } from 'src/translates/common/translates.interfaces';
-import { Langs } from './common/langs.enum';
+import { LangsFiles } from './common/langsFiles.enum';
 
 @Injectable()
 export class PootleService {
@@ -18,12 +17,11 @@ export class PootleService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly helpersService: HelpersService,
   ) {}
 
   async updateDicts(data: UpdateDictsDTO) {
-    const { project } = data;
-    const filesData = await this.getFiles(project);
+    const { project, po_file: poFileName } = data;
+    const filesData = await this.getFiles(project, poFileName);
     const hash = crypto.createHash('md5').update(new Date().toString()).digest('hex');
 
     return this.cacheManager.set<RedisData>(project.toString(), { hash, filesData });
@@ -59,27 +57,18 @@ export class PootleService {
     return dicts;
   }
 
-  async getFiles(project: keyof typeof Projects) {
-    const requests: Observable<Dict>[] = [];
+  async getFiles(project: keyof typeof Projects, poFileName: LangsFiles) {
+    const url = `${this.configService.get('pootle.url')}assets/lang/${project.toString().toLowerCase()}/${poFileName}`;
+    const lang = poFileName.toString().split('.')[0];
 
-    for (const lang of this.helpersService.convertEnumValuesToArray(Langs)) {
-      const url = `${this.configService.get('pootle.url')}assets/lang/${project.toString().toLowerCase()}/${lang}.po`;
+    const response = this.httpService
+      .request({
+        method: 'get',
+        url,
+        responseType: 'blob',
+      })
+      .pipe(map((response) => this.convertLangs({ lang, data: response.data })));
 
-      requests.push(
-        this.httpService
-          .request({
-            method: 'get',
-            url,
-            responseType: 'blob',
-          })
-          .pipe(map((response) => this.convertLangs({ lang, data: response.data }))),
-      );
-    }
-
-    return lastValueFrom(
-      forkJoin(requests, (...responses) =>
-        responses.reduce((accumulator, current) => Object.assign(accumulator, current), {}),
-      ),
-    );
+    return lastValueFrom(response);
   }
 }
