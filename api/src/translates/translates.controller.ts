@@ -21,7 +21,6 @@ export class TranslatesController {
   @ApiBadRequestResponse({ description: 'Undefined project' })
   async getDicts(
     @Query() data: GetDictDTO,
-    @Cookies('mcn_status') mcnStatus: string,
     @Res() response: Response,
     @Project() project: Projects,
     @Cookies('mcn_translator_products_hash') requestTranslatorProductsHash: ProductsHash,
@@ -29,7 +28,7 @@ export class TranslatesController {
     const { projectName, hash, filesData } = await this.translatesService.getDicts(data, project);
     const responseTranslatorProductsHash = { ...requestTranslatorProductsHash, [projectName]: hash };
 
-    if (hash && hash[projectName] !== mcnStatus) {
+    if (hash && hash !== requestTranslatorProductsHash[projectName]) {
       response.cookie('mcn_translator_products_hash', responseTranslatorProductsHash, {
         sameSite: 'strict',
         httpOnly: true,
