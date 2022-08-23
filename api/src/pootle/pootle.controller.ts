@@ -1,5 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, HttpCode, HttpStatus, Put } from '@nestjs/common';
+import { ApiAcceptedResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateDictsDTO } from './common/pootle.dto';
 import { PootleService } from './pootle.service';
 
@@ -11,8 +11,9 @@ import { PootleService } from './pootle.service';
 export class PootleController {
   constructor(private readonly translatesService: PootleService) {}
 
-  @Post('update-dicts')
-  @ApiCreatedResponse()
+  @Put('dicts')
+  @ApiAcceptedResponse()
+  @HttpCode(HttpStatus.ACCEPTED)
   async updateDicts(@Body() data: UpdateDictsDTO) {
     this.translatesService.updateDicts(data);
   }
