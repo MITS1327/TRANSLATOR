@@ -62,7 +62,8 @@ function prod()
 function euprod()
 {
 	export ENVNAME=euprod
-	export DOMAIN="mcntele.com"
-	export TLD="com"
-	CI_URL="$APPNAME.$DOMAIN"
+	export DOMAIN="kompaas.tech"
+	export TLD="tech"
+	export TLD_EU="tech"
+	export CI_URL="$APPNAME.$DOMAIN"
 }
