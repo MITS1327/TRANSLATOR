@@ -20,5 +20,5 @@ euprod:
   redisHost: redis-euprod
   redisPort: 6379
   pootleApiUrl: https://translate.mcn.ru/
-  graylogHost: glogvoip2.mcn.ru
+  graylogHost: graylog.kompaas.tech
   graylogPort: 12201
