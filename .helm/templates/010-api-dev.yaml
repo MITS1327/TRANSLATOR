@@ -27,10 +27,9 @@ spec:
           value: "'true'"
         - name: PROJECT
           value: {{ printf "%s-%s" .Chart.Name (env "ENVNAME")}}
-        {{- range $key, $val := index .Values .Values.global.env }}
-        - name: {{ $key | snakecase | upper }}
-          value: {{ quote $val }}
-        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: config-values
         volumeMounts:
         - mountPath: /workspace
           name: workspace
