@@ -19,7 +19,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: "http://base-service-smallauth.base-euprod.svc.cluster.local/auth"
 {{ end }}
     nginx.ingress.kubernetes.io/auth-method: "GET"
-    nginx.ingress.kubernetes.io/auth-response-headers: "MCN-ACCOUNT-ID, MCN-USER-ID, MCN-USER-LANG"
+    nginx.ingress.kubernetes.io/auth-response-headers: "MCN-ACCOUNT-ID, MCN-USER-ID, MCN-USER-LANG, MCN-SUPPORT-USER-ID"
     ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/configuration-snippet: |
       if ($http_origin ~ '^https:\/\/(.*)?\.?(chatofon|mcn|mcntele|kompaas)\.(ru|com|tech)$' ) {
