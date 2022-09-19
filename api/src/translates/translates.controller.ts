@@ -1,8 +1,9 @@
 import { Projects } from '@common/enums/projects.enum';
 import { ProductsHash } from '@common/types/productsHash.type';
+import { IsSupport } from '@decorators/auth.decorators';
 import { Cookies } from '@decorators/cookie.decorator';
 import { Project } from '@decorators/project.decorator';
-import { Body, Controller, Get, Patch, Query, Res } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Patch, Query, Res } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ChangeKeyDTO, GetDictDTO } from './common/translates.dto';
@@ -43,7 +44,11 @@ export class TranslatesController {
   @ApiOkResponse({ description: 'Successfully changed key' })
   @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
   @ApiBadRequestResponse({ description: 'Undefined project' })
-  async changeKey(@Body() data: ChangeKeyDTO, @Project() project: Projects) {
+  async changeKey(@Body() data: ChangeKeyDTO, @Project() project: Projects, @IsSupport() isSupport: boolean) {
+    if (!isSupport) {
+      throw new ForbiddenException('You need a support role');
+    }
+
     return this.translatesService.changeKey(data, project);
   }
 }
