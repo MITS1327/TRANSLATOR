@@ -47,7 +47,6 @@ module.exports = {
     'no-multiple-empty-lines': 'warn',
     'space-in-parens': 'warn',
     'no-trailing-spaces': 'warn',
-    'newline-per-chained-call': 'warn',
     'array-element-newline': [
       'warn',
       {
