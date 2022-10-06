@@ -23,9 +23,9 @@ export class PootleService {
     const { project, po_file: poFileName } = data;
     const filesData = await this.getFiles(project, poFileName);
     const hash = crypto.createHash('md5').update(new Date().toString()).digest('hex');
-    const { filesData: currentData } = await this.cacheManager.get<RedisData>(project.toString());
+    const redisData = await this.cacheManager.get<RedisData>(project.toString());
 
-    return this.cacheManager.set<RedisData>(project.toString(), { hash, filesData: { ...currentData, ...filesData } });
+    return this.cacheManager.set<RedisData>(project.toString(), { hash, filesData: { ...redisData?.filesData, ...filesData } });
   }
 
   convertLangs(file: PootleFile): Dict {
