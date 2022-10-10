@@ -1,69 +1,44 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
+  <a href="http://mcn.ru/" target="blank"><img src="assets/logo.svg" width="200" alt="MCN Logo" /></a>
 </p>
 
-## Description
+## Документация
 
-Translator API
+1. [Установка сервиса](/docs/additional-documentation/usage.html)
+2. [Использование](/docs/additional-documentation/install.html)
+3. [Концепция работы микросервиса](/docs/additional-documentation/algorithms.html)
 
-## Installation
+# Описание
 
-```bash
-$ npm install
-```
+[Translator](https://github.com/welltime/translator) сервис работы с переводами
 
-## Running the app
+## Описание используемых тенологий
 
-```bash
-# development
-$ npm run start
+<p>
 
-# watch mode
-$ npm run start:dev
+![Node.js](https://img.shields.io/badge/-Node.js-000?&logo=node.js)
+![Nest.js](https://img.shields.io/badge/-Nest.js-000?&logo=nestjs)
+![Swagger](https://img.shields.io/badge/-Swagger-000?&logo=swagger)
+![Graylog](https://img.shields.io/badge/-Graylog-000?&logo=graylog)
 
-# production mode
-$ npm run start:prod
-```
+</p>
 
-## Documentation
+Среда выполнения:
+[Node.js](https://nodejs.org/)
 
-```bash
-# only development
-$ npm run doc
-```
+Для основного фреймворка выбран:
+[Nest.js](https://nestjs.com/)
 
-## Test
+У любого сервиса должен быть веб интерфейс API, в качестве openapi технологии выбран:
+[Swagger](https://swagger.io/)
 
-```bash
-# unit tests
-$ npm run test
+Для логирования запросов используется:
+[Graylog](https://www.graylog.org/)
+[Graylog2.js](https://www.npmjs.com/package/graylog2)
 
-# e2e tests
-$ npm run test:e2e
+Микросервис переводов:
+[MCN pootle](https://translate.mcn.ru/)
 
-# test coverage
-$ npm run test:cov
-```
+## Stay in touch
 
-## Linter
-
-```bash
-# lint fix
-$ npm run lint
-```
-
-## Type coverage
-
-```bash
-# type-coverage report
-$ npm run type-coverage
-```
-
-Для форматирования кода при нажатии комбинации ctrl + S небходимо добавить в `.vscode/settings.json` следующие свойства:
-
-```json
-"editor.codeActionsOnSave": {
-"source.fixAll.eslint": true
-},
-"eslint.validate": ["javascript"]
-```
+- Author - [MCN Telecom](https://mcn.ru)

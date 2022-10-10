@@ -1,0 +1,53 @@
+{{- if or (eq .env "stage") (eq .env "prod") (eq .env "euprod") }}
+---
+artifact: {{ .project }}-docs-build
+from: node:18
+
+git:
+- add: /
+  to: /workspace/{{ .project }}
+  excludePaths:
+  - .editorconfig
+  - .gitignore
+  - werf.yaml
+  - .helm
+  - .werf-partial
+  stageDependencies:
+    install:
+      - "**/*"
+    setup:
+      - "**/*"
+
+ansible:
+  beforeInstall:
+  - name: Setup workspace
+    file:
+      path: /workspace/{{ .project }}
+      state: directory
+  - name:  ssh_config for github
+    shell: printf "Host github.com\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
+  setup:
+  - name: Build docs
+    shell: npm run doc:generate
+    args:
+     chdir: /workspace/{{ .project }}/api
+---
+---
+image: {{ .project }}-docs-{{ .env }}
+from: nginx:stable-alpine
+docker:
+  USER: root
+  WORKDIR: /workspace/{{ .project }}
+  EXPOSE: "80"
+
+import:
+- artifact: {{ .project }}-docs-build
+  add: /workspace/{{ .project }}
+  to: /workspace/{{ .project }}
+  owner: nginx
+  group: nginx
+  excludePaths:
+  - api/node_modules
+  after: install
+---
+{{- end }}

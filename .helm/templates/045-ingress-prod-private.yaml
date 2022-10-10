@@ -39,5 +39,12 @@ spec:
             name:  {{ .Chart.Name }}-api
             port:
               number:  3000
+      - pathType: Prefix
+        path: /docs
+        backend:
+          service:
+            name:  {{ .Chart.Name }}-docs
+            port:
+              number: 80
 ---
 {{- end }}
