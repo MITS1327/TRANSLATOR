@@ -6,4 +6,5 @@ export enum Projects {
   'telephony' = 'telephony',
   'robocall_platform' = 'robocall',
   'mcn_ui_components' = 'mcn-ui-components',
+  'calltracking' = 'calltracking'
 }
