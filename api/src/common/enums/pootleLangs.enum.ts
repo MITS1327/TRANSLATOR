@@ -4,4 +4,7 @@ export enum PootleLangs {
   'hu',
   'sk',
   'de',
+  'fr',
+  'it',
+  'es'
 }
