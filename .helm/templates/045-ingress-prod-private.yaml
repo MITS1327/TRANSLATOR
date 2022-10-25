@@ -46,5 +46,12 @@ spec:
             name:  {{ .Chart.Name }}-docs
             port:
               number: 80
+      - pathType: Prefix
+        path: /api/swagger
+        backend:
+          service:
+            name:  {{ .Chart.Name }}-api
+            port:
+              number:  3000
 ---
 {{- end }}
