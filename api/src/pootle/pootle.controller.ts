@@ -1,5 +1,6 @@
-import { Body, Controller, HttpCode, HttpStatus, Put } from '@nestjs/common';
-import { ApiAcceptedResponse, ApiTags } from '@nestjs/swagger';
+import { Projects } from '@common/enums/projects.enum';
+import { Body, Controller, HttpCode, HttpStatus, Param, Put } from '@nestjs/common';
+import { ApiAcceptedResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UpdateDictsDTO } from './common/pootle.dto';
 import { PootleService } from './pootle.service';
 
@@ -11,10 +12,21 @@ import { PootleService } from './pootle.service';
 export class PootleController {
   constructor(private readonly translatesService: PootleService) {}
 
+  @Put('dicts/:project')
+  @ApiAcceptedResponse()
+  @ApiParam({
+    name: 'project',
+    enum: Object.keys(Projects)
+  })
+  @HttpCode(HttpStatus.ACCEPTED)
+  async updateProjectDicts(@Body() data: UpdateDictsDTO, @Param('project') project: keyof typeof Projects) {
+    this.translatesService.updateProjectDicts(data, project);
+  }
+
   @Put('dicts')
   @ApiAcceptedResponse()
   @HttpCode(HttpStatus.ACCEPTED)
-  async updateDicts(@Body() data: UpdateDictsDTO) {
-    this.translatesService.updateDicts(data);
+  async updateDicts() {
+    this.translatesService.updateDicts();
   }
 }
