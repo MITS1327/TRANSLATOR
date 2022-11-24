@@ -1,4 +1,4 @@
-import { Dict } from './dict.interface';
+import { Dict } from '@common/types/dict.type';
 
 export interface RedisData {
   hash: string;

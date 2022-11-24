@@ -7,11 +7,11 @@ import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { UpdateDictsDTO } from './common/pootle.dto';
 import { RedisData } from '@common/interfaces/redisData.interface';
-import { Dict } from '@common/interfaces/dict.interface';
 import { PootleFile } from 'src/translates/common/translates.interfaces';
 import { LangsFiles } from './common/langsFiles.enum';
 import { HelpersService } from 'src/helpers/helpers.service';
 import { GetFileRO } from './common/pootle.interfaces';
+import { Dict } from '@common/types/dict.type';
 
 @Injectable()
 export class PootleService {
@@ -19,14 +19,17 @@ export class PootleService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly helpersService: HelpersService
+    private readonly helpersService: HelpersService,
   ) {}
 
   async setDictsToRedis(project: keyof typeof Projects, fileData: Dict) {
     const hash = crypto.createHash('md5').update(new Date().toString()).digest('hex');
     const redisData = await this.cacheManager.get<RedisData>(project.toString());
 
-    return this.cacheManager.set<RedisData>(project.toString(), { hash, filesData: { ...redisData?.filesData, ...fileData } });
+    return this.cacheManager.set<RedisData>(project.toString(), {
+      hash,
+      filesData: { ...redisData?.filesData, ...fileData },
+    });
   }
 
   async updateProjectDicts(data: UpdateDictsDTO, project: keyof typeof Projects) {
@@ -46,13 +49,13 @@ export class PootleService {
     }
     const responses = await Promise.all(requests);
 
-    for (const {project, data: fileData} of responses) {
+    for (const { project, data: fileData } of responses) {
       await this.setDictsToRedis(project, fileData);
     }
   }
 
   convertLangs(file: PootleFile): Dict {
-    const dicts: Dict = {};
+    const dicts = {};
 
     const { lang, data } = file;
     dicts[lang] = {};
@@ -78,7 +81,7 @@ export class PootleService {
       dicts[lang][key] = value;
     }
 
-    return dicts;
+    return dicts as Dict;
   }
 
   async getFile(project: keyof typeof Projects, poFileName: LangsFiles): Promise<GetFileRO> {
@@ -91,10 +94,12 @@ export class PootleService {
         url,
         responseType: 'blob',
       })
-      .pipe(map((response) => ({
-        project,
-        data: this.convertLangs({ lang, data: response.data })
-      })));
+      .pipe(
+        map((response) => ({
+          project,
+          data: this.convertLangs({ lang, data: response.data }),
+        })),
+      );
 
     return lastValueFrom(response);
   }

@@ -1,12 +1,18 @@
 import { Projects } from '@common/enums/projects.enum';
+import { SupportGuard } from '@common/guards/support.guard';
 import { ProductsHash } from '@common/types/productsHash.type';
-import { IsSupport } from '@decorators/auth.decorators';
 import { Cookies } from '@decorators/cookie.decorator';
 import { Project } from '@decorators/project.decorator';
-import { Body, Controller, ForbiddenException, Get, Post, Query, Res } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
-import { ChangeKeyDTO, GetDictDTO } from './common/translates.dto';
+import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/translates.dto';
 import { TranslatesService } from './translates.service';
 
 @ApiTags('translates')
@@ -42,13 +48,37 @@ export class TranslatesController {
 
   @Post('key')
   @ApiOkResponse({ description: 'Successfully changed key' })
+  @ApiForbiddenResponse({ description: 'You need a support role' })
   @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
   @ApiBadRequestResponse({ description: 'Undefined project' })
-  async changeKey(@Body() data: ChangeKeyDTO, @Project() project: Projects, @IsSupport() isSupport: boolean) {
-    if (!isSupport) {
-      throw new ForbiddenException('You need a support role');
-    }
-
+  async changeKey(@Body() data: ChangeKeyDTO, @Project() project: Projects) {
     return this.translatesService.changeKey(data, project);
+  }
+
+  @Get('langs')
+  @ApiOkResponse({ description: 'Successfully get langs' })
+  @ApiForbiddenResponse({ description: 'You need a support role' })
+  @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
+  @UseGuards(SupportGuard)
+  async getLangs() {
+    return this.translatesService.getLangs();
+  }
+
+  @Get('projects')
+  @ApiOkResponse({ description: 'Successfully get projects' })
+  @ApiForbiddenResponse({ description: 'You need a support role' })
+  @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
+  @UseGuards(SupportGuard)
+  async getProjects() {
+    return this.translatesService.getProjects();
+  }
+
+  @Get('keys/not-translated')
+  @ApiOkResponse({ description: 'Successfully get not translated projects' })
+  @ApiForbiddenResponse({ description: 'You need a support role' })
+  @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
+  @UseGuards(SupportGuard)
+  async getNotTranslatedDicts(@Query() data: GetNotTranslatedDictsDTO) {
+    return this.translatesService.getNotTranslatedDicts(data);
   }
 }

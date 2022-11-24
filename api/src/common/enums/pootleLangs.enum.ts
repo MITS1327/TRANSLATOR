@@ -6,5 +6,5 @@ export enum PootleLangs {
   'de',
   'fr',
   'it',
-  'es'
+  'es',
 }
