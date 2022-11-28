@@ -67,6 +67,10 @@ export class TranslatesService {
     );
   }
   private getNotTranslatedKeysByDict(dict: LangDict, project: Projects, lang: Langs): NotTranslatedKey[] {
+    if (!dict) {
+      return [];
+    }
+
     return Object.keys(dict).reduce<NotTranslatedKey[]>(
       (acc: NotTranslatedKey[], langKey: string): NotTranslatedKey[] => {
         if (langKey === dict[langKey]) {
