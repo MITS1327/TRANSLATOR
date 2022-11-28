@@ -1,0 +1,47 @@
+{{- if or (eq .Values.global.env "stage") (eq .Values.global.env "prod") (eq .Values.global.env "euprod") }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Chart.Name }}-ingress-protected
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
+    nginx.ingress.kubernetes.io/auth-url: http://base-service-smallauth.base-{{ .Values.global.env }}.svc.cluster.local/auth
+    nginx.ingress.kubernetes.io/auth-method: "GET"
+    nginx.ingress.kubernetes.io/auth-response-headers: "MCN-ACCOUNT-ID, MCN-CONTRACT-ID, MCN-USER-ID, MCN-SUPPORT-USER-ID, MCN-USER-LANG"
+    ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($http_origin ~ '^https:\/\/(.*)?\.?(chatofon|mcn|mcntele|kompaas)\.(ru|com|tech)$' ) {
+        more_set_headers "Access-Control-Allow-Origin: $http_origin";
+        more_set_headers "Access-Control-Allow-Credentials: true";
+      }
+      if ($request_method = 'OPTIONS') {
+        add_header 'Access-Control-Allow-Origin' "$http_origin" always;
+        add_header 'Access-Control-Allow-Credentials' "true" always;
+        add_header 'Access-Control-Allow-Methods' "PUT, GET, POST, DELETE, OPTIONS" always;
+        add_header 'Access-Control-Allow-Headers' "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization" always;
+        add_header 'Access-Control-Max-Age' 1728000 always;
+        return 204;
+      }
+
+spec:
+  tls:
+    - hosts:
+        - {{ .Values.ci_url }}
+      secretName: mcn-tls-secret
+  rules:
+  - host: {{ .Values.ci_url }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: /api/protected
+        backend:
+          service:
+            name:  {{ .Chart.Name }}-api
+            port:
+              number:  3000
+---
+{{- end }}
