@@ -6,5 +6,5 @@ export enum LangsFiles {
   'de_DE.po',
   'fr_FR.po',
   'it_IT.po',
-  'es_ES.po'
+  'es_ES.po',
 }

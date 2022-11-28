@@ -16,7 +16,7 @@ export class PootleController {
   @ApiAcceptedResponse()
   @ApiParam({
     name: 'project',
-    enum: Object.keys(Projects)
+    enum: Object.keys(Projects),
   })
   @HttpCode(HttpStatus.ACCEPTED)
   async updateProjectDicts(@Body() data: UpdateDictsDTO, @Param('project') project: keyof typeof Projects) {
