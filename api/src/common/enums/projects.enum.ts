@@ -8,4 +8,5 @@ export enum Projects {
   'mcn_ui_components' = 'mcn-ui-components',
   'calltracking' = 'calltracking',
   'messaging' = 'messaging',
+  'addressbook' = 'addressbook'
 }
