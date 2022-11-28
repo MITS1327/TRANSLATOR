@@ -3,7 +3,7 @@ import { SupportGuard } from '@common/guards/support.guard';
 import { ProductsHash } from '@common/types/productsHash.type';
 import { Cookies } from '@decorators/cookie.decorator';
 import { Project } from '@decorators/project.decorator';
-import { Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res, UseGuards, Version } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -16,13 +16,11 @@ import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/tra
 import { TranslatesService } from './translates.service';
 
 @ApiTags('translates')
-@Controller({
-  version: 'public',
-  path: 'translates',
-})
+@Controller('translates')
 export class TranslatesController {
   constructor(private readonly translatesService: TranslatesService) {}
 
+  @Version('public')
   @Get('dicts')
   @ApiOkResponse({ description: 'Successfully returned dict or emptry response if hash equals cookie hash' })
   @ApiBadRequestResponse({ description: 'Undefined project' })
@@ -46,6 +44,7 @@ export class TranslatesController {
     }
   }
 
+  @Version('protected')
   @Post('key')
   @ApiOkResponse({ description: 'Successfully changed key' })
   @ApiForbiddenResponse({ description: 'You need a support role' })
@@ -55,6 +54,7 @@ export class TranslatesController {
     return this.translatesService.changeKey(data, project);
   }
 
+  @Version('protected')
   @Get('langs')
   @ApiOkResponse({ description: 'Successfully get langs' })
   @ApiForbiddenResponse({ description: 'You need a support role' })
@@ -64,6 +64,7 @@ export class TranslatesController {
     return this.translatesService.getLangs();
   }
 
+  @Version('protected')
   @Get('projects')
   @ApiOkResponse({ description: 'Successfully get projects' })
   @ApiForbiddenResponse({ description: 'You need a support role' })
@@ -73,6 +74,7 @@ export class TranslatesController {
     return this.translatesService.getProjects();
   }
 
+  @Version('protected')
   @Get('keys/not-translated')
   @ApiOkResponse({ description: 'Successfully get not translated projects' })
   @ApiForbiddenResponse({ description: 'You need a support role' })
