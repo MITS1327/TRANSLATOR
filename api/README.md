@@ -20,6 +20,7 @@
 ![Nest.js](https://img.shields.io/badge/-Nest.js-000?&logo=nestjs)
 ![Swagger](https://img.shields.io/badge/-Swagger-000?&logo=swagger)
 ![Graylog](https://img.shields.io/badge/-Graylog-000?&logo=graylog)
+![Redis](https://img.shields.io/badge/-Redis-000?&logo=redis)
 
 </p>
 
@@ -35,6 +36,9 @@
 Для логирования запросов используется:
 [Graylog](https://www.graylog.org/)
 [Graylog2.js](https://www.npmjs.com/package/graylog2)
+
+Для хранения кэша переводов используется:
+[Redis](https://redis.io/)
 
 Микросервис переводов:
 [MCN pootle](https://translate.mcn.ru/)
