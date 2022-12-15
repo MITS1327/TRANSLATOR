@@ -21,7 +21,7 @@
     "type-coverage": "typescript-coverage-report --ignore-files 'dist/**/*.*'",
     "type-coverage:console": "type-coverage --ignore-files 'dist/**/*.*' --detail",
     "prepare": "cd ../ && husky install",
-    "doc": "npx @compodoc/compodoc -p tsconfig.json -s --includes docs -a docs/assets -w",
+    "doc": "npx @compodoc/compodoc -p tsconfig.json -s --includes docs -a docs/assets -w -n 'Translator'",
     "doc:generate": "npx @compodoc/compodoc -p tsconfig.json --includes docs -a docs/assets -n 'Translator' --hideGenerator",
     "pre-commit": "lint-staged"
   },
