@@ -19,20 +19,18 @@ spec:
     spec:
       containers:
         - name: translator-redis
-          image: quay.io/continuouspipe/redis3:latest
-          command: ['redis-server']
+          image: eqalpha/keydb
+          command: ['keydb-server']
           ports:
             - containerPort: {{ with (index .Values (env "ENVNAME")) }}{{ .redisPort }}{{ end }}
               protocol: TCP
           volumeMounts:
             - name: store-redis
               mountPath: /data
-
       volumes:
         - name: store-redis
           persistentVolumeClaim:
             claimName: pvc-redis-store-translator
-
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1

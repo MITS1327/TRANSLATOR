@@ -2,7 +2,7 @@
 #   prod - конфигурация "Продакшн", приложение смотрит на боевой сервер.
 #   dev* - конфигурация для разработки, запускаются база и пгадмин 
 
-export TAG=1.008
+export TAG=1.011
 export APPNAME=translator
 export NAMESPACE=translator
 
