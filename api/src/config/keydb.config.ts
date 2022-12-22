@@ -1,9 +1,9 @@
 import { registerAs } from '@nestjs/config';
 
 export default registerAs(
-  'redis',
+  'keydb',
   (): Record<string, unknown> => ({
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
+    host: process.env.KEYDB_HOST,
+    port: process.env.KEYDB_PORT,
   }),
 );

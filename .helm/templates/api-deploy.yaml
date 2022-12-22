@@ -1,5 +1,5 @@
 {{- define "api-deploy" }} {{- $ := index . 0 }} {{- with index . 1 }}
-
+{{- $replicaCount := index .Values (env "ENVNAME") "replicaCount" -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8,16 +8,30 @@ metadata:
   labels:
     app: {{ .Chart.Name }}-api
 spec:
-  replicas: 1
+  replicas: {{ $replicaCount }}
   serviceName: {{ .Chart.Name }}-api
   selector:
       matchLabels:
         app: {{ .Chart.Name }}-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
         app: {{ .Chart.Name }}-api
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Chart.Name }}-api
+            topologyKey: "kubernetes.io/hostname"
       containers:
       - name: {{ .Chart.Name }}-api
 {{ tuple (printf "%s-%s" .Chart.Name (env "ENVNAME")) . | include "werf_container_image" | indent 8 }}

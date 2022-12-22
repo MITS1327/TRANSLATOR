@@ -1,78 +1,87 @@
+{{- $replicaCount := index .Values (env "ENVNAME") "replicaCount" -}}
+{{- $keydbHost := index .Values (env "ENVNAME") "keydbHost" -}}
+{{- $keydbPort := index .Values (env "ENVNAME") "keydbPort" -}}
 
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: translator-redis
-spec:
-  selector:
-    matchLabels:
-      service: translator-redis
-  revisionHistoryLimit: 3
-  replicas: 1
-  serviceName: translator-redis
-  template:
-    metadata:
-      labels:
-        ingressInternal: "yes"
-        ingressExternal: "no"
-        service: translator-redis
-    spec:
-      containers:
-        - name: translator-redis
-          image: eqalpha/keydb
-          command: ['keydb-server']
-          ports:
-            - containerPort: {{ with (index .Values (env "ENVNAME")) }}{{ .redisPort }}{{ end }}
-              protocol: TCP
-          volumeMounts:
-            - name: store-redis
-              mountPath: /data
-      volumes:
-        - name: store-redis
-          persistentVolumeClaim:
-            claimName: pvc-redis-store-translator
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: pvc-redis-store-translator
-spec:
-{{- if (eq (env "ENVNAME") "dev") }}
-  storageClassName: redis-storage-{{ .Chart.Name }}
-{{- else }}
-  storageClassName: csi-rbd-sc
-{{- end }}
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 30Gi
----
-{{- if (eq (env "ENVNAME") "dev") }}
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-redis-store-translator
-spec:
-  storageClassName: redis-storage-{{ .Chart.Name }}
-  capacity:
-    storage: 30Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: '/tmp/pv-redis'
----
-{{- end }}
 apiVersion: v1
 kind: Service
 metadata:
-  name:  {{ with (index .Values (env "ENVNAME")) }}{{ .redisHost }}{{ end }}
-  labels:
-    service: translator-redis
+  name: {{ $keydbHost }}
 spec:
-  ports:
-    - name: {{ with (index .Values (env "ENVNAME")) }}{{ .redisHost }}{{ end }}
-      port: {{ with (index .Values (env "ENVNAME")) }}{{ .redisPort }}{{ end }}
   selector:
-    service: translator-redis
+    app: {{ $keydbHost }}
+  ports:
+    - name: {{ $keydbHost }}
+      protocol: TCP
+      port: {{ $keydbPort }}
+      targetPort: {{ $keydbHost }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $keydbHost }}
+  labels:
+    app: {{ $keydbHost }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ $keydbHost }}
+  serviceName: {{ $keydbHost }}
+  replicas: {{ $replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ $keydbHost }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ $keydbHost }}
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: {{ $keydbHost }}
+        image: eqalpha/keydb
+        command: [ "/bin/bash", "-c"]
+        args:
+        - |
+          set -euxo pipefail
+          host="$(hostname)"
+          replicas=()
+          for replicaId in {0..{{ (sub ($replicaCount | int) 1) }}}; do
+            if [ "${host}" != "{{ $keydbHost }}-${replicaId}" ]; then
+                replicas+=("--replicaof {{ $keydbHost }}-${replicaId}.{{ $keydbHost }} {{ $keydbPort }} ")
+            fi
+          done
+          exec keydb-server /etc/keydb/redis.conf \
+            --active-replica yes  \
+            --multi-master yes \
+            --appendonly no \
+            --bind 0.0.0.0 \
+            --port {{ $keydbPort }} \
+            --protected-mode no \
+            --loglevel notice \
+            "${replicas[@]}"
+        ports:
+        - name: {{ $keydbHost }}
+          containerPort: {{ $keydbPort }}
+          protocol: TCP
+        volumeMounts:
+        - name: keydb-data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: keydb-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+  {{- if not (or (eq (env "ENVNAME") "dev") (eq (env "ENVNAME") "stage")) }}
+      storageClassName: csi-rbd-sc
+  {{- else }}
+      storageClassName: standard
+  {{- end }}
