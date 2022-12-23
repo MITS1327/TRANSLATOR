@@ -6,7 +6,6 @@ metadata:
   labels:
     app: {{ .Chart.Name }}-api
 spec:
-  clusterIP: None
   selector:
     app: {{ .Chart.Name }}-api
   ports:
