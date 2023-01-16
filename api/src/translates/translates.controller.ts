@@ -35,7 +35,7 @@ export class TranslatesController {
 
     if (hash && hash !== requestTranslatorProductsHash?.[projectName]) {
       response.cookie('mcn_translator_products_hash', responseTranslatorProductsHash, {
-        sameSite: 'none',
+        sameSite: 'strict',
         secure: true
       });
       response.json(filesData);
