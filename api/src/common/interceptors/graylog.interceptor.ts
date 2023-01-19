@@ -13,6 +13,7 @@ import { tap } from 'rxjs/operators';
 import { randomBytes } from 'crypto';
 import * as graylog from 'graylog2';
 import { LogTopic } from '@common/enums/logger.enums';
+import { Reflector } from '@nestjs/core';
 
 /**
  * Interceptor that logs input/output requests to graylog
@@ -21,6 +22,7 @@ import { LogTopic } from '@common/enums/logger.enums';
 export class GraylogInterceptor implements NestInterceptor {
   private logger = new Logger(LogTopic.Api);
   private graylog = null;
+  private reflector: Reflector;
   constructor(host: string, port: string, project: string) {
     this.graylog = new graylog.graylog({
       servers: [{ host, port }],
@@ -32,6 +34,8 @@ export class GraylogInterceptor implements NestInterceptor {
     this.graylog.on('error', (error: Error) => {
       this.logger.error(error);
     });
+
+    this.reflector = new Reflector();
   }
 
   /**
@@ -41,6 +45,13 @@ export class GraylogInterceptor implements NestInterceptor {
    */
   public intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request: Request = context.switchToHttp().getRequest();
+    const shouldSkip =
+      this.reflector.get<boolean>('GRAYLOG_INTERCEPTOR_SKIP', context.getClass()) ||
+      this.reflector.get<boolean>('GRAYLOG_INTERCEPTOR_SKIP', context.getHandler());
+    if (shouldSkip) {
+      return next.handle();
+    }
+
     const { method, url, body, headers, query, params, route } = request;
     const message = `Incoming request - ${method} - ${url}`;
 
