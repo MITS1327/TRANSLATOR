@@ -1,15 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
-import { HealthCheck, HealthCheckService, HttpHealthIndicator } from '@nestjs/terminus';
+import { HealthCheck } from '@nestjs/terminus';
+import { ExcludeGraylogLogging } from '@decorators/exclude-graylog-logging.decorator';
 
-@ApiExcludeController()
 @Controller('healthz')
+@ApiExcludeController()
+@ExcludeGraylogLogging()
 export class HealthController {
-  constructor(private health: HealthCheckService, private http: HttpHealthIndicator) {}
-
   @Get()
   @HealthCheck()
-  async check() {
-    return this.health.check([() => this.http.pingCheck('pingGoogle', 'https://google.com')]);
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  check() {}
 }
