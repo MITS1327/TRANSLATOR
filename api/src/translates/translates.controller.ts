@@ -1,9 +1,7 @@
 import { Projects } from '@common/enums/projects.enum';
 import { SupportGuard } from '@common/guards/support.guard';
-import { ProductsHash } from '@common/types/productsHash.type';
-import { Cookies } from '@decorators/cookie.decorator';
 import { Project } from '@decorators/project.decorator';
-import { Body, Controller, Get, Post, Query, Res, UseGuards, Version } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, Query, Res, UseGuards, Version } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -28,16 +26,19 @@ export class TranslatesController {
     @Query() data: GetDictDTO,
     @Res() response: Response,
     @Project() project: Projects,
-    @Cookies('mcn_translator_products_hash') requestTranslatorProductsHash: ProductsHash,
+    @Headers('x-products-hash') requestTranslatorProductsHash: string,
   ) {
     const { projectName, hash, filesData } = await this.translatesService.getDicts(data, project);
-    const responseTranslatorProductsHash = { ...requestTranslatorProductsHash, [projectName]: hash };
+    let requestHeader = null;
 
-    if (hash && hash !== requestTranslatorProductsHash?.[projectName]) {
-      response.cookie('mcn_translator_products_hash', responseTranslatorProductsHash, {
-        sameSite: 'strict',
-        secure: true
-      });
+    try {
+      requestHeader = JSON.parse(requestTranslatorProductsHash);
+      //eslint-disable-next-line no-empty
+    } catch (error) {}
+    const responseTranslatorProductsHash = { ...requestHeader, [projectName]: hash };
+
+    if (hash !== requestHeader?.[projectName]) {
+      response.set({'x-products-hash': JSON.stringify(responseTranslatorProductsHash)});
       response.json(filesData);
     } else {
       response.send();
