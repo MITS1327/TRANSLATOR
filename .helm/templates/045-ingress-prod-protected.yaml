@@ -1,5 +1,9 @@
 {{- if or (eq .Values.global.env "stage") (eq .Values.global.env "prod") (eq .Values.global.env "euprod") }}
----
+{{- $domains := index .Values (env "ENVNAME") "additionalDomains"  -}}
+{{- $hosts := list -}}
+{{- range $domains }}
+    {{- $hosts = append $hosts (printf "%s%s" (env "APPNAME") .) }}
+{{- end }}---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -14,7 +18,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-response-headers: "MCN-ACCOUNT-ID, MCN-CONTRACT-ID, MCN-USER-ID, MCN-SUPPORT-USER-ID, MCN-USER-LANG"
     ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($http_origin ~ '^https:\/\/(.*)?\.?(chatofon|mcn|mcntele|kompaas)\.(ru|com|tech)$' ) {
+      if ($http_origin ~ '^https:\/\/(.*)?\.?({{ print (join "|" (prepend $domains (env "DOMAIN"))) }})$' ) {
         more_set_headers "Access-Control-Allow-Origin: $http_origin";
         more_set_headers "Access-Control-Allow-Credentials: true";
       }
@@ -28,20 +32,18 @@ metadata:
       }
 
 spec:
-  tls:
-    - hosts:
-        - {{ .Values.ci_url }}
-      secretName: mcn-tls-secret
   rules:
-  - host: {{ .Values.ci_url }}
+  {{- range prepend $hosts .Values.ci_url  }}
+  - host: {{ . }}
     http:
       paths:
       - pathType: Prefix
         path: /api/protected
         backend:
           service:
-            name:  {{ .Chart.Name }}-api
+            name:   {{ $.Chart.Name }}-api
             port:
               number:  3000
+  {{- end }}
 ---
 {{- end }}
