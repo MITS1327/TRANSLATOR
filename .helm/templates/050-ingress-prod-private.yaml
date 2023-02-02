@@ -1,4 +1,9 @@
 {{- if or (eq .Values.global.env "stage") (eq .Values.global.env "prod") (eq .Values.global.env "euprod") }}
+{{- $domains := index .Values (env "ENVNAME") "additionalDomains"  -}}
+{{- $hosts := list -}}
+{{- range $domains }}
+    {{- $hosts = append $hosts (printf "%s%s" (env "APPNAME") .) }}
+{{- end }}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -24,34 +29,32 @@ metadata:
       127.0.0.0/24
 
 spec:
-  tls:
-    - hosts:
-        - {{ .Values.ci_url }}
-      secretName: mcn-tls-secret
   rules:
-  - host: {{ .Values.ci_url }}
+  {{- range prepend $hosts .Values.ci_url  }}
+  - host: {{ . }}
     http:
       paths:
       - pathType: Prefix
         path: /api/private
         backend:
           service:
-            name:  {{ .Chart.Name }}-api
+            name:  {{ $.Chart.Name }}-api
             port:
               number:  3000
       - pathType: Prefix
         path: /docs
         backend:
           service:
-            name:  {{ .Chart.Name }}-docs
+            name:  {{ $.Chart.Name }}-docs
             port:
               number: 80
       - pathType: Prefix
         path: /api/swagger
         backend:
           service:
-            name:  {{ .Chart.Name }}-api
+            name:  {{ $.Chart.Name }}-api
             port:
               number:  3000
+  {{- end }}
 ---
 {{- end }}

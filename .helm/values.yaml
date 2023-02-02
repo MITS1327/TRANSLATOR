@@ -26,3 +26,6 @@ euprod:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: graylog.kompaas.tech
   graylogPort: 12201
+  additionalDomains:
+    - .myinno.net
+    - .cpaas.tech
