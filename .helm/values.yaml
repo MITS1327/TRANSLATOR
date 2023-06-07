@@ -19,6 +19,8 @@ prod:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
+  additionalDomains:
+    - .mcnmobile.ru
 euprod:
   replicaCount: 3
   keydbHost: keydb-euprod
