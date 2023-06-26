@@ -31,3 +31,7 @@ euprod:
   additionalDomains:
     - .myinno.net
     - .cpaas.tech
+dns:
+  - prod: translator.example.org
+    tls: example.org
+    domain: example
