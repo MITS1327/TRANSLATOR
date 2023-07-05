@@ -46,5 +46,20 @@ spec:
             port:
               number:  3000
   {{- end }}
+{{- range $item := .Values.dns }}
+    {{- if not (contains $.Values.ci_url $item.prod) }}
+  - host: {{ $item.prod }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: /api/protected
+        backend:
+          service:
+            name:   {{ $.Chart.Name }}-api
+            port:
+              number:  3000
+    {{- end }}
+{{- end }}
+
 ---
 {{- end }}

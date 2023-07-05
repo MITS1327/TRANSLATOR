@@ -45,5 +45,34 @@ spec:
             port:
               number:  3000
   {{- end }}
+{{- range $item := .Values.dns }}
+    {{- if not (contains $.Values.ci_url $item.prod) }}
+  - host: {{ $item.prod }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: /api/private
+        backend:
+          service:
+            name:  {{ $.Chart.Name }}-api
+            port:
+              number:  3000
+      - pathType: Prefix
+        path: /docs
+        backend:
+          service:
+            name:  {{ $.Chart.Name }}-docs
+            port:
+              number: 80
+      - pathType: Prefix
+        path: /api/swagger
+        backend:
+          service:
+            name:  {{ $.Chart.Name }}-api
+            port:
+              number:  3000
+    {{- end }}
+{{- end }}
+
 ---
 {{- end }}
