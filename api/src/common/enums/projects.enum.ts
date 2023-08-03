@@ -11,5 +11,6 @@ export enum Projects {
   'addressbook' = 'addressbook',
   'shop' = 'shop',
   'shop_backend' = 'shop_backend',
-  'notificator' = 'notificator'
+  'notificator' = 'notificator',
+  'topbar' = 'topbar',
 }
