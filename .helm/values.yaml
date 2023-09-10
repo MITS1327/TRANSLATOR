@@ -35,3 +35,6 @@ dns:
   - prod: translator.example.org
     tls: example.org
     domain: example
+  - prod: translator.myinno.net
+    tls: translator.myinno.net
+    domain: myinno
