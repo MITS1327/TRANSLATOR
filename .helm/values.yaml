@@ -38,3 +38,6 @@ dns:
   - prod: translator.myinno.net
     tls: translator.myinno.net
     domain: myinno
+  - prod: translator.mcn.kz
+    tls: translator.mcn.kz
+    domain: mcn
