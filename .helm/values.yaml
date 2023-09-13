@@ -41,18 +41,3 @@ dns:
   - prod: translator.mcn.kz
     tls: translator.mcn.kz
     domain: mcn
-  - prod: translator.mcn.kz
-    tls: translator.mcn.kz
-    domain: mcn
-  - prod: translator.mcn.kz
-    tls: translator.mcn.kz
-    domain: mcn
-  - prod: translator.mcn.kz
-    tls: translator.mcn.kz
-    domain: mcn
-  - prod: translator.mcn.kz
-    tls: translator.mcn.kz
-    domain: mcn
-  - prod: translator.mcn.kz
-    tls: translator.mcn.kz
-    domain: mcn
