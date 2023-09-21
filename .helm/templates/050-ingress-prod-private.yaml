@@ -1,8 +1,13 @@
-{{- if or (eq .Values.global.env "stage") (eq .Values.global.env "prod") (eq .Values.global.env "euprod") }}
-{{- $domains := index .Values (env "ENVNAME") "additionalDomains" | default list -}}
+{{- if not (eq .Values.global.env "dev") }}
+{{- $dns := index .Values "dns" | default list -}}
 {{- $hosts := list -}}
-{{- range $domains }}
-    {{- $hosts = append $hosts (printf "%s%s" (env "APPNAME") .) }}
+{{- $domains := list -}}
+{{- if or (eq .Values.global.env "prod") (eq .Values.global.env "euprod")}}
+{{- range $dns }}
+    {{- $hostParts :=  splitList "." .prod | list | first | reverse -}}
+    {{- $domains = append $domains (printf "%s.%s" (index $hostParts 1) (index $hostParts 0) )}}
+    {{- $hosts = append $hosts (printf "%s.%s.%s" (env "APPNAME") (index $hostParts 1) (index $hostParts 0) ) }}
+{{- end }}
 {{- end }}
 ---
 apiVersion: networking.k8s.io/v1
@@ -45,34 +50,5 @@ spec:
             port:
               number:  3000
   {{- end }}
-{{- range $item := .Values.dns }}
-    {{- if not (contains $.Values.ci_url $item.prod) }}
-  - host: {{ $item.prod }}
-    http:
-      paths:
-      - pathType: Prefix
-        path: /api/private
-        backend:
-          service:
-            name:  {{ $.Chart.Name }}-api
-            port:
-              number:  3000
-      - pathType: Prefix
-        path: /docs
-        backend:
-          service:
-            name:  {{ $.Chart.Name }}-docs
-            port:
-              number: 80
-      - pathType: Prefix
-        path: /api/swagger
-        backend:
-          service:
-            name:  {{ $.Chart.Name }}-api
-            port:
-              number:  3000
-    {{- end }}
-{{- end }}
-
 ---
 {{- end }}
