@@ -1,4 +1,4 @@
-{{- if or (eq .Values.global.env "stage") (eq .Values.global.env "prod") (eq .Values.global.env "euprod") }}
+{{- if not (eq .Values.global.env "dev") }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

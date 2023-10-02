@@ -1,7 +1,3 @@
-# ENVNAME 
-#   prod - конфигурация "Продакшн", приложение смотрит на боевой сервер.
-#   dev* - конфигурация для разработки, запускаются база и пгадмин 
-
 export TAG=1.102
 export APPNAME=translator
 export NAMESPACE=translator
@@ -38,8 +34,8 @@ function spd1()
 	export ENVNAME=spd1
 	export CLUSTER_IP=$IP_TO_ETCHOST
 	export TLD="ru"
-	export DOMAIN="mcn.ru"
-	CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
+	export DOMAIN="mcn.$TLD"
+	export CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
 }
 
 function spd2()
@@ -47,8 +43,8 @@ function spd2()
 	export ENVNAME=spd2
 	export CLUSTER_IP=$IP_TO_ETCHOST
 	export TLD="ru"
-	export DOMAIN="mcn.ru"
-	CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
+	export DOMAIN="mcn.$TLD"
+	export CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
 }
 
 function prod()

@@ -12,6 +12,20 @@ stage:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
+spd1:
+  replicaCount: 1
+  keydbHost: keydb-spd1
+  keydbPort: 6379
+  pootleApiUrl: https://translate.mcn.ru/
+  graylogHost: glogvoip2.mcn.ru
+  graylogPort: 12201
+spd2:
+  replicaCount: 1
+  keydbHost: keydb-spd2
+  keydbPort: 6379
+  pootleApiUrl: https://translate.mcn.ru/
+  graylogHost: glogvoip2.mcn.ru
+  graylogPort: 12201
 prod:
   replicaCount: 3
   keydbHost: keydb-prod
