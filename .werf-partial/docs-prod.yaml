@@ -1,4 +1,4 @@
-{{- if or (eq .env "stage") (eq .env "prod") (eq .env "euprod") }}
+{{- if not (eq .Values.global.env "dev") }}
 ---
 artifact: {{ .project }}-docs-build
 from: node:18
