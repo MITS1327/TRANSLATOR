@@ -80,7 +80,7 @@ spec:
       resources:
         requests:
           storage: 1Gi
-  {{- if not (or (eq (env "ENVNAME") "dev") (eq (env "ENVNAME") "stage")) }}
+  {{- if or (eq (env "ENVNAME") "prod") (eq (env "ENVNAME") "euprod") }}
       storageClassName: csi-rbd-sc
   {{- else }}
       storageClassName: standard
