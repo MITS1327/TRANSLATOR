@@ -1,6 +1,8 @@
 {{- $replicaCount := index .Values (env "ENVNAME") "replicaCount" -}}
 {{- $keydbHost := index .Values (env "ENVNAME") "keydbHost" -}}
 {{- $keydbPort := index .Values (env "ENVNAME") "keydbPort" -}}
+{{- $storageClassName := index .Values (env "ENVNAME") "storageClassName" -}}
+
 
 apiVersion: v1
 kind: Service
@@ -80,8 +82,4 @@ spec:
       resources:
         requests:
           storage: 1Gi
-  {{- if or (eq (env "ENVNAME") "prod") (eq (env "ENVNAME") "euprod") }}
-      storageClassName: csi-rbd-sc
-  {{- else }}
-      storageClassName: standard
-  {{- end }}
+      storageClassName: {{ $storageClassName }}
