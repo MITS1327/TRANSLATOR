@@ -5,6 +5,7 @@ dev:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
+  storageClassName: standard
 stage:
   replicaCount: 1
   keydbHost: keydb-stage
@@ -12,6 +13,7 @@ stage:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
+  storageClassName: standard
 spd1:
   replicaCount: 1
   keydbHost: keydb-spd1
@@ -19,13 +21,7 @@ spd1:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
-spd2:
-  replicaCount: 1
-  keydbHost: keydb-spd2
-  keydbPort: 6379
-  pootleApiUrl: https://translate.mcn.ru/
-  graylogHost: glogvoip2.mcn.ru
-  graylogPort: 12201
+  storageClassName: local-path
 prod:
   replicaCount: 3
   keydbHost: keydb-prod
@@ -33,8 +29,7 @@ prod:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
-  additionalDomains:
-    - .mcnmobile.ru
+  storageClassName: csi-rbd-sc
 euprod:
   replicaCount: 3
   keydbHost: keydb-euprod
@@ -42,13 +37,8 @@ euprod:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: graylog.kompaas.tech
   graylogPort: 12201
-  additionalDomains:
-    - .myinno.net
-    - .cpaas.tech
+  storageClassName: csi-rbd-sc
 dns:
-  - prod: translator.example.org
-    tls: example.org
-    domain: example
   - prod: translator.myinno.net
     tls: translator.myinno.net
     domain: myinno
