@@ -36,13 +36,6 @@ spec:
             port:
               number:  3000
       - pathType: Prefix
-        path: /docs
-        backend:
-          service:
-            name:  {{ $.Chart.Name }}-docs
-            port:
-              number: 80
-      - pathType: Prefix
         path: /api/swagger
         backend:
           service:

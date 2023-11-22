@@ -2,42 +2,47 @@ dev:
   replicaCount: 1
   keydbHost: keydb-dev
   keydbPort: 6379
+  keydbStorageClass: standard
+  keydbStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
-  storageClassName: standard
 stage:
   replicaCount: 1
   keydbHost: keydb-stage
   keydbPort: 6379
+  keydbStorageClass: local-path
+  keydbStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
-  storageClassName: standard
 spd1:
   replicaCount: 1
   keydbHost: keydb-spd1
   keydbPort: 6379
+  keydbStorageClass: local-path
+  keydbStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
-  storageClassName: local-path
 prod:
   replicaCount: 3
   keydbHost: keydb-prod
   keydbPort: 6379
+  keydbStorageClass: csi-rbd-sc
+  keydbStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
-  storageClassName: csi-rbd-sc
 euprod:
   replicaCount: 3
   keydbHost: keydb-euprod
   keydbPort: 6379
+  keydbStorageClass: csi-rbd-sc
+  keydbStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: graylog.kompaas.tech
   graylogPort: 12201
-  storageClassName: csi-rbd-sc
 dns:
   - prod: translator.myinno.net
     tls: translator.myinno.net
