@@ -1,5 +1,0 @@
-{{- if not (eq .Values.global.env "dev") }}
-
-{{- include "docs-deploy" (list $ .) }}
-
-{{- end }}

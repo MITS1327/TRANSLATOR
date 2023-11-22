@@ -1,9 +1,10 @@
 {{- $replicaCount := index .Values (env "ENVNAME") "replicaCount" -}}
 {{- $keydbHost := index .Values (env "ENVNAME") "keydbHost" -}}
 {{- $keydbPort := index .Values (env "ENVNAME") "keydbPort" -}}
-{{- $storageClassName := index .Values (env "ENVNAME") "storageClassName" -}}
+{{- $keydbStorageClass := index .Values (env "ENVNAME") "keydbStorageClass" -}}
+{{- $keydbStorage := index .Values (env "ENVNAME") "keydbStorage" -}}
 
-
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -46,7 +47,7 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: {{ $keydbHost }}
-        image: eqalpha/keydb
+        image: eqalpha/keydb:x86_64_v6.3.2
         command: [ "/bin/bash", "-c"]
         args:
         - |
@@ -58,7 +59,7 @@ spec:
                 replicas+=("--replicaof {{ $keydbHost }}-${replicaId}.{{ $keydbHost }} {{ $keydbPort }} ")
             fi
           done
-          exec keydb-server /etc/keydb/redis.conf \
+          exec keydb-server /etc/keydb/keydb.conf \
             --active-replica yes  \
             --multi-master yes \
             --appendonly no \
@@ -81,5 +82,5 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 1Gi
-      storageClassName: {{ $storageClassName }}
+          storage: {{ $keydbStorage }}
+      storageClassName: {{ $keydbStorageClass }}

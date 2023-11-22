@@ -6,7 +6,7 @@ deploy:
   namespace: {{ env "NAMESPACE" }}-{{ env "ENVNAME" }}
   namespaceSlug: false
 
-{{ $_ := set . "BaseImage" "node:18" }}
+{{ $_ := set . "BaseImage" "node:20" }}
 {{ $_ := env "ENVNAME" | set . "env" }}
 ---
 {{ range $path, $content := .Files.Glob ".werf-partial/*.yaml" }}
