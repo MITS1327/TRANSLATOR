@@ -5,6 +5,7 @@ import { Body, Controller, Get, Headers, Post, Query, Res, UseGuards, Version } 
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
+  ApiHeader,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiTags,
@@ -22,22 +23,23 @@ export class TranslatesController {
   @Get('dicts')
   @ApiOkResponse({ description: 'Successfully returned dict or emptry response if hash equals cookie hash' })
   @ApiBadRequestResponse({ description: 'Undefined project' })
+  @ApiHeader({ name: 'x-products-hash', description: 'Dict hash', required: false })
   async getDicts(
     @Query() data: GetDictDTO,
     @Res() response: Response,
     @Project() project: Projects,
     @Headers('x-products-hash') requestTranslatorProductsHash: string,
   ) {
-    const { projectName, hash, filesData } = await this.translatesService.getDicts(data, project);
+    const { projectName, unixTime, filesData } = await this.translatesService.getDicts(data, project);
     let requestHeader = null;
 
     try {
       requestHeader = JSON.parse(requestTranslatorProductsHash);
       //eslint-disable-next-line no-empty
     } catch (error) {}
-    const responseTranslatorProductsHash = { ...requestHeader, [projectName]: hash };
+    const responseTranslatorProductsHash = { ...requestHeader, [projectName]: unixTime };
 
-    if (hash !== requestHeader?.[projectName]) {
+    if (unixTime !== requestHeader?.[projectName]) {
       response.set({'x-products-hash': JSON.stringify(responseTranslatorProductsHash)});
       response.json(filesData);
     } else {

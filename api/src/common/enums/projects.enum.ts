@@ -13,4 +13,8 @@ export enum Projects {
   'shop_backend' = 'shop_backend',
   'notificator' = 'notificator',
   'topbar' = 'topbar',
+  'references' = 'references',
+  'services_backend' = 'services_backend',
+  'vpbx_backend' = 'vpbx_backend',
+  'acquiring' = 'acquiring',
 }

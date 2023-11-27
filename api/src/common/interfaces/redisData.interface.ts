@@ -1,6 +1,6 @@
 import { Dict } from '@common/types/dict.type';
 
 export interface RedisData {
-  hash: string;
+  unixTime: string;
   filesData: Dict;
 }

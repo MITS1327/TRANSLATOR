@@ -7,20 +7,15 @@ import {
   Logger,
   NestInterceptor,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Request, Response } from 'express';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, tap } from 'rxjs';
 import { randomBytes } from 'crypto';
 import * as graylog from 'graylog2';
-import { LogTopic } from '@common/enums/logger.enums';
-import { Reflector } from '@nestjs/core';
 
-/**
- * Interceptor that logs input/output requests to graylog
- */
 @Injectable()
 export class GraylogInterceptor implements NestInterceptor {
-  private logger = new Logger(LogTopic.Api);
+  private logger = new Logger();
   private graylog = null;
   private reflector: Reflector;
   constructor(host: string, port: string, project: string) {
@@ -38,11 +33,6 @@ export class GraylogInterceptor implements NestInterceptor {
     this.reflector = new Reflector();
   }
 
-  /**
-   * Intercept method, logs before and after the request being processed
-   * @param { ExecutionContext } context details about the current request
-   * @param { CallHandler } next implements the handle method that returns an Observable
-   */
   public intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request: Request = context.switchToHttp().getRequest();
     const shouldSkip =
@@ -84,13 +74,6 @@ export class GraylogInterceptor implements NestInterceptor {
     );
   }
 
-  /**
-   * Logs the request response in success cases
-   * @param { unknown } responseData body returned
-   * @param { ExecutionContext } context details about the current request
-   * @param { Record<string, unknown> } graylogParams default graylog data
-   * @param { Record<string, unknown> } additionalParams additional data for graylog
-   */
   private logNext(
     responseData: unknown,
     context: ExecutionContext,
@@ -109,13 +92,6 @@ export class GraylogInterceptor implements NestInterceptor {
     });
   }
 
-  /**
-   * Logs the response in error cases
-   * @param { Error } error Error object
-   * @param { ExecutionContext } context details about the current request
-   * @param { Record<string, unknown> } graylogParams default graylog data
-   * @param { Record<string, unknown> } additionalParams additional data for graylog
-   */
   private logError(
     error: Error,
     context: ExecutionContext,

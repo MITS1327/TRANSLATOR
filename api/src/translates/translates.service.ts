@@ -1,16 +1,21 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { Cache } from 'cache-manager';
-import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/translates.dto';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { catchError, lastValueFrom, map } from 'rxjs';
-import { Projects } from '../common/enums/projects.enum';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
-import { HelpersService } from 'src/helpers/helpers.service';
+import { Cache } from 'cache-manager';
 import { AxiosResponse } from 'axios';
+import { catchError, lastValueFrom, map } from 'rxjs';
+
+import { convertEnumToObject, convertEnumValuesToArray, findObjectKeyByValue } from '@utils';
+
 import { RedisData } from '@common/interfaces/redisData.interface';
-import { GetDictsRO, NotTranslatedDictsRO, NotTranslatedKey } from './common/translates.interfaces';
 import { LangDict } from '@common/interfaces/langDict.interface';
 import { Langs } from '@common/enums/langs.enum';
+
+import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/translates.dto';
+import { GetDictsRO, NotTranslatedDictsRO, NotTranslatedKey } from './common/translates.interfaces';
+
+import { Projects } from '../common/enums/projects.enum';
 import { OrderByOptions } from './common/translates.enum';
 
 @Injectable()
@@ -19,7 +24,6 @@ export class TranslatesService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly helpersService: HelpersService,
   ) {}
 
   async getDicts(data: GetDictDTO, project: Projects): Promise<GetDictsRO> {
@@ -33,14 +37,14 @@ export class TranslatesService {
   }
 
   getProject(project: Projects): Projects {
-    const enumObj = this.helpersService.convertEnumToObject(Projects);
-    const projectName = this.helpersService.findObjectKeyByValue(enumObj, project);
+    const enumObj = convertEnumToObject(Projects);
+    const projectName = findObjectKeyByValue(enumObj, project);
 
     if (!projectName) {
-      throw new BadRequestException('Undefined project');
+      throw new NotFoundException('Project not found');
     }
 
-    return this.helpersService.findObjectKeyByValue(enumObj, project) as Projects;
+    return findObjectKeyByValue(enumObj, project) as Projects;
   }
 
   async changeKey(data: ChangeKeyDTO, project: Projects) {
@@ -87,7 +91,7 @@ export class TranslatesService {
     );
   }
 
-  private async getNotTranslatedDict(project: Projects, page: number, limitPerPage: number, lang?: Langs) {
+  private async getNotTranslatedDict(project: Projects, lang?: Langs) {
     const redisData = await this.cacheManager.get<RedisData>(project);
     if (!redisData) {
       return null;
@@ -121,11 +125,11 @@ export class TranslatesService {
 
     if (project) {
       const projectPootleName = this.getProject(project);
-      dicts = await this.getNotTranslatedDict(projectPootleName, page, limitPerPage, lang);
+      dicts = await this.getNotTranslatedDict(projectPootleName, lang);
     } else {
       const redisKeys = await this.cacheManager.store.keys();
       for (const redisKey of redisKeys) {
-        const notTranslatedDict = await this.getNotTranslatedDict(redisKey, page, limitPerPage, lang);
+        const notTranslatedDict = await this.getNotTranslatedDict(redisKey as Projects, lang);
         dicts.keys = [...dicts.keys, ...notTranslatedDict.keys];
       }
     }
@@ -152,6 +156,6 @@ export class TranslatesService {
   }
 
   async getLangs() {
-    return this.helpersService.convertEnumValuesToArray(Langs);
+    return convertEnumValuesToArray(Langs);
   }
 }

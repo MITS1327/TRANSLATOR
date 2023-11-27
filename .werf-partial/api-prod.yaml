@@ -1,4 +1,4 @@
-{{- if not (eq .Values.global.env "dev") }}
+{{- if not (eq .env "dev") }}
 
 ---
 image: {{ .project }}-{{ .env }}
@@ -26,6 +26,6 @@ ansible:
 docker:
   WORKDIR: /workspace/translator/api
   EXPOSE: ["3000"]
-  ENTRYPOINT: "npm run start"
+  ENTRYPOINT: "npm run start:prod"
 
 {{- end }}
