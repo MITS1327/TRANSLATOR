@@ -1,12 +1,14 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
+
 import { TranslatesModule } from './translates/translates.module';
 import { HealthModule } from './health/health.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { HelpersModule } from './helpers/helpers.module';
 import { PootleModule } from './pootle/pootle.module';
+
 import keydbConfig from './config/keydb.config';
 import pootleConfig from './config/pootle.config';
-import * as redisStore from 'cache-manager-redis-store';
 import graylogConfig from './config/graylog.config';
 import commonConfig from './config/common.config';
 
@@ -20,17 +22,18 @@ import commonConfig from './config/common.config';
       imports: [ConfigModule],
       isGlobal: true,
       useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get('keydb.host'),
-        port: configService.get('keydb.port'),
-        db: 1,
-        ttl: 0,
+        store: await redisStore({
+          socket: {
+            host: configService.getOrThrow('keydb.host'),
+            port: configService.getOrThrow('keydb.port'),
+          },
+          database: 1,
+        }),
       }),
       inject: [ConfigService],
     }),
     TranslatesModule,
     HealthModule,
-    HelpersModule,
     PootleModule,
   ],
   controllers: [],

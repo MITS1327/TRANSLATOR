@@ -1,17 +1,21 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { HttpService } from '@nestjs/axios';
-import { lastValueFrom, map } from 'rxjs';
-import { Projects } from '../common/enums/projects.enum';
-import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
-import { UpdateDictsDTO } from './common/pootle.dto';
-import { RedisData } from '@common/interfaces/redisData.interface';
-import { PootleFile } from 'src/translates/common/translates.interfaces';
-import { LangsFiles } from './common/langsFiles.enum';
-import { HelpersService } from 'src/helpers/helpers.service';
-import { GetFileRO } from './common/pootle.interfaces';
+import { HttpService } from '@nestjs/axios';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { catchError, lastValueFrom, map, of } from 'rxjs';
+
+import { convertEnumValuesToArray } from '@utils';
+
 import { Dict } from '@common/types/dict.type';
+import { RedisData } from '@common/interfaces/redisData.interface';
+
+import { PootleFile } from 'src/translates/common/translates.interfaces';
+
+import { Projects } from '../common/enums/projects.enum';
+import { LangsFiles } from './common/langsFiles.enum';
+import { UpdateDictsDTO } from './common/pootle.dto';
+import { GetFileRO } from './common/pootle.interfaces';
 
 @Injectable()
 export class PootleService {
@@ -19,15 +23,14 @@ export class PootleService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly helpersService: HelpersService,
   ) {}
 
   async setDictsToRedis(project: keyof typeof Projects, fileData: Dict) {
-    const hash = crypto.createHash('md5').update(new Date().toString()).digest('hex');
+    const unixTime = Math.floor(Date.now() / 1000).toString();
     const redisData = await this.cacheManager.get<RedisData>(project.toString());
 
-    return this.cacheManager.set<RedisData>(project.toString(), {
-      hash,
+    return this.cacheManager.set(project.toString(), {
+      unixTime,
       filesData: { ...redisData?.filesData, ...fileData },
     });
   }
@@ -41,7 +44,7 @@ export class PootleService {
   async updateDicts() {
     const requests: Promise<GetFileRO>[] = [];
     const projects = Object.keys(Projects) as (keyof typeof Projects)[];
-    const poFileNames = this.helpersService.convertEnumValuesToArray<LangsFiles>(LangsFiles);
+    const poFileNames = convertEnumValuesToArray<LangsFiles>(LangsFiles);
     for (const project of projects) {
       for (const poFileName of poFileNames) {
         requests.push(this.getFile(project, poFileName));
@@ -99,6 +102,12 @@ export class PootleService {
           project,
           data: this.convertLangs({ lang, data: response.data }),
         })),
+        catchError(() =>
+          of({
+            project,
+            data: {} as Dict,
+          }),
+        ),
       );
 
     return lastValueFrom(response);
