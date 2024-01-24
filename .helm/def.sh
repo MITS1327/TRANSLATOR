@@ -26,7 +26,7 @@ function stage2()
   export CLUSTER_IP=$IP_TO_ETCHOST
   export TLD="ru"
   export DOMAIN="mcnloc.$TLD"
-  CI_URL="$APPNAME.$DOMAIN"
+  export CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
 }
 
 function preprod()
