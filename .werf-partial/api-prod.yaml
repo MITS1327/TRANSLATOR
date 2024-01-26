@@ -2,7 +2,7 @@
 
 ---
 image: {{ .project }}-{{ .env }}
-from: {{ .BaseImage }}
+from: {{ .BaseProdNodeImage }}
 git:
 - add: /api/
   to: /workspace/translator/api

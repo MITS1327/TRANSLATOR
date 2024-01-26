@@ -1,7 +1,7 @@
 {{- if (eq .env "dev") }}
 ---
 image: {{ .project }}-{{ .env }}
-from: {{ .BaseImage }}
+from: {{ .BaseDevNodeImage }}
 docker:
   WORKDIR: /workspace/
   USER: root
