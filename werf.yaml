@@ -6,6 +6,8 @@ deploy:
   namespace: {{ env "NAMESPACE" }}-{{ env "ENVNAME" }}
   namespaceSlug: false
 
+#
+
 {{ $_ := set . "BaseDevNodeImage" "node:20" }}
 {{ $_ := set . "BaseProdNodeImage" "node:20-alpine" }}
 {{ $_ := env "ENVNAME" | set . "env" }}
