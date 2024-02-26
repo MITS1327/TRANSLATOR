@@ -6,7 +6,7 @@
 {{- range $dns }}
     {{- $hostParts :=  splitList "." .prod | list | first | reverse -}}
     {{- $domains = append $domains (printf "%s.%s" (index $hostParts 1) (index $hostParts 0) )}}
-    {{- $hosts = append $hosts (printf "%s.%s.%s" (.Values.APPNAME) (index $hostParts 1) (index $hostParts 0) ) }}
+    {{- $hosts = append $hosts (printf "%s.%s.%s" ($.Values.APPNAME) (index $hostParts 1) (index $hostParts 0) ) }}
 {{- end }}
 {{- end }}
 ---
