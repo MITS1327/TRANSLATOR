@@ -1,0 +1,102 @@
+---
+include:
+  - project: 'ci-cd/templates'
+    ref: master
+    file: 'build.shell.gitlab-ci.yml'
+
+  - project: 'ci-cd/templates'
+    ref: master
+    file: 'lint.shell.gitlab-ci.yml'    
+
+  - project: 'ci-cd/templates'
+    ref: master
+    file: 'deploy.shell.gitlab-ci.yml'
+
+  - project: 'ci-cd/templates'
+    ref: master
+    file: 'dismiss.shell.gitlab-ci.yml'
+
+  - project: 'ci-cd/templates'
+    ref: master
+    file: 'cleanup.shell.gitlab-ci.yml'
+
+.before:
+  before_script:
+
+################################################### TEST
+.test:
+  tags:
+    - docker
+  image: node:20
+  stage: test
+  allow_failure: true
+  rules:
+    - changes:
+      - 'api/src/**.ts' 
+
+test_type-coverage:
+  extends: .test
+  script:
+    - cd api/ && npm ci && npm run type-coverage
+test_pootle-validate:
+  extends: .test
+  script:
+    - cd api/ && npm ci && npm run pootle-validate
+  rules:
+    - changes:
+      - 'lang/**.po'  
+test_lint:
+  extends: .test
+  script:
+    - cd api/ && npm ci && npm run lint  
+################################################### PROD
+build_prod:
+  extends: .build_prod
+###################################### 
+lint_prod:
+  extends: .lint_prod
+######################################    
+deploy_prod:
+  extends: .deploy_prod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master"
+    when: never
+###################################### 
+dismiss_prod:
+  extends: .dismiss_prod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master"
+    when: never
+################################################### EUPROD
+build_euprod:
+  extends: .build_euprod
+######################################
+lint_euprod:
+  extends: .lint_euprod
+######################################
+deploy_euprod:
+  extends: .deploy_euprod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master"
+    when: never  
+######################################
+dismiss_euprod:
+  extends: .dismiss_euprod
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+      when: never
+################################################## STAGE
+build_stage:
+  extends: .build_stage
+###################################### 
+lint_stage:
+  extends: .lint_stage
+######################################    
+deploy_stage:
+  extends: .deploy_stage
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "stage"
+    when: manual
+##################################### 
+dismiss_stage:
+  extends: .dismiss_stage
