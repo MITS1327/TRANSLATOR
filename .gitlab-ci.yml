@@ -30,17 +30,21 @@ include:
   image: node:20
   stage: test
   allow_failure: true
-  rules:
-    - changes:
-      - 'api/src/**.ts' 
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 
 test_type-coverage:
   extends: .test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - 'api/src/**.ts' 
   script:
     - cd api/ && npm ci && npm run type-coverage
 test_lint:
   extends: .test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      changes:
+        - 'api/src/**.ts' 
   script:
     - cd api/ && npm ci && npm run lint  
 ################################################### PROD
