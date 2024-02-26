@@ -1,6 +1,7 @@
 {{- if not (eq .Values.global.env "dev") }}
 
-{{- $replicaCount := index .Values (env "ENVNAME") "replicaCount" -}}
+{{- $chartname := printf "%s-%s" .Chart.Name $.Values.werf.env -}}
+{{- $replicaCount := index .Values (.Values.global.env) "replicaCount" -}}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,10 +36,10 @@ spec:
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: {{ .Chart.Name }}-api
-{{ tuple (printf "%s-%s" .Chart.Name (env "ENVNAME")) . | include "werf_container_image" | indent 8 }}
+        image: '{{ index .Values.werf.image $chartname }}'
         env:
         - name: PROJECT
-          value: {{ printf "%s-%s" .Chart.Name (env "ENVNAME")}}
+          value: {{ printf "%s-%s" .Chart.Name (.Values.global.env)}}
         envFrom:
         - configMapRef:
             name: config-values

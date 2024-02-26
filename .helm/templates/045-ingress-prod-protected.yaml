@@ -6,7 +6,7 @@
 {{- range $dns }}
     {{- $hostParts :=  splitList "." .prod | list | first | reverse -}}
     {{- $domains = append $domains (printf "%s.%s" (index $hostParts 1) (index $hostParts 0) )}}
-    {{- $hosts = append $hosts (printf "%s.%s.%s" (env "APPNAME") (index $hostParts 1) (index $hostParts 0) ) }}
+    {{- $hosts = append $hosts (printf "%s.%s.%s" (.Values.APPNAME) (index $hostParts 1) (index $hostParts 0) ) }}
 {{- end }}
 {{- end }}
 ---
@@ -24,7 +24,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-response-headers: "MCN-ACCOUNT-ID, MCN-CONTRACT-ID, MCN-USER-ID, MCN-SUPPORT-USER-ID, MCN-USER-LANG"
     ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($http_origin ~ '^https:\/\/(.*)?\.?({{ print (join "|" (prepend $domains (env "DOMAIN"))) }})$' ) {
+      if ($http_origin ~ '^https:\/\/(.*)?\.?({{ print (join "|" (prepend $domains (.Values.DOMAIN))) }})$' ) {
         more_set_headers "Access-Control-Allow-Origin: $http_origin";
         more_set_headers "Access-Control-Allow-Credentials: true";
       }

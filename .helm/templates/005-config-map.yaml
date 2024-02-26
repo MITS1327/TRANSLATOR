@@ -6,3 +6,6 @@ data:
   {{- range $key, $val := index .Values .Values.global.env }}
   {{ $key | snakecase | upper }}: {{ quote $val }} 
   {{- end }}
+  {{- range $key, $val := index .Values "env-secrets" }}
+  {{ $key | snakecase | upper }}: {{ quote $val }} 
+  {{- end }}
