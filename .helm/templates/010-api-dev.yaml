@@ -19,14 +19,14 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}-api
-{{ tuple (printf "%s-%s-%s" .Chart.Name "api" (env "ENVNAME")) . | include "werf_container_image" | indent 8 }}
+{{ tuple (printf "%s-%s-%s" .Chart.Name "api" (.Values.global.env)) . | include "werf_container_image" | indent 8 }}
         env:
         - name: SSH_AUTH_SOCK
           value: /ssh-agent
         - name: IS_DEV
           value: "'true'"
         - name: PROJECT
-          value: {{ printf "%s-%s" .Chart.Name (env "ENVNAME")}}
+          value: {{ printf "%s-%s" .Chart.Name (.Values.global.env)}}
         envFrom:
         - configMapRef:
             name: config-values

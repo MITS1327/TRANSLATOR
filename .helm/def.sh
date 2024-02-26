@@ -14,28 +14,10 @@ function dev()
 function stage()
 {
   export ENVNAME=stage
-  export CLUSTER_IP=$(kubectl cluster-info | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | head -1)
-  export TLD="loc"
-  export DOMAIN="mcn.$TLD"
-  CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
-}
-
-function stage2()
-{
-  export ENVNAME=stage
   export CLUSTER_IP=$IP_TO_ETCHOST
   export TLD="ru"
   export DOMAIN="mcnloc.$TLD"
   export CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
-}
-
-function preprod()
-{
-  export ENVNAME=stage
-  export CLUSTER_IP=$IP_TO_ETCHOST
-  export TLD="ru"
-  export DOMAIN="mcn.$TLD"
-  CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
 }
 
 function spd1()

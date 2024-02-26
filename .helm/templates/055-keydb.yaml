@@ -1,8 +1,8 @@
-{{- $replicaCount := index .Values (env "ENVNAME") "replicaCount" -}}
-{{- $keydbHost := index .Values (env "ENVNAME") "keydbHost" -}}
-{{- $keydbPort := index .Values (env "ENVNAME") "keydbPort" -}}
-{{- $keydbStorageClass := index .Values (env "ENVNAME") "keydbStorageClass" -}}
-{{- $keydbStorage := index .Values (env "ENVNAME") "keydbStorage" -}}
+{{- $replicaCount := index .Values (.Values.global.env) "replicaCount" -}}
+{{- $keydbHost := index .Values (.Values.global.env) "keydbHost" -}}
+{{- $keydbPort := index .Values (.Values.global.env) "keydbPort" -}}
+{{- $keydbStorageClass := index .Values (.Values.global.env) "keydbStorageClass" -}}
+{{- $keydbStorage := index .Values (.Values.global.env) "keydbStorage" -}}
 
 ---
 apiVersion: v1

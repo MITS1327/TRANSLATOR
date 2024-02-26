@@ -3,19 +3,15 @@ include:
   - project: 'ci-cd/templates'
     ref: master
     file: 'build.shell.gitlab-ci.yml'
-
   - project: 'ci-cd/templates'
     ref: master
-    file: 'lint.shell.gitlab-ci.yml'    
-
+    file: 'lint.shell.gitlab-ci.yml'
   - project: 'ci-cd/templates'
     ref: master
-    file: 'deploy.shell.gitlab-ci.yml'
-
+    file: 'deployv2.shell.gitlab-ci.yml'
   - project: 'ci-cd/templates'
     ref: master
     file: 'dismiss.shell.gitlab-ci.yml'
-
   - project: 'ci-cd/templates'
     ref: master
     file: 'cleanup.shell.gitlab-ci.yml'
@@ -23,7 +19,7 @@ include:
 .before:
   before_script:
 
-################################################### TEST
+# TEST
 .test:
   tags:
     - docker
@@ -36,7 +32,7 @@ test_type-coverage:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       changes:
-        - 'api/src/**.ts' 
+        - 'api/**/*.ts'
   script:
     - cd api/ && npm ci && npm run type-coverage
 test_lint:
@@ -44,57 +40,69 @@ test_lint:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       changes:
-        - 'api/src/**.ts' 
+        - 'api/**/*.ts'
   script:
-    - cd api/ && npm ci && npm run lint  
-################################################### PROD
+    - cd api/ && npm ci && npm run lint
+
+
+# PROD
 build_prod:
   extends: .build_prod
-###################################### 
 lint_prod:
   extends: .lint_prod
-######################################    
 deploy_prod:
   extends: .deploy_prod
   rules:
   - if: $CI_COMMIT_REF_NAME == "master"
-    when: never
-###################################### 
+    when: manual
 dismiss_prod:
   extends: .dismiss_prod
   rules:
   - if: $CI_COMMIT_REF_NAME == "master"
-    when: never
-################################################### EUPROD
+    when: manual
+
+# EUPROD
 build_euprod:
   extends: .build_euprod
-######################################
 lint_euprod:
   extends: .lint_euprod
-######################################
 deploy_euprod:
   extends: .deploy_euprod
   rules:
   - if: $CI_COMMIT_REF_NAME == "master"
-    when: never  
-######################################
+    when: manual
 dismiss_euprod:
   extends: .dismiss_euprod
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
-      when: never
-################################################## STAGE
+      when: manual
+
+# STAGE
+.deploy_stage2:
+  variables:
+    k8s_cluster: $config_stage2
+    tag_ns: stage
+    repo_tag: gitlabstage
+  extends: .werf_deploy
+  environment:
+    name: staging
+    url: $CI_PROJECT_NAME-stage.mcnloc.ru
+    kubernetes:
+      namespace: staging
+
 build_stage:
   extends: .build_stage
-###################################### 
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 lint_stage:
   extends: .lint_stage
-######################################    
 deploy_stage:
-  extends: .deploy_stage
+  extends: .deploy_stage2
   rules:
-  - if: $CI_COMMIT_REF_NAME == "stage"
-    when: manual
-##################################### 
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
 dismiss_stage:
   extends: .dismiss_stage
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
