@@ -39,7 +39,7 @@ metadata:
 
 spec:
   rules:
-  {{- range prepend $hosts .Values.ci_url  }}
+  {{- range prepend $hosts .Values.CI_URL  }}
   - host: {{ . }}
     http:
       paths:

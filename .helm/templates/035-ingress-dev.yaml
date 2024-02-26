@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 100m
 spec:
   rules:
-  - host:  {{ .Values.ci_url  }}
+  - host:  {{ .Values.CI_URL  }}
     http:
       paths:
       - pathType: Prefix

@@ -30,7 +30,7 @@ ansible:
         - openssh-server
   - name: StrictHostKeyChecking no
     shell: |
-      printf "Host github.com\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
+      printf "Host gitlab.mcnloc.ru\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
 docker:
   WORKDIR: /workspace
   EXPOSE: "3000"
