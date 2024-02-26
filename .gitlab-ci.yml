@@ -5,19 +5,23 @@ include:
     file: 'build.shell.gitlab-ci.yml'
   - project: 'ci-cd/templates'
     ref: master
-    file: 'lint.shell.gitlab-ci.yml'
+    file: 'lintv2.shell.gitlab-ci.yml'
   - project: 'ci-cd/templates'
     ref: master
     file: 'deployv2.shell.gitlab-ci.yml'
   - project: 'ci-cd/templates'
     ref: master
     file: 'dismiss.shell.gitlab-ci.yml'
-  - project: 'ci-cd/templates'
-    ref: master
-    file: 'cleanup.shell.gitlab-ci.yml'
 
 .before:
   before_script:
+
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+  - dismiss
 
 # TEST
 .test:
@@ -43,7 +47,6 @@ test_lint:
         - 'api/**/*.ts'
   script:
     - cd api/ && npm ci && npm run lint
-
 
 # PROD
 build_prod:
@@ -78,26 +81,16 @@ dismiss_euprod:
       when: manual
 
 # STAGE
-.deploy_stage2:
-  variables:
-    k8s_cluster: $config_stage2
-    tag_ns: stage
-    repo_tag: gitlabstage
-  extends: .werf_deploy
-  environment:
-    name: staging
-    url: $CI_PROJECT_NAME-stage.mcnloc.ru
-    kubernetes:
-      namespace: staging
-
 build_stage:
   extends: .build_stage
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
 lint_stage:
   extends: .lint_stage
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 deploy_stage:
-  extends: .deploy_stage2
+  extends: .deploy_stage
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: manual
