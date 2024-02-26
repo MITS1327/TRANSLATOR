@@ -4,8 +4,17 @@ metadata:
   name: config-values
 data:
   {{- range $key, $val := index .Values .Values.global.env }}
-  {{ $key | snakecase | upper }}: {{ quote $val }} 
+  {{ $key | snakecase | upper }}: {{ quote $val }}
   {{- end }}
+
   {{- range $key, $val := index .Values "env-secrets" }}
-  {{ $key | snakecase | upper }}: {{ quote $val }} 
+  {{ $key | snakecase | upper }}: {{ quote $val }}
   {{- end }}
+
+  {{-  $secretDirectoryPath := printf "%s/%s/*" "secret" .Values.global.env -}}
+  {{ range $path, $_ :=  .Files.Glob $secretDirectoryPath }}
+  {{ $relativePath := $path | replace "secret/" "" -}}
+  {{-  $envPath := printf "%s/" $.Values.global.env -}}
+  {{ $name :=  $relativePath | replace $envPath "" | snakecase | upper | replace "." "_" -}}
+  {{ $name }}: {{ werf_secret_file $relativePath | b64enc }}
+  {{ end }}

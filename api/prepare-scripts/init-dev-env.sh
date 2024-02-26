@@ -1,8 +1,14 @@
-set -e
-
 DIR=/workspace
 cd $DIR
 
-[ ! -d translator ] &&
-    git clone git@github.com:welltime/translator.git --branch master || true
-cd translator/api && npm i && npm i -g @nestjs/cli && npm run build
+if ! [ -f $DIR/.gitclone ]; then
+    echo "1. Clone repo"
+
+    git clone git@gitlab.mcnloc.ru:platformav2/vpbx_team/translator.git \
+    && touch $DIR/.gitclone \
+    && cd translator/api \
+    && npm i \
+    && npm i -g @nestjs/cli \
+    && npm i -g npm-check-updates \
+    && npm run build
+fi

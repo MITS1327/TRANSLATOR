@@ -1,4 +1,6 @@
 {{- if  (eq .Values.global.env "dev") }}
+
+{{- $apiChartName := printf "%s-%s" .Chart.Name .Values.global.env -}}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -16,12 +18,26 @@ spec:
       labels:
         app: {{ .Chart.Name }}-api
     spec:
+      initContainers:
+      - name: prepare-dev-env
+        image: {{ index .Values.werf.image $apiChartName }}
+        envFrom:
+        - configMapRef:
+            name: config-values
+        volumeMounts:
+        - mountPath: /workspace
+          name: workspace-dev
+        - name: id-rsa-vcs
+          mountPath: /root/.ssh/id_rsa
+          subPath: id_rsa
+        command:
+          - "/bin/bash"
+          - "-c"
+          - "sudo /install/prepare-scripts/init-dev-env.sh"
       containers:
       - name: {{ .Chart.Name }}-api
-{{ tuple (printf "%s-%s-%s" .Chart.Name "api" (.Values.global.env)) . | include "werf_container_image" | indent 8 }}
+        image: {{ index .Values.werf.image $apiChartName }}
         env:
-        - name: SSH_AUTH_SOCK
-          value: /ssh-agent
         - name: IS_DEV
           value: "'true'"
         - name: PROJECT
@@ -31,15 +47,16 @@ spec:
             name: config-values
         volumeMounts:
         - mountPath: /workspace
-          name: workspace
-        - name: ssh-agent-sock
-          mountPath: /ssh-agent
+          name: workspace-dev
+        - name: id-rsa-vcs
+          mountPath: /root/.ssh/id_rsa
+          subPath: id_rsa
       volumes:
-      - name: workspace
-        hostPath:
-          path: /.volumes/workspace-{{ .Chart.Name }}-api
-      - name: ssh-agent-sock
-        hostPath:
-          path: /ssh-agent
-          type: Socket
+      - name: id-rsa-vcs
+        secret:
+          secretName: id-rsa-vcs
+          defaultMode: 0600
+      - name: workspace-dev
+        persistentVolumeClaim:
+          claimName: {{ .Chart.Name }}-workspace-pv-claim
 {{- end }}

@@ -2,37 +2,41 @@
 ---
 image: {{ .project }}-{{ .env }}
 from: {{ .BaseDevNodeImage }}
-docker:
-  WORKDIR: /workspace/
-  USER: root
-  EXPOSE: "3000"
-
+mount:
+- from: tmp_dir
+  to: /var/lib/apt/lists
+- from: build_dir
+  to: /var/cache/apt
 ansible:
- install:
- - name: Setting up ssh
-   shell: |
-     printf "Host github.com\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
-     echo 'export SSH_AUTH_SOCK=/ssh-agent' >> ~/.bashrc
- - name: "Install additional packages"
-   apt:
-     state: present
-     update_cache: yes
-     pkg:
-       - locales
-       - mc
-       - vim
-       - neovim
- - name: StrictHostKeyChecking no
-   shell: |
-     printf "Host github.com\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
----
-image: {{ .project }}-api-{{ .env }}
-fromImage: {{ .project }}-{{ .env }}
+  install:
+  - name: Disable docker hook for apt-cache deletion
+    shell: |
+      set -e
+      sed -i -e "s/DPkg::Post-Invoke.*//" /etc/apt/apt.conf.d/docker-clean
+      sed -i -e "s/APT::Update::Post-Invoke.*//" /etc/apt/apt.conf.d/docker-clean
+  - name: "Install additional packages"
+    apt:
+      state: present
+      update_cache: yes
+      pkg:
+        - git
+        - sudo
+        - curl
+        - wget
+        - net-tools
+        - telnet
+        - vim
+        - mc
+        - openssh-server
+  - name: StrictHostKeyChecking no
+    shell: |
+      printf "Host github.com\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
+docker:
+  WORKDIR: /workspace
+  EXPOSE: "3000"
+  ENTRYPOINT: ["/bin/sleep", "infinity"]
 git:
 - add: /api/prepare-scripts
   to: /install/prepare-scripts
-docker:
-  CMD: ["/bin/sleep", "infinity"]
-  WORKDIR: /workspace
 ---
 {{- end }}

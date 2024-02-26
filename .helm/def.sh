@@ -1,4 +1,4 @@
-export TAG=1.102
+export TAG=1.103
 export APPNAME=translator
 export NAMESPACE=translator
 
@@ -6,8 +6,10 @@ function dev()
 {
   export ENVNAME=dev
   export CLUSTER_IP=$(kubectl cluster-info | grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" | head -1)
-  export TLD="loc"
-  export DOMAIN="mcn.$TLD"
+  IP=$(hostname -I | awk '{print $1}');
+  IP=$(echo "${IP##*.}")
+  export TLD="ru"
+  export DOMAIN="$IP.mcnloc.$TLD"
   export CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
 }
 
@@ -19,9 +21,9 @@ function stage()
   export CI_URL="$APPNAME-$ENVNAME.$DOMAIN"
 }
 
-function spd1()
+function spd()
 {
-  export ENVNAME=spd1
+  export ENVNAME=spd
   export TLD="ru"
   export DOMAIN="mcnspd.$TLD"
   export CI_URL="$APPNAME.$DOMAIN"

@@ -1,0 +1,22 @@
+{{- if (eq .Values.global.env "dev") }}
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: id-rsa-vcs
+data:
+  id_rsa: {{ .Files.Get "tmp/id_rsa-vcs" | b64enc }}
+type: Opaque
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ .Chart.Name }}-workspace-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi
+  storageClassName: standard
+{{- end }}
