@@ -7,6 +7,11 @@ dev:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
+  kafkaBrokers: '["bootstrap-k8s-kafka-stage.mcnloc.ru:444"]'
+  kafkaClientId: translator_api_dev
+  kafkaGroupId: translator_api_dev
+  postgresHost: eridanus4.mcn.ru
+  postgresPort: 5432
 stage:
   replicaCount: 1
   keydbHost: keydb-stage
@@ -16,6 +21,11 @@ stage:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
+  kafkaBrokers: '["bootstrap-k8s-kafka-stage.mcnloc.ru:444"]'
+  kafkaClientId: translator_api_stage
+  kafkaGroupId: translator_api_stage
+  postgresHost: eridanus4.mcn.ru
+  postgresPort: 5432
 spd:
   replicaCount: 1
   keydbHost: keydb-spd
@@ -25,6 +35,11 @@ spd:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
+  kafkaBrokers: '["bootstrap-k8s-kafka-stage.mcnloc.ru:444"]'
+  kafkaClientId: translator_api_spd1
+  kafkaGroupId: translator_api_spd1
+  postgresHost: eridanus4.mcn.ru
+  postgresPort: 5432
 prod:
   replicaCount: 3
   keydbHost: keydb-prod
@@ -34,6 +49,19 @@ prod:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
+  kafkaBrokers: '["bootstrap-k8s-kafka3.mcn.ru:444"]'
+  kafkaClientId: translator_api
+  kafkaGroupId: translator_api
+  kafkaSecrets:
+    - name: KAFKA_KEY
+      secretName: prod-kafka3-cluster-ca-cert
+      secretKey: vpbx-team.key
+    - name: KAFKA_CRT
+      secretName: prod-kafka3-cluster-ca-cert
+      secretKey: vpbx-team.crt
+    - name: CLUSTER_CRT
+      secretName: prod-kafka3-cluster-ca-cert
+      secretKey: cluster-ca.crt
 euprod:
   replicaCount: 3
   keydbHost: keydb-euprod
@@ -43,6 +71,9 @@ euprod:
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: graylog.kompaas.tech
   graylogPort: 12201
+  kafkaBrokers: '["mcn-kafka-cluster-eu-kafka-bootstrap.kafka:9092"]'
+  kafkaClientId: translator_api
+  kafkaGroupId: translator_api
 dns:
   - prod: translator.myinno.net
     tls: translator.myinno.net

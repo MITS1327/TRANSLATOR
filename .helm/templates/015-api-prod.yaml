@@ -2,6 +2,8 @@
 
 {{- $apiChartName := printf "%s-%s" .Chart.Name .Values.global.env -}}
 {{- $replicaCount := index .Values (.Values.global.env) "replicaCount" -}}
+{{- $kafkaSecrets := index .Values (.Values.global.env) "kafkaSecrets" | default list -}}
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -39,6 +41,13 @@ spec:
         env:
         - name: PROJECT
           value: {{ printf "%s-%s" .Chart.Name (.Values.global.env)}}
+        {{- range $kafkaSecrets  }}
+        - name: {{ .name }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .secretName }}
+              key: {{ .secretKey }}
+        {{- end }}
         envFrom:
         - configMapRef:
             name: config-values
