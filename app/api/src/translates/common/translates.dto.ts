@@ -1,6 +1,6 @@
-import { Langs } from '@common/enums/langs.enum';
-import { PootleLangs } from '@common/enums/pootleLangs.enum';
-import { Projects } from '@common/enums/projects.enum';
+import { Langs } from 'api/src/common/enums/langs.enum';
+import { PootleLangs } from 'api/src/common/enums/pootleLangs.enum';
+import { Projects } from 'api/src/common/enums/projects.enum';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';

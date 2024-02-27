@@ -1,6 +1,6 @@
-import { Langs } from '@common/enums/langs.enum';
-import { Projects } from '@common/enums/projects.enum';
-import { RedisData } from '@common/interfaces/redisData.interface';
+import { Langs } from 'api/src/common/enums/langs.enum';
+import { Projects } from 'api/src/common/enums/projects.enum';
+import { RedisData } from 'api/src/common/interfaces/redisData.interface';
 
 export interface PootleFile {
   lang: string;

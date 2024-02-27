@@ -8,10 +8,9 @@
   "scripts": {
     "build": "nest build",
     "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
-    "lint": "prettier --write \"src/**/*.ts\" && eslint \"src/**/*.ts\" --fix --max-warnings 0",
+    "start-api:dev": "nest start --watch api",
+    "start-api:prod": "node dist/api/src/main",
+    "lint": "prettier --write \"{api,libs}/**/*.ts\" && eslint \"{api,libs}/**/*.ts\" --fix --max-warnings 0",
     "type-coverage": "typescript-coverage-report --ignore-files 'dist/**/*.*'",
     "type-coverage:console": "type-coverage --ignore-files 'dist/**/*.*' --detail",
     "prepare": "cd ../ && husky install",
@@ -61,7 +60,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "api/commitizen.js"
+      "path": "app/commitizen.js"
     }
   },
   "lint-staged": {

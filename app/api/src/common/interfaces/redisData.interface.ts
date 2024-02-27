@@ -1,4 +1,4 @@
-import { Dict } from '@common/types/dict.type';
+import { Dict } from 'api/src/common/types/dict.type';
 
 export interface RedisData {
   unixTime: string;

@@ -5,12 +5,12 @@ import { HttpService } from '@nestjs/axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { catchError, lastValueFrom, map, of } from 'rxjs';
 
-import { convertEnumValuesToArray } from '@utils';
+import { convertEnumValuesToArray } from 'api/src/utils';
 
-import { Dict } from '@common/types/dict.type';
-import { RedisData } from '@common/interfaces/redisData.interface';
+import { Dict } from 'api/src/common/types/dict.type';
+import { RedisData } from 'api/src/common/interfaces/redisData.interface';
 
-import { PootleFile } from 'src/translates/common/translates.interfaces';
+import { PootleFile } from 'api/src/translates/common/translates.interfaces';
 
 import { Projects } from '../common/enums/projects.enum';
 import { LangsFiles } from './common/langsFiles.enum';

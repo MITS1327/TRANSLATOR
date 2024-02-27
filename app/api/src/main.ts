@@ -1,4 +1,4 @@
-import { GraylogInterceptor } from '@common/interceptors/graylog.interceptor';
+import { GraylogInterceptor } from 'api/src/common/interceptors/graylog.interceptor';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';

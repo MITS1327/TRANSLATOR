@@ -17,10 +17,10 @@
 
 1. [Swagger](https://translator.mcn.ru/api/swagger)
 2. [Docs](https://translator.mcn.ru/docs/)
-3. [Описание сервиса (github)](api/README.md)
-4. [Установка сервиса (github)](api/docs/INSTALL.md)
-5. [Использование (github)](api/docs/USAGE.md)
-6. [Концепция работы микросервиса (github)](api/docs/ALGORITHMS.md)
+3. [Описание сервиса (github)](app/README.md)
+4. [Установка сервиса (github)](docs/INSTALL.md)
+5. [Использование (github)](docs/USAGE.md)
+6. [Концепция работы микросервиса (github)](docs/ALGORITHMS.md)
 
 ---
 

@@ -36,17 +36,17 @@ test_type-coverage:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       changes:
-        - 'api/**/*.ts'
+        - 'app/**/*.ts'
   script:
-    - cd api/ && npm ci && npm run type-coverage
+    - cd app/ && npm ci && npm run type-coverage
 test_lint:
   extends: .test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       changes:
-        - 'api/**/*.ts'
+        - 'app/**/*.ts'
   script:
-    - cd api/ && npm ci && npm run lint
+    - cd app/ && npm ci && npm run lint
 
 # PROD
 build_prod:

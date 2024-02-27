@@ -36,7 +36,7 @@ docker:
   EXPOSE: "3000"
   ENTRYPOINT: ["/bin/sleep", "infinity"]
 git:
-- add: /api/prepare-scripts
+- add: /app/prepare-scripts
   to: /install/prepare-scripts
 ---
 {{- end }}

@@ -19,13 +19,13 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@decorators/*": [
-        "src/common/decorators/*"
+        "api/src/common/decorators/*"
       ],
       "@common/*": [
-        "src/common/*"
+        "api/src/common/*"
       ],
       "@utils": [
-        "src/utils"
+        "api/src/utils"
       ]
     }
   }

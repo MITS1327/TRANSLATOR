@@ -4,8 +4,8 @@
 image: {{ .project }}-{{ .env }}
 from: {{ .BaseProdNodeImage }}
 git:
-- add: /api/
-  to: /workspace/translator/api
+- add: /app/
+  to: /workspace/translator/app
   stageDependencies:
     setup:
     - "*/**"
@@ -17,15 +17,15 @@ ansible:
   - name: "Install libs"
     shell: npm ci
     args:
-     chdir: /workspace/translator/api
+     chdir: /workspace/translator/app
   setup:
   - name: "Compile"
     shell: npm run build
     args:
-     chdir: /workspace/translator/api
+     chdir: /workspace/translator/app
 docker:
-  WORKDIR: /workspace/translator/api
+  WORKDIR: /workspace/translator/app
   EXPOSE: ["3000"]
-  ENTRYPOINT: "npm run start:prod"
+  ENTRYPOINT: "npm run start-api:prod"
 
 {{- end }}

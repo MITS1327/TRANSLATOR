@@ -1,6 +1,6 @@
-import { Projects } from '@common/enums/projects.enum';
-import { SupportGuard } from '@common/guards/support.guard';
-import { Project } from '@decorators/project.decorator';
+import { Projects } from 'api/src/common/enums/projects.enum';
+import { SupportGuard } from 'api/src/common/guards/support.guard';
+import { Project } from 'api/src/common/decorators/project.decorator';
 import { Body, Controller, Get, Headers, Post, Query, Res, UseGuards, Version } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -40,7 +40,7 @@ export class TranslatesController {
     const responseTranslatorProductsHash = { ...requestHeader, [projectName]: unixTime };
 
     if (unixTime !== requestHeader?.[projectName]) {
-      response.set({'x-products-hash': JSON.stringify(responseTranslatorProductsHash)});
+      response.set({ 'x-products-hash': JSON.stringify(responseTranslatorProductsHash) });
       response.json(filesData);
     } else {
       response.send();

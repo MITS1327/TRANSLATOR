@@ -6,11 +6,11 @@ import { Cache } from 'cache-manager';
 import { AxiosResponse } from 'axios';
 import { catchError, lastValueFrom, map } from 'rxjs';
 
-import { convertEnumToObject, convertEnumValuesToArray, findObjectKeyByValue } from '@utils';
+import { convertEnumToObject, convertEnumValuesToArray, findObjectKeyByValue } from 'api/src/utils';
 
-import { RedisData } from '@common/interfaces/redisData.interface';
-import { LangDict } from '@common/interfaces/langDict.interface';
-import { Langs } from '@common/enums/langs.enum';
+import { RedisData } from 'api/src/common/interfaces/redisData.interface';
+import { LangDict } from 'api/src/common/interfaces/langDict.interface';
+import { Langs } from 'api/src/common/enums/langs.enum';
 
 import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/translates.dto';
 import { GetDictsRO, NotTranslatedDictsRO, NotTranslatedKey } from './common/translates.interfaces';

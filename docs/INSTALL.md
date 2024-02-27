@@ -28,7 +28,7 @@ $ ./00-build-deploy.sh translator
 5. Переходим в рабочую директорию внутри пода:
 
 ```bash
-$ cd workspace/translator/api/
+$ cd workspace/translator/app/
 ```
 
 ## Installation
