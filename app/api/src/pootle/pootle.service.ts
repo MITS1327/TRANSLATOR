@@ -1,16 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { catchError, lastValueFrom, map, of } from 'rxjs';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
-import { convertEnumValuesToArray } from 'api/src/utils';
-
-import { Dict } from 'api/src/common/types/dict.type';
 import { RedisData } from 'api/src/common/interfaces/redisData.interface';
-
+import { Dict } from 'api/src/common/types/dict.type';
 import { PootleFile } from 'api/src/translates/common/translates.interfaces';
+import { convertEnumValuesToArray } from 'api/src/utils';
+import { Cache } from 'cache-manager';
+import { catchError, lastValueFrom, map, of } from 'rxjs';
 
 import { Projects } from '../common/enums/projects.enum';
 import { LangsFiles } from './common/langsFiles.enum';

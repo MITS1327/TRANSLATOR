@@ -1,6 +1,8 @@
-import { Projects } from 'api/src/common/enums/projects.enum';
 import { ApiProperty } from '@nestjs/swagger';
+
+import { Projects } from 'api/src/common/enums/projects.enum';
 import { IsEnum, IsNotEmpty } from 'class-validator';
+
 import { LangsFiles } from './langsFiles.enum';
 
 export class UpdateDictsParams {

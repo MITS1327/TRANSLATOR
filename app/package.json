@@ -5,6 +5,12 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "workspaces": {
+    "packages": [
+      "libs/shared/",
+      "api/"
+    ]
+  },
   "scripts": {
     "build": "nest build",
     "start": "nest start",
@@ -13,6 +19,10 @@
     "lint": "prettier --write \"{api,libs}/**/*.ts\" && eslint \"{api,libs}/**/*.ts\" --fix --max-warnings 0",
     "type-coverage": "typescript-coverage-report --ignore-files 'dist/**/*.*'",
     "type-coverage:console": "type-coverage --ignore-files 'dist/**/*.*' --detail",
+    "migration:up": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ormconfig.ts",
+    "migration:down": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d ormconfig.ts",
+    "migration:generate": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ormconfig.ts",
+    "migration:create": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:create",
     "prepare": "cd ../ && husky install",
     "pre-commit": "lint-staged"
   },
@@ -22,18 +32,25 @@
     "@nestjs/common": "^10.2.10",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.2.10",
+    "@nestjs/microservices": "^10.3.3",
     "@nestjs/platform-express": "^10.2.10",
     "@nestjs/swagger": "^7.1.16",
     "@nestjs/terminus": "^10.2.0",
+    "@nestjs/typeorm": "^10.0.2",
     "cache-manager": "^5.3.1",
-    "cache-manager-redis-yet": "^4.1.2",
+    "cache-manager-ioredis-yet": "^1.2.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "graylog2": "^0.2.1",
-    "redis": "^4.6.11",
+    "ioredis": "^5.3.2",
+    "kafkajs": "^2.2.4",
+    "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.20",
+    "typeorm-naming-strategies": "^4.1.0",
+    "typeorm-transactional": "^0.5.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
@@ -47,6 +64,7 @@
     "@typescript-eslint/parser": "^6.13.1",
     "commitizen": "^4.3.0",
     "eslint": "^8.54.0",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
     "husky": "^8.0.3",
     "lint-staged": "^15.1.0",
     "prettier": "^3.1.0",

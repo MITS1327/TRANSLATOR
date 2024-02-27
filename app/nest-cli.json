@@ -5,6 +5,15 @@
   "sourceRoot": "./",
   "root": "./",
   "projects": {
+    "shared": {
+      "type": "library",
+      "root": "libs/shared",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
+      }
+    },
     "api": {
       "type": "application",
       "root": "api",

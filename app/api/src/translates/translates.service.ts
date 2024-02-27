@@ -1,22 +1,20 @@
-import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Cache } from 'cache-manager';
+
+import { Langs } from 'api/src/common/enums/langs.enum';
+import { LangDict } from 'api/src/common/interfaces/langDict.interface';
+import { RedisData } from 'api/src/common/interfaces/redisData.interface';
+import { convertEnumToObject, convertEnumValuesToArray, findObjectKeyByValue } from 'api/src/utils';
 import { AxiosResponse } from 'axios';
+import { Cache } from 'cache-manager';
 import { catchError, lastValueFrom, map } from 'rxjs';
 
-import { convertEnumToObject, convertEnumValuesToArray, findObjectKeyByValue } from 'api/src/utils';
-
-import { RedisData } from 'api/src/common/interfaces/redisData.interface';
-import { LangDict } from 'api/src/common/interfaces/langDict.interface';
-import { Langs } from 'api/src/common/enums/langs.enum';
-
-import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/translates.dto';
-import { GetDictsRO, NotTranslatedDictsRO, NotTranslatedKey } from './common/translates.interfaces';
-
 import { Projects } from '../common/enums/projects.enum';
+import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/translates.dto';
 import { OrderByOptions } from './common/translates.enum';
+import { GetDictsRO, NotTranslatedDictsRO, NotTranslatedKey } from './common/translates.interfaces';
 
 @Injectable()
 export class TranslatesService {

@@ -1,13 +1,18 @@
-import { GraylogInterceptor } from 'api/src/common/interceptors/graylog.interceptor';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+import { GraylogInterceptor } from 'api/src/common/interceptors/graylog.interceptor';
 import { useContainer } from 'class-validator';
 import * as cookieParser from 'cookie-parser';
+import { initializeTransactionalContext } from 'typeorm-transactional';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  initializeTransactionalContext();
+
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
@@ -19,8 +24,8 @@ async function bootstrap() {
   });
   app.useGlobalInterceptors(
     new GraylogInterceptor(
-      configService.get('graylog.host'),
-      configService.get('graylog.port'),
+      configService.get('common.host'),
+      configService.get('common.port'),
       configService.get('common.project'),
     ),
   );

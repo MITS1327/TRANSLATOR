@@ -27,7 +27,7 @@ stages:
 .test:
   tags:
     - docker
-  image: node:20
+  image: node:20-alpine
   stage: test
   allow_failure: true
 

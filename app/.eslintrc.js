@@ -1,6 +1,9 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'],
+  parserOptions: {
+    sourceType: 'module',
+  },
+  plugins: ['@typescript-eslint', 'simple-import-sort'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
@@ -12,22 +15,52 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.js'],
+      files: ['*.js', '*.ts'],
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
+        'simple-import-sort/imports': [
+          'error',
+          {
+            groups: [
+              ['^(@nestjs)(\\.*|$)'],
+              ['^(?!(@translator\\/|@nestjs\\/|\\.\\.\\/|\\.\\/|$)).*'],
+              ['^(@translator/core)(\\.*|$)'],
+              ['^(@translator/messaging)(\\.*|$)'],
+              ['^(@translator/shared)(\\.*|$)'],
+              ['^(@translator/api)(\\.*|$)'],
+            ],
+          },
+        ],
       },
     },
   ],
   rules: {
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
     // Suggestions
     'no-var': 'error',
-    'one-var': [2, "never"],
+    'one-var': [2, 'never'],
     'prefer-const': 'error',
     // Possible Problems
     'no-duplicate-imports': 'error',
     'no-self-compare': 'error',
     'no-use-before-define': 'error',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      },
+    ],
     // Layout & Formatting
+    '@typescript-eslint/no-empty-interface': [
+      'error',
+      {
+        allowSingleExtends: true,
+      },
+    ],
     semi: 'warn',
     curly: 2,
     indent: [
@@ -82,6 +115,6 @@ module.exports = {
     quotes: ['warn', 'single'],
     'template-curly-spacing': ['warn', 'never'],
     'max-lines-per-function': ['warn', { max: 50, skipComments: true, skipBlankLines: true }],
-    'newline-per-chained-call': ['warn', { "ignoreChainWithDepth": 3 }],
+    'newline-per-chained-call': ['warn', { ignoreChainWithDepth: 3 }],
   },
 };

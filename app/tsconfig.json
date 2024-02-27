@@ -26,7 +26,31 @@
       ],
       "@utils": [
         "api/src/utils"
-      ]
+      ],
+      "@translator/shared": [
+        "libs/shared/src"
+      ],
+      "@translator/shared/*": [
+        "libs/shared/src/*"
+      ],
+      "@translator/core": [
+        "libs/core/src"
+      ],
+      "@translator/core/*": [
+        "libs/core/src/*"
+      ],
+      "@translator/messaging": [
+        "libs/messaging/src"
+      ],
+      "@translator/messaging/*": [
+        "libs/messaging/src/*"
+      ],
+      "@translator/api/": [
+        "api/src"
+      ],
+      "@translator/api/*": [
+        "api/src/*"
+      ],
     }
   }
 }

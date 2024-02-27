@@ -1,33 +1,37 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-yet';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TranslatesModule } from './translates/translates.module';
+import { redisStore } from 'cache-manager-ioredis-yet';
+import { DataSource } from 'typeorm';
+import { addTransactionalDataSource } from 'typeorm-transactional';
+
+import configs from '@translator/shared/configs';
+
 import { HealthModule } from './health/health.module';
 import { PootleModule } from './pootle/pootle.module';
-
-import keydbConfig from './config/keydb.config';
-import pootleConfig from './config/pootle.config';
-import graylogConfig from './config/graylog.config';
-import commonConfig from './config/common.config';
+import { TranslatesModule } from './translates/translates.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [keydbConfig, pootleConfig, graylogConfig, commonConfig],
+      load: configs,
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({ ...configService.getOrThrow('db') }),
+      dataSourceFactory: async (options) => addTransactionalDataSource(new DataSource(options)),
     }),
     CacheModule.registerAsync({
       imports: [ConfigModule],
       isGlobal: true,
       useFactory: async (configService: ConfigService) => ({
         store: await redisStore({
-          socket: {
-            host: configService.getOrThrow('keydb.host'),
-            port: configService.getOrThrow('keydb.port'),
-          },
-          database: 1,
+          host: configService.getOrThrow('keydb.host'),
+          port: configService.getOrThrow('keydb.port'),
+          db: 1,
         }),
       }),
       inject: [ConfigService],

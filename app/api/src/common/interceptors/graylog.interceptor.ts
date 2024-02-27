@@ -8,10 +8,11 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Request, Response } from 'express';
-import { Observable, tap } from 'rxjs';
+
 import { randomBytes } from 'crypto';
+import { Request, Response } from 'express';
 import * as graylog from 'graylog2';
+import { Observable, tap } from 'rxjs';
 
 @Injectable()
 export class GraylogInterceptor implements NestInterceptor {

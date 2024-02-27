@@ -1,6 +1,3 @@
-import { Projects } from 'api/src/common/enums/projects.enum';
-import { SupportGuard } from 'api/src/common/guards/support.guard';
-import { Project } from 'api/src/common/decorators/project.decorator';
 import { Body, Controller, Get, Headers, Post, Query, Res, UseGuards, Version } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -10,7 +7,12 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { Project } from 'api/src/common/decorators/project.decorator';
+import { Projects } from 'api/src/common/enums/projects.enum';
+import { SupportGuard } from 'api/src/common/guards/support.guard';
 import { Response } from 'express';
+
 import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/translates.dto';
 import { TranslatesService } from './translates.service';
 

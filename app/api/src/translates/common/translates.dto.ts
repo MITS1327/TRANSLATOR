@@ -1,9 +1,11 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
 import { Langs } from 'api/src/common/enums/langs.enum';
 import { PootleLangs } from 'api/src/common/enums/pootleLangs.enum';
 import { Projects } from 'api/src/common/enums/projects.enum';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+
 import { OrderByOptions, SortFieldsForNotTranslatedKeys } from './translates.enum';
 
 export class GetDictDTO {
