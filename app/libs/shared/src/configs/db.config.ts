@@ -21,7 +21,7 @@ export const defaultDatabaseConfig: Omit<BaseDataSourceOptions, 'type'> = {
   synchronize: false,
   entities: [path.join(__dirname, '../../../{core,messaging}/**/*.entity.{ts,js}')],
   namingStrategy: new SnakeNamingStrategy(),
-  migrationsTableName: 'migrations',
+  migrationsTableName: 'migration',
   migrationsRun: true,
   migrations: MIGRATIONS,
 };
