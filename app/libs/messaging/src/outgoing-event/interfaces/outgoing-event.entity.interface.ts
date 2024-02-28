@@ -1,4 +1,4 @@
-import { BaseEntity } from '@vpbx/shared';
+import { BaseEntity } from '@translator/shared';
 
 export interface OutgoingEventEntity extends BaseEntity {
   id: string;

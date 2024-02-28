@@ -3,7 +3,7 @@
 Event
 
 ```ts
-import { BaseEventImpl, KafkaEvent, OutgoingEventTypeEnum } from '@vpbx/messaging/outgoing-event';
+import { BaseEventImpl, KafkaEvent, OutgoingEventTypeEnum } from '@translator/messaging/outgoing-event';
 
 export interface AnyClientEventData {
   testField: string;
@@ -29,7 +29,7 @@ export class AnyKafkaEvent extends AnyEvent implements KafkaEvent {
 Module
 ```ts
 
-import { OutgoingEventModule } from '@vpbx/messaging/outgoing-event';
+import { OutgoingEventModule } from '@translator/messaging/outgoing-event';
 
 @Module({
   imports: [...otherImports, OutgoingEventModule],
@@ -52,7 +52,7 @@ Recomend to use ```emit``` with message broker with commit functionality.
 Flow: app read message broker -> do any manipulation with read message -> emit to another message broker -> commit
 
 ```ts
-import { OutgoingEventService } from '@vpbx/messaging/outgoing-event';
+import { OutgoingEventService } from '@translator/messaging/outgoing-event';
 ...
 
 export class AnyService {

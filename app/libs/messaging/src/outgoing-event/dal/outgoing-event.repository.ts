@@ -1,7 +1,8 @@
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { BaseRepositoryImpl } from '@vpbx/shared/dal';
 import { Repository } from 'typeorm';
+
+import { BaseRepositoryImpl } from '@translator/shared/dal';
 
 import { OutgoingEventRepository } from '../interfaces';
 import { OutgoingEventEntityImpl } from './outgoing-event.entity';

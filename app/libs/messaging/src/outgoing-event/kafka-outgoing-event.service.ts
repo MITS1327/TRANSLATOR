@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 
-import { KAFKA_PROVIDER } from '@vpbx/shared';
 import { firstValueFrom } from 'rxjs';
+
+import { KAFKA_PROVIDER } from '@translator/shared';
 
 import { KafkaEvent, KafkaOutgoingEventService, OutgoingEventRepository } from './interfaces';
 import { OUTGOING_EVENT_REPOSITORY_PROVIDER } from './outgoing-event.di-tokens';

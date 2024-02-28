@@ -1,4 +1,4 @@
-import { BaseRepository } from '@vpbx/shared/dal';
+import { BaseRepository } from '@translator/shared/dal';
 
 import { OutgoingEventEntity } from './outgoing-event.entity.interface';
 
