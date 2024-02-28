@@ -10,6 +10,7 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 import configs from '@translator/shared/configs';
 
 import { HealthModule } from './health/health.module';
+import { LangModule } from './lang';
 import { PootleModule } from './pootle/pootle.module';
 import { ProjectModule } from './project';
 import { TranslatesModule } from './translates/translates.module';
@@ -41,6 +42,7 @@ import { TranslatesModule } from './translates/translates.module';
     HealthModule,
     PootleModule,
     ProjectModule,
+    LangModule,
   ],
 })
 export class AppModule {}
