@@ -4,14 +4,18 @@ import { Repository } from 'typeorm';
 
 import { BaseRepositoryImpl } from '@translator/shared/dal';
 
-import { ProjectRepository } from '../interfaces';
+import { ProjectEntity, ProjectRepository } from '../interfaces';
 import { ProjectEntityImpl } from './project.entity';
 
 export class ProjectRepositoryImpl extends BaseRepositoryImpl<ProjectEntityImpl> implements ProjectRepository {
   constructor(
     @InjectRepository(ProjectEntityImpl)
-    private projectRepositoryRepository: Repository<ProjectEntityImpl>,
+    private projectRepository: Repository<ProjectEntityImpl>,
   ) {
-    super(projectRepositoryRepository.target, projectRepositoryRepository.manager);
+    super(projectRepository.target, projectRepository.manager);
+  }
+
+  getByIdAndLock(id: number): Promise<ProjectEntity> {
+    return this.projectRepository.findOne({ where: { id }, lock: { mode: 'pessimistic_write', tables: ['project'] } });
   }
 }
