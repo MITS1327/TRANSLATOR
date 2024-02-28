@@ -11,6 +11,7 @@ import configs from '@translator/shared/configs';
 
 import { HealthModule } from './health/health.module';
 import { PootleModule } from './pootle/pootle.module';
+import { ProjectModule } from './project';
 import { TranslatesModule } from './translates/translates.module';
 
 @Module({
@@ -39,8 +40,7 @@ import { TranslatesModule } from './translates/translates.module';
     TranslatesModule,
     HealthModule,
     PootleModule,
+    ProjectModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}

@@ -8,9 +8,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { OnlySupportGuard } from '@common/guards';
 import { Project } from 'api/src/common/decorators/project.decorator';
 import { Projects } from 'api/src/common/enums/projects.enum';
-import { SupportGuard } from 'api/src/common/guards/support.guard';
 import { Response } from 'express';
 
 import { ChangeKeyDTO, GetDictDTO, GetNotTranslatedDictsDTO } from './common/translates.dto';
@@ -64,7 +64,7 @@ export class TranslatesController {
   @ApiOkResponse({ description: 'Successfully get langs' })
   @ApiForbiddenResponse({ description: 'You need a support role' })
   @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
-  @UseGuards(SupportGuard)
+  @UseGuards(OnlySupportGuard)
   async getLangs() {
     return this.translatesService.getLangs();
   }
@@ -74,7 +74,7 @@ export class TranslatesController {
   @ApiOkResponse({ description: 'Successfully get projects' })
   @ApiForbiddenResponse({ description: 'You need a support role' })
   @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
-  @UseGuards(SupportGuard)
+  @UseGuards(OnlySupportGuard)
   async getProjects() {
     return this.translatesService.getProjects();
   }
@@ -84,7 +84,7 @@ export class TranslatesController {
   @ApiOkResponse({ description: 'Successfully get not translated projects' })
   @ApiForbiddenResponse({ description: 'You need a support role' })
   @ApiInternalServerErrorResponse({ description: 'Something went wrong' })
-  @UseGuards(SupportGuard)
+  @UseGuards(OnlySupportGuard)
   async getNotTranslatedDicts(@Query() data: GetNotTranslatedDictsDTO) {
     return this.translatesService.getNotTranslatedDicts(data);
   }

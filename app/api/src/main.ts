@@ -24,8 +24,8 @@ async function bootstrap() {
   });
   app.useGlobalInterceptors(
     new GraylogInterceptor(
-      configService.get('common.host'),
-      configService.get('common.port'),
+      configService.get('common.graylogHost'),
+      configService.get('common.graylogPort'),
       configService.get('common.project'),
     ),
   );
