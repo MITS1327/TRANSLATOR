@@ -57,6 +57,10 @@ export abstract class BaseRepositoryImpl<T extends BaseEntity> implements BaseRe
     return entry;
   }
 
+  async getCountBy(filter: FilterOptions<T>): Promise<number> {
+    return this.repo.countBy(filter as FindOptionsWhere<T>);
+  }
+
   async getManyBy(filter: FilterOptions<T>): Promise<T[]> {
     return this.repo.findBy(filter as FindOptionsWhere<T>);
   }

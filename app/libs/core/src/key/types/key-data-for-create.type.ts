@@ -1,7 +1,7 @@
 import { LangEntity } from '@translator/core/lang';
 
-import { KeyEntity } from '../interfaces';
+import { TranslatedKeyEntity } from '../interfaces';
 
-export type KeyDataForCreate = Omit<KeyEntity, 'id' | 'createdAt' | 'updatedAt'> & {
+export type KeyDataForCreate = Omit<TranslatedKeyEntity, 'id' | 'createdAt' | 'updatedAt'> & {
   langName: LangEntity['name'];
 };

@@ -1,5 +1,5 @@
 import { GetDataWithFilterDTO } from '@common/dtos';
 
-import { KeyEntity } from '@translator/core/key';
+import { TranslatedKeyEntity } from '@translator/core/key';
 
-export class GetKeysWithFilterDTO extends GetDataWithFilterDTO<KeyEntity> {}
+export class GetTranslatedKeysWithFilterDTO extends GetDataWithFilterDTO<TranslatedKeyEntity> {}

@@ -8,10 +8,15 @@ import { KEY_SERVICE_PROVIDER, KeyService } from '@translator/core/key';
 
 import { CacheKeyService } from '../cache-key.service';
 import { HEADER_FOR_TIMESTAMP } from '../constants';
-import { CreateKeyDTO, GetGroupedKeysDTO, GetKeysWithFilterDTO, UpdateKeyDTO } from '../dtos';
+import {
+  CreateKeyDTO,
+  GetGroupedKeysDTO,
+  GetTranslatedKeysWithFilterDTO,
+  UpdateKeyDTO,
+  UpdateKeyTranslateDTO,
+} from '../dtos';
 
 @Controller({
-  path: 'keys',
   version: 'private',
 })
 @ApiTags('keys')
@@ -21,24 +26,29 @@ export class KeyPrivateHttpController {
     private readonly cacheKeyService: CacheKeyService,
   ) {}
 
-  @Post()
+  @Post('keys')
   createKey(@UserId() userId: string, @Body() data: CreateKeyDTO) {
     return this.coreKeyService.createKey({ ...data, userId });
   }
 
-  @Get()
-  getKeys(@Query() data: GetKeysWithFilterDTO) {
-    return this.coreKeyService.getKeys(data);
+  @Get('translated-keys')
+  getTranslatedKeys(@Query() data: GetTranslatedKeysWithFilterDTO) {
+    return this.coreKeyService.getTranslatedKeys(data);
+  }
+
+  @Patch('keys/:name')
+  updateKey(@Param('name') name: string, @Body() data: UpdateKeyDTO) {
+    return this.coreKeyService.updateKey({ ...data, name });
   }
 
   @ApiHeader({ name: HEADER_FOR_TIMESTAMP, description: 'Product keys cache timestamp', required: false })
-  @Get('/grouped')
-  async getProjectKeys(
+  @Get('translated-keys/grouped')
+  async getProjectTranslatedKeys(
     @Query() data: GetGroupedKeysDTO,
     @Res() response: Response,
     @Headers(HEADER_FOR_TIMESTAMP) requestTimestamp: string,
   ) {
-    const result = await this.cacheKeyService.getGroupedKeys(
+    const result = await this.cacheKeyService.getGroupedTranslatedKeys(
       data.projectId,
       requestTimestamp ? +requestTimestamp : null,
     );
@@ -53,8 +63,12 @@ export class KeyPrivateHttpController {
     response.json(result.keys);
   }
 
-  @Patch(':id')
-  updateKey(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateKeyDTO) {
-    return this.coreKeyService.updateKey({ ...data, id });
+  @Patch('translated-keys/:id')
+  updateKeyTranslate(
+    @UserId() userId: string,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: UpdateKeyTranslateDTO,
+  ) {
+    return this.coreKeyService.updateKeyTranslate({ ...data, userId, id });
   }
 }

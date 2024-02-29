@@ -5,6 +5,7 @@ export interface BaseRepository<T extends BaseEntity> {
   getOneById(id: T['id']): Promise<T | null>;
   getOneBy(filter: FilterOptions<T>): Promise<T>;
   getManyBy(filter: FilterOptions<T>): Promise<T[]>;
+  getCountBy(filter: FilterOptions<T>): Promise<number>;
   getWithLimitAndOffset(
     filter: FilterOptions<T>,
     limit: number,

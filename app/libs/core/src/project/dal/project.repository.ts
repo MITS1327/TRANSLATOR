@@ -15,7 +15,7 @@ export class ProjectRepositoryImpl extends BaseRepositoryImpl<ProjectEntityImpl>
     super(projectRepository.target, projectRepository.manager);
   }
 
-  getByIdAndLock(id: number): Promise<ProjectEntity> {
+  getOneByIdAndLock(id: number): Promise<ProjectEntity> {
     return this.projectRepository.findOne({ where: { id }, lock: { mode: 'pessimistic_write', tables: ['project'] } });
   }
 }

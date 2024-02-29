@@ -1,5 +1,5 @@
 import { GetDataWithFilterInputObject } from '@translator/shared';
 
-import { KeyEntity } from '../interfaces';
+import { TranslatedKeyEntity } from '../interfaces';
 
-export interface GetKeysWithFilterInputObject extends GetDataWithFilterInputObject<KeyEntity> {}
+export interface GetKeysWithFilterInputObject extends GetDataWithFilterInputObject<TranslatedKeyEntity> {}

@@ -1,5 +1,8 @@
 import { LangEntity } from '@translator/core/lang';
 
-import { KeyEntity } from '../interfaces';
+import { TranslatedKeyEntity } from '../interfaces';
 
-export type GroupedKeysByLangName = Record<LangEntity['name'], Record<KeyEntity['name'], KeyEntity['value']>>;
+export type GroupedTranslatedKeysByLangName = Record<
+  LangEntity['name'],
+  Record<TranslatedKeyEntity['name'], TranslatedKeyEntity['value']>
+>;

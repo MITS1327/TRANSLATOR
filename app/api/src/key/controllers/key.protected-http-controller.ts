@@ -7,7 +7,6 @@ import { KeyPrivateHttpController } from './key.private-http-controller';
 
 @UseGuards(OnlySupportGuard)
 @Controller({
-  path: 'keys',
   version: 'protected',
 })
 @ApiTags('keys')

@@ -19,11 +19,11 @@ export class CacheKeyService {
     return `${this.PREFIX_FOR_TIMESTAMP}:${projectId}`;
   }
 
-  private getGroupedKeysCacheKey(projectId: ProjectEntity['id']): string {
+  private getGroupedTranslatedKeysCacheKey(projectId: ProjectEntity['id']): string {
     return `${this.PREFIX_FOR_GROUPED_KEYS}:${projectId}`;
   }
 
-  async getGroupedKeys(
+  async getGroupedTranslatedKeys(
     projectId: ProjectEntity['id'],
     timestamp: number,
   ): Promise<{
@@ -37,13 +37,13 @@ export class CacheKeyService {
     }
 
     let cacheData = await this.inMemoryStorageService.get<Record<string, unknown>>(
-      this.getGroupedKeysCacheKey(projectId),
+      this.getGroupedTranslatedKeysCacheKey(projectId),
     );
     if (!cacheData) {
-      const data = await this.coreKeyService.getProjectKeysGroupedByLangName(projectId);
+      const data = await this.coreKeyService.getTranslatedKeysGroupedByLangName(projectId);
       const timestamp = Date.now();
       const setDataCommand = await this.inMemoryStorageService.getUpsertCommand(
-        this.getGroupedKeysCacheKey(projectId),
+        this.getGroupedTranslatedKeysCacheKey(projectId),
         data,
       );
       const updateTimestampCommand = await this.inMemoryStorageService.getUpsertCommand(

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsNumber, IsString, NotEquals, ValidateIf, ValidateNested } from 'class-validator';
 
 class KeyValueDTO {
@@ -12,13 +12,20 @@ class KeyValueDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  @Transform(({ value }) => value?.trim())
   value: string;
 }
 
 export class CreateKeyDTO {
   @ApiProperty()
   @IsNotEmpty()
+  @Transform(({ value }) => value?.trim())
   name: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.trim())
+  comment: string;
 
   @ApiProperty()
   @IsNotEmpty()

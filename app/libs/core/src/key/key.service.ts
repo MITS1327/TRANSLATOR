@@ -13,29 +13,36 @@ import { GetDataWithFilterOutputObject } from '@translator/shared';
 import { LANG_REPOSITORY_PROVIDER, LangRepository } from '../lang';
 import { PROJECT_REPOSITORY_PROVIDER, ProjectEntity, ProjectRepository } from '../project';
 import { CreateKeyKafkaEvent, UpdateKeyKafkaEvent } from './events';
-import { CreateKeyInputObject, GetKeysWithFilterInputObject, UpdateKeyInputObject } from './input-objects';
-import { KeyEntity, KeyRepository, KeyService } from './interfaces';
+import {
+  CreateKeyInputObject,
+  GetKeysWithFilterInputObject,
+  UpdateKeyInputObject,
+  UpdateTranslatedKeyInputObject,
+} from './input-objects';
+import { KeyService, TranslatedKeyEntity, TranslatedKeyRepository } from './interfaces';
 import { KEY_REPOSITORY_PROVIDER } from './key.di-tokens';
-import { GroupedKeysByLangName, KeyDataForCreate } from './types';
+import { GroupedTranslatedKeysByLangName, KeyDataForCreate } from './types';
 
 @Injectable()
 export class KeyServiceImpl implements KeyService {
   constructor(
-    @Inject(KEY_REPOSITORY_PROVIDER) private readonly keyRepository: KeyRepository,
+    @Inject(KEY_REPOSITORY_PROVIDER) private readonly keyRepository: TranslatedKeyRepository,
     @Inject(LANG_REPOSITORY_PROVIDER) private readonly langRepository: LangRepository,
     @Inject(PROJECT_REPOSITORY_PROVIDER) private readonly projectRepository: ProjectRepository,
     @Inject(KAFKA_OUTGOING_EVENT_SERVICE_PROVIDER) private readonly outgoingEventService: BaseOutgoingEventService,
   ) {}
 
-  async getKeys(data: GetKeysWithFilterInputObject): Promise<GetDataWithFilterOutputObject<KeyEntity>> {
+  async getTranslatedKeys(
+    data: GetKeysWithFilterInputObject,
+  ): Promise<GetDataWithFilterOutputObject<TranslatedKeyEntity>> {
     const { limit, offset, sortBy, orderBy, filter } = data;
     const additionalFilter = this.keyRepository.filterBuilder(filter);
 
     return this.keyRepository.getWithLimitAndOffset(additionalFilter, limit, offset, orderBy, sortBy);
   }
 
-  async getProjectOrThrow(projectId: ProjectEntity['id']): Promise<ProjectEntity> {
-    const project = await this.projectRepository.getOneById(projectId);
+  async getProjectWithLockOrThrow(projectId: ProjectEntity['id']): Promise<ProjectEntity> {
+    const project = await this.projectRepository.getOneByIdAndLock(projectId);
     if (!project) {
       throw new NotFoundException('Project not found');
     }
@@ -45,7 +52,7 @@ export class KeyServiceImpl implements KeyService {
 
   @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
   async createKey(data: CreateKeyInputObject): Promise<void> {
-    const project = await this.getProjectOrThrow(data.projectId);
+    const project = await this.getProjectWithLockOrThrow(data.projectId);
 
     const langs = await this.langRepository.getAll();
     const valuesObject =
@@ -58,13 +65,22 @@ export class KeyServiceImpl implements KeyService {
       ) || {};
 
     const keys: KeyDataForCreate[] = langs.map((lang) => {
+      const keyValue = valuesObject[lang.id] || data.name;
+
       return {
         name: data.name,
         projectId: data.projectId,
-        userId: data.userId,
-        value: valuesObject[lang.id] || data.name,
+        value: keyValue,
         langId: lang.id,
         langName: lang.name,
+        logs: [
+          {
+            newValue: keyValue,
+            oldValue: '',
+            userId: data.userId,
+          },
+        ],
+        comment: data.comment,
       };
     });
 
@@ -82,8 +98,8 @@ export class KeyServiceImpl implements KeyService {
     await this.keyRepository.createBulk(keys);
   }
 
-  async getProjectKeysGroupedByLangName(projectId: ProjectEntity['id']): Promise<GroupedKeysByLangName> {
-    await this.getProjectOrThrow(projectId);
+  async getTranslatedKeysGroupedByLangName(projectId: ProjectEntity['id']): Promise<GroupedTranslatedKeysByLangName> {
+    await this.getProjectWithLockOrThrow(projectId);
 
     const langs = await this.langRepository.getAll();
     const keyObjectArray = await Promise.all(
@@ -92,7 +108,7 @@ export class KeyServiceImpl implements KeyService {
 
         return {
           [lang.name]: keys.map((key) => ({ [key.name]: key.value })),
-        } as unknown as GroupedKeysByLangName;
+        } as unknown as GroupedTranslatedKeysByLangName;
       }),
     );
 
@@ -105,8 +121,8 @@ export class KeyServiceImpl implements KeyService {
     );
   }
 
-  async getKeyByIdOrThrow(id: KeyEntity['id']): Promise<KeyEntity> {
-    const key = await this.keyRepository.getOneById(id);
+  private async getTranslatedKeyByIdWithLockOrThrow(id: TranslatedKeyEntity['id']): Promise<TranslatedKeyEntity> {
+    const key = await this.keyRepository.getOneByIdAndLock(id);
     if (!key) {
       throw new NotFoundException('Key not found');
     }
@@ -116,11 +132,35 @@ export class KeyServiceImpl implements KeyService {
 
   @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
   async updateKey(data: UpdateKeyInputObject): Promise<void> {
-    const key = await this.getKeyByIdOrThrow(data.id);
+    const translatedKeysCount = await this.keyRepository.getCountBy({ projectId: data.projectId, name: data.name });
+    if (!translatedKeysCount) {
+      throw new NotFoundException('Key not found');
+    }
+
+    await this.keyRepository.updateManyByWithoutCheck(
+      { projectId: data.projectId, name: data.name },
+      {
+        comment: data.comment,
+        updatedAt: new Date(),
+      },
+    );
+  }
+
+  @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
+  async updateKeyTranslate(data: UpdateTranslatedKeyInputObject): Promise<void> {
+    const key = await this.getTranslatedKeyByIdWithLockOrThrow(data.id);
     const lang = await this.langRepository.getOneById(key.langId);
 
     await this.keyRepository.updateOneById(data.id, {
       ...data,
+      logs: [
+        {
+          newValue: data.value,
+          oldValue: key.value,
+          userId: data.userId,
+        },
+        ...key.logs,
+      ],
       updatedAt: new Date(),
     });
 

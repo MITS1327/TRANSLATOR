@@ -2,12 +2,12 @@ import { LangEntity } from '@translator/core/lang';
 
 import { BaseEventImpl, KafkaEvent } from '@translator/messaging';
 
-import { KeyEntity } from '../interfaces';
+import { TranslatedKeyEntity } from '../interfaces';
 
 export type UpdateKeyClientEventData = {
-  keyName: KeyEntity['name'];
-  keyValue: KeyEntity['value'];
-  projectId: KeyEntity['projectId'];
+  keyName: TranslatedKeyEntity['name'];
+  keyValue: TranslatedKeyEntity['value'];
+  projectId: TranslatedKeyEntity['projectId'];
   langName: LangEntity['name'];
 };
 

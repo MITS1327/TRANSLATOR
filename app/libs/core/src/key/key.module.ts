@@ -5,10 +5,10 @@ import { OutgoingEventModule } from '@translator/messaging';
 
 import { LangModule } from '../lang';
 import { ProjectModule } from '../project';
-import { KeyEntityImpl } from './dal';
+import { TranslatedKeyEntityImpl } from './dal';
 import { PROVIDERS } from './key.providers';
 
-const imports = [TypeOrmModule.forFeature([KeyEntityImpl]), LangModule, ProjectModule, OutgoingEventModule];
+const imports = [TypeOrmModule.forFeature([TranslatedKeyEntityImpl]), LangModule, ProjectModule, OutgoingEventModule];
 
 @Module({
   imports,

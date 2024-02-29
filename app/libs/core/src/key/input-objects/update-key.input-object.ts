@@ -1,6 +1,7 @@
-import { KeyEntity } from '../interfaces';
+import { TranslatedKeyEntity } from '../interfaces';
 
 export interface UpdateKeyInputObject {
-  id: KeyEntity['id'];
-  value: KeyEntity['value'];
+  name: TranslatedKeyEntity['name'];
+  projectId: TranslatedKeyEntity['projectId'];
+  comment: TranslatedKeyEntity['comment'];
 }

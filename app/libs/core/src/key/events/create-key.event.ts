@@ -2,14 +2,14 @@ import { LangEntity } from '@translator/core/lang';
 
 import { BaseEventImpl, KafkaEvent } from '@translator/messaging';
 
-import { KeyEntity } from '../interfaces';
+import { TranslatedKeyEntity } from '../interfaces';
 
 export type CreateKeyClientEventData = {
-  keyName: KeyEntity['name'];
-  projectId: KeyEntity['projectId'];
+  keyName: TranslatedKeyEntity['name'];
+  projectId: TranslatedKeyEntity['projectId'];
   values: {
     langName: LangEntity['name'];
-    value: KeyEntity['value'];
+    value: TranslatedKeyEntity['value'];
   }[];
 };
 

@@ -3,26 +3,30 @@ import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } 
 import { LangEntity, LangEntityImpl } from '@translator/core/lang';
 import { ProjectEntity, ProjectEntityImpl } from '@translator/core/project';
 
-import { KeyEntity } from '../interfaces';
+import { TranslatedKeyEntity, TranslatedKeyLog } from '../interfaces';
 
 @Index('unique_name_project_id_lang_id', ['name', 'projectId', 'langId'], { unique: true })
-@Entity('key')
-export class KeyEntityImpl implements KeyEntity {
+@Entity('translated_key')
+export class TranslatedKeyEntityImpl implements TranslatedKeyEntity {
   @PrimaryGeneratedColumn({
-    name: 'key_id',
-    primaryKeyConstraintName: 'key_id_pkey',
+    name: 'translated_key_id',
+    primaryKeyConstraintName: 'translated_key_id_pkey',
   })
   id: number;
 
+  @Index('translated_key_name_index', { synchronize: false })
   @Column('text')
   name: string;
 
+  @Index('translated_key_lang_id_index')
   @Column('int')
   langId: number;
 
+  @Index('translated_key_project_id_index')
   @Column('int')
   projectId: number;
 
+  @Index('translated_key_value_index', { synchronize: false })
   @Column('text')
   value: string;
 
@@ -32,14 +36,17 @@ export class KeyEntityImpl implements KeyEntity {
   @Column('timestamp', { default: () => 'timezone(\'utc\'::text, now())' })
   updatedAt: Date;
 
-  @Column('bigint', { nullable: true })
-  userId: string;
+  @Column('jsonb')
+  logs: TranslatedKeyLog[];
+
+  @Column('text', { nullable: true })
+  comment: string | null;
 
   @ManyToOne(() => LangEntityImpl, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'lang_id', foreignKeyConstraintName: 'key_lang_id_fkey' })
+  @JoinColumn({ name: 'lang_id', foreignKeyConstraintName: 'translated_key_lang_id_fkey' })
   lang: LangEntity;
 
   @ManyToOne(() => ProjectEntityImpl, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'project_id', foreignKeyConstraintName: 'key_project_id_fkey' })
+  @JoinColumn({ name: 'project_id', foreignKeyConstraintName: 'translated_key_project_id_fkey' })
   project: ProjectEntity;
 }
