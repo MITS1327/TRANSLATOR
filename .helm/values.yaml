@@ -1,9 +1,13 @@
 dev:
   replicaCount: 1
-  keydbHost: keydb-dev
-  keydbPort: 6379
-  keydbStorageClass: standard
-  keydbStorage: 1Gi
+  redisHost: redis
+  redisPort: 6379
+  redisSentinelHost: sentinel
+  redisSentinelPort: 26379
+  redisSentinelMasterName: mymaster
+  redisCacheDatabase: 1
+  redisStorageClass: standard
+  redisStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
@@ -14,10 +18,14 @@ dev:
   postgresPort: 5432
 stage:
   replicaCount: 1
-  keydbHost: keydb-stage
-  keydbPort: 6379
-  keydbStorageClass: local-path
-  keydbStorage: 1Gi
+  redisHost: redis
+  redisPort: 6379
+  redisSentinelHost: sentinel
+  redisSentinelPort: 26379
+  redisSentinelMasterName: mymaster
+  redisCacheDatabase: 1
+  redisStorageClass: local-path
+  redisStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
@@ -28,10 +36,14 @@ stage:
   postgresPort: 5432
 spd:
   replicaCount: 1
-  keydbHost: keydb-spd
-  keydbPort: 6379
-  keydbStorageClass: local-path
-  keydbStorage: 1Gi
+  redisHost: redis
+  redisPort: 6379
+  redisSentinelHost: sentinel
+  redisSentinelPort: 26379
+  redisSentinelMasterName: mymaster
+  redisCacheDatabase: 1
+  redisStorageClass: local-path
+  redisStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
@@ -42,10 +54,14 @@ spd:
   postgresPort: 5432
 prod:
   replicaCount: 3
-  keydbHost: keydb-prod
-  keydbPort: 6379
-  keydbStorageClass: csi-rbd-sc
-  keydbStorage: 1Gi
+  redisHost: redis
+  redisPort: 6379
+  redisSentinelHost: sentinel
+  redisSentinelPort: 26379
+  redisSentinelMasterName: mymaster
+  redisCacheDatabase: 1
+  redisStorageClass: csi-rbd-sc
+  redisStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
@@ -66,10 +82,14 @@ prod:
   postgresPort: 54206
 euprod:
   replicaCount: 3
-  keydbHost: keydb-euprod
-  keydbPort: 6379
-  keydbStorageClass: csi-rbd-sc
-  keydbStorage: 1Gi
+  redisHost: redis
+  redisPort: 6379
+  redisSentinelHost: sentinel
+  redisSentinelPort: 26379
+  redisSentinelMasterName: mymaster
+  redisCacheDatabase: 1
+  redisStorageClass: csi-rbd-sc
+  redisStorage: 1Gi
   pootleApiUrl: https://translate.mcn.ru/
   graylogHost: graylog.kompaas.tech
   graylogPort: 12201
