@@ -45,6 +45,12 @@
       "@translator/messaging/*": [
         "libs/messaging/src/*"
       ],
+      "@translator/infrastructure": [
+        "libs/infrastructure/src"
+      ],
+      "@translator/infrastructure/*": [
+        "libs/infrastructure/src/*"
+      ],
       "@translator/api/": [
         "api/src"
       ],

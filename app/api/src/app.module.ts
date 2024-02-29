@@ -9,12 +9,12 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import configs from '@translator/shared/configs';
 
-import { HealthModule } from './health/health.module';
 import { KeyModule } from './key';
 import { LangModule } from './lang';
 import { PootleModule } from './pootle/pootle.module';
 import { ProjectModule } from './project';
 import { TranslatesModule } from './translates/translates.module';
+import { HealthModule } from '@translator/infrastructure';
 
 @Module({
   imports: [
