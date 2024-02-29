@@ -62,6 +62,8 @@ prod:
     - name: CLUSTER_CRT
       secretName: prod-kafka3-cluster-ca-cert
       secretKey: cluster-ca.crt
+  postgresHost: translatordb.veles.mcn.ru
+  postgresPort: 54206
 euprod:
   replicaCount: 3
   keydbHost: keydb-euprod

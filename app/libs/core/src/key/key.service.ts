@@ -2,14 +2,21 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
 
+import {
+  BaseOutgoingEventService,
+  KAFKA_OUTGOING_EVENT_SERVICE_PROVIDER,
+  OutgoingEventTypeEnum,
+} from '@translator/messaging';
+
 import { GetDataWithFilterOutputObject } from '@translator/shared';
 
 import { LANG_REPOSITORY_PROVIDER, LangRepository } from '../lang';
 import { PROJECT_REPOSITORY_PROVIDER, ProjectEntity, ProjectRepository } from '../project';
+import { CreateKeyKafkaEvent, UpdateKeyKafkaEvent } from './events';
 import { CreateKeyInputObject, GetKeysWithFilterInputObject, UpdateKeyInputObject } from './input-objects';
 import { KeyEntity, KeyRepository, KeyService } from './interfaces';
 import { KEY_REPOSITORY_PROVIDER } from './key.di-tokens';
-import { GroupedKeysByLangName } from './types';
+import { GroupedKeysByLangName, KeyDataForCreate } from './types';
 
 @Injectable()
 export class KeyServiceImpl implements KeyService {
@@ -17,6 +24,7 @@ export class KeyServiceImpl implements KeyService {
     @Inject(KEY_REPOSITORY_PROVIDER) private readonly keyRepository: KeyRepository,
     @Inject(LANG_REPOSITORY_PROVIDER) private readonly langRepository: LangRepository,
     @Inject(PROJECT_REPOSITORY_PROVIDER) private readonly projectRepository: ProjectRepository,
+    @Inject(KAFKA_OUTGOING_EVENT_SERVICE_PROVIDER) private readonly outgoingEventService: BaseOutgoingEventService,
   ) {}
 
   async getKeys(data: GetKeysWithFilterInputObject): Promise<GetDataWithFilterOutputObject<KeyEntity>> {
@@ -49,16 +57,27 @@ export class KeyServiceImpl implements KeyService {
         {},
       ) || {};
 
-    const keys: Omit<KeyEntity, 'id' | 'createdAt' | 'updatedAt'>[] = langs.map((lang) => {
+    const keys: KeyDataForCreate[] = langs.map((lang) => {
       return {
         name: data.name,
         projectId: data.projectId,
         userId: data.userId,
         value: valuesObject[lang.id] || data.name,
         langId: lang.id,
+        langName: lang.name,
       };
     });
 
+    await this.outgoingEventService.emitFromPersist(
+      new CreateKeyKafkaEvent(OutgoingEventTypeEnum.EXTERNAL, {
+        keyName: data.name,
+        projectId: data.projectId,
+        values: keys.map((key) => ({
+          langName: key.langName,
+          value: key.value,
+        })),
+      }),
+    );
     await this.projectRepository.updateOneById(data.projectId, { keysCount: project.keysCount + 1 });
     await this.keyRepository.createBulk(keys);
   }
@@ -86,10 +105,32 @@ export class KeyServiceImpl implements KeyService {
     );
   }
 
+  async getKeyByIdOrThrow(id: KeyEntity['id']): Promise<KeyEntity> {
+    const key = await this.keyRepository.getOneById(id);
+    if (!key) {
+      throw new NotFoundException('Key not found');
+    }
+
+    return key;
+  }
+
+  @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
   async updateKey(data: UpdateKeyInputObject): Promise<void> {
+    const key = await this.getKeyByIdOrThrow(data.id);
+    const lang = await this.langRepository.getOneById(key.langId);
+
     await this.keyRepository.updateOneById(data.id, {
       ...data,
       updatedAt: new Date(),
     });
+
+    await this.outgoingEventService.emitFromPersist(
+      new UpdateKeyKafkaEvent(OutgoingEventTypeEnum.EXTERNAL, {
+        keyName: key.name,
+        langName: lang.name,
+        keyValue: data.value,
+        projectId: key.projectId,
+      }),
+    );
   }
 }

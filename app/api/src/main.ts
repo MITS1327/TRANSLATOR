@@ -1,6 +1,7 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { GraylogInterceptor } from 'api/src/common/interceptors/graylog.interceptor';
@@ -15,6 +16,8 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  app.connectMicroservice<MicroserviceOptions>(configService.getOrThrow('kafka'));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
@@ -39,5 +42,8 @@ async function bootstrap() {
   SwaggerModule.setup('api/swagger', app, document);
   const port = process.env.port || 3000;
   await app.listen(port, () => console.log(`listening at http://localhost:${port}`));
+  await app.startAllMicroservices().catch((error) => {
+    console.log(error);
+  });
 }
 bootstrap();
