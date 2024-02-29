@@ -1,11 +1,11 @@
 import { Provider } from '@nestjs/common';
 
 import { TranslatedKeyRepositoryImpl } from './dal';
-import { KEY_REPOSITORY_PROVIDER, KEY_SERVICE_PROVIDER } from './key.di-tokens';
+import { KEY_SERVICE_PROVIDER,TRANSLATED_KEY_REPOSITORY_PROVIDER } from './key.di-tokens';
 import { KeyServiceImpl } from './key.service';
 
 const keyRepositoryProvider: Provider = {
-  provide: KEY_REPOSITORY_PROVIDER,
+  provide: TRANSLATED_KEY_REPOSITORY_PROVIDER,
   useClass: TranslatedKeyRepositoryImpl,
 };
 

@@ -11,8 +11,10 @@ export type UpdateKeyClientEventData = {
   langName: LangEntity['name'];
 };
 
+export const UPDATE_KEY_EVENT_NAME = 'update_key';
+
 export class UpdateKeyEvent extends BaseEventImpl<UpdateKeyClientEventData> {
-  override eventName = 'update_key';
+  override eventName = UPDATE_KEY_EVENT_NAME;
 }
 
 export class UpdateKeyKafkaEvent extends UpdateKeyEvent implements KafkaEvent {

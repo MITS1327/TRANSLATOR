@@ -7,6 +7,7 @@ export type TranslatedKeyLog = {
   newValue: string;
   oldValue: string;
   userId: string | null;
+  timestamp: Date;
 };
 
 export interface TranslatedKeyEntity extends BaseEntity {

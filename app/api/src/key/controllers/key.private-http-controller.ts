@@ -48,18 +48,16 @@ export class KeyPrivateHttpController {
     @Res() response: Response,
     @Headers(HEADER_FOR_TIMESTAMP) requestTimestamp: string,
   ) {
-    const result = await this.cacheKeyService.getGroupedTranslatedKeys(
-      data.projectId,
-      requestTimestamp ? +requestTimestamp : null,
-    );
-
-    if (!result) {
+    const projectCacheTimestamp = await this.cacheKeyService.getProjectCacheTimestamp(data.projectId);
+    if (requestTimestamp && projectCacheTimestamp && projectCacheTimestamp === +requestTimestamp) {
       response.send();
 
       return;
     }
 
-    response.set({ [HEADER_FOR_TIMESTAMP]: result.timestamp });
+    const result = await this.cacheKeyService.getGroupedTranslatedKeys(data.projectId);
+
+    response.set({ [HEADER_FOR_TIMESTAMP]: result.cacheTimestamp });
     response.json(result.keys);
   }
 

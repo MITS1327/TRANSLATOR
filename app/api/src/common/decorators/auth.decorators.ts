@@ -12,7 +12,7 @@ export const AccountId = createParamDecorator((data: unknown, ctx: ExecutionCont
 export const UserId = createParamDecorator((data: unknown, ctx: ExecutionContext): number => {
   const request = ctx.switchToHttp().getRequest();
 
-  return request.headers['mcn-user-id'];
+  return request.headers['mcn-user-id'] || null;
 });
 
 export const Cookies = createParamDecorator((data: string, ctx: ExecutionContext): string | string[] => {

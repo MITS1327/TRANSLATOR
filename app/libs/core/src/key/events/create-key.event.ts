@@ -13,8 +13,10 @@ export type CreateKeyClientEventData = {
   }[];
 };
 
+export const CREATE_KEY_EVENT_NAME = 'create_key';
+
 export class CreateKeyEvent extends BaseEventImpl<CreateKeyClientEventData> {
-  override eventName = 'create_key';
+  override eventName = CREATE_KEY_EVENT_NAME;
 }
 
 export class CreateKeyKafkaEvent extends CreateKeyEvent implements KafkaEvent {
