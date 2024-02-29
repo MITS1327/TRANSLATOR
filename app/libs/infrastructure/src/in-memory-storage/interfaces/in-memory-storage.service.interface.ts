@@ -9,7 +9,6 @@ export interface InMemoryStorageService {
   getUpsertCommand<T = unknown>(key: string, data: T): StorageCommand;
   executeCommand(command: StorageCommand): Promise<void>;
   executeCommandsInTransaction(...commands: StorageCommand[]): Promise<void>;
+  wrapInLock<T = unknown>(key: string, callback: () => Promise<T>): Promise<T>;
   isHaveLock(key: string): Promise<boolean>;
-  lock(key: string): Promise<LockObject>;
-  releaseLock(id: LockObject): Promise<void>;
 }

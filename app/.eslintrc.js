@@ -27,6 +27,7 @@ module.exports = {
               ['^(@translator/core)(\\.*|$)'],
               ['^(@translator/messaging)(\\.*|$)'],
               ['^(@translator/shared)(\\.*|$)'],
+              ['^(@translator/infrastructure)(\\.*|$)'],
               ['^(@translator/api)(\\.*|$)'],
             ],
           },

@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { Redis } from 'ioredis';
-import Redlock, { Lock } from 'redlock';
+import Redlock from 'redlock';
 
 import { REDIS_CLIENT_PROVIDER, REDLOCK_PROVIDER } from './in-memory-storage.di-tokens';
-import { InMemoryStorageService, LockObject, StorageCommand } from './interfaces';
+import { InMemoryStorageService, StorageCommand } from './interfaces';
 
 @Injectable()
 export class InMemoryStorageServiceImpl implements InMemoryStorageService {
@@ -13,7 +13,7 @@ export class InMemoryStorageServiceImpl implements InMemoryStorageService {
     @Inject(REDLOCK_PROVIDER) private readonly redisLock: Redlock,
   ) {}
 
-  private readonly DEFAULT_LOCK_TIMEOUT = 5000;
+  private readonly DEFAULT_LOCK_TIMEOUT = 10000;
   private readonly LOCK_PREFIX = 'lock';
 
   async upsert<T = unknown>(key: string, data: T): Promise<void> {
@@ -43,24 +43,17 @@ export class InMemoryStorageServiceImpl implements InMemoryStorageService {
     }
   }
 
+  private getLockKey(key: string): string {
+    return `${this.LOCK_PREFIX}:${key}`;
+  }
+
   async isHaveLock(key: string): Promise<boolean> {
-    const lock = await this.redisClient.get(`${this.LOCK_PREFIX}:${key}`);
+    const lock = await this.redisClient.get(this.getLockKey(key));
 
     return !!lock;
   }
 
-  async lock(key: string): Promise<LockObject> {
-    const lockInstance = await this.redisLock.acquire([`${this.LOCK_PREFIX}:${key}`], this.DEFAULT_LOCK_TIMEOUT);
-
-    return {
-      instance: lockInstance,
-    };
-  }
-
-  async releaseLock(lockObject: LockObject): Promise<void> {
-    if (!lockObject.instance) {
-      return;
-    }
-    await this.redisLock.release(lockObject.instance as Lock);
+  wrapInLock<T = unknown>(key: string, callback: () => Promise<T>): Promise<T> {
+    return this.redisLock.using<T>([this.getLockKey(key)], this.DEFAULT_LOCK_TIMEOUT, callback);
   }
 }

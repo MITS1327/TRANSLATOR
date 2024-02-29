@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Inject, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Headers, Inject, Param, ParseIntPipe, Patch, Post, Query, Res } from '@nestjs/common';
+import { ApiHeader, ApiTags } from '@nestjs/swagger';
 
 import { UserId } from '@decorators/auth.decorators';
+import { Response } from 'express';
 
 import { KEY_SERVICE_PROVIDER, KeyService } from '@translator/core/key';
 
+import { CacheKeyService } from '../cache-key.service';
+import { HEADER_FOR_TIMESTAMP } from '../constants';
 import { CreateKeyDTO, GetGroupedKeysDTO, GetKeysWithFilterDTO, UpdateKeyDTO } from '../dtos';
 
 @Controller({
@@ -13,7 +16,10 @@ import { CreateKeyDTO, GetGroupedKeysDTO, GetKeysWithFilterDTO, UpdateKeyDTO } f
 })
 @ApiTags('keys')
 export class KeyPrivateHttpController {
-  constructor(@Inject(KEY_SERVICE_PROVIDER) private readonly coreKeyService: KeyService) {}
+  constructor(
+    @Inject(KEY_SERVICE_PROVIDER) private readonly coreKeyService: KeyService,
+    private readonly cacheKeyService: CacheKeyService,
+  ) {}
 
   @Post()
   createKey(@UserId() userId: string, @Body() data: CreateKeyDTO) {
@@ -25,9 +31,26 @@ export class KeyPrivateHttpController {
     return this.coreKeyService.getKeys(data);
   }
 
+  @ApiHeader({ name: HEADER_FOR_TIMESTAMP, description: 'Product keys cache timestamp', required: false })
   @Get('/grouped')
-  getProjectKeys(@Query() data: GetGroupedKeysDTO) {
-    return this.coreKeyService.getProjectKeysGroupedByLangName(data.projectId);
+  async getProjectKeys(
+    @Query() data: GetGroupedKeysDTO,
+    @Res() response: Response,
+    @Headers(HEADER_FOR_TIMESTAMP) requestTimestamp: string,
+  ) {
+    const result = await this.cacheKeyService.getGroupedKeys(
+      data.projectId,
+      requestTimestamp ? +requestTimestamp : null,
+    );
+
+    if (!result) {
+      response.send();
+
+      return;
+    }
+
+    response.set({ [HEADER_FOR_TIMESTAMP]: result.timestamp });
+    response.json(result.keys);
   }
 
   @Patch(':id')

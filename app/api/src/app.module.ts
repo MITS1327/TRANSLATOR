@@ -9,12 +9,13 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import configs from '@translator/shared/configs';
 
+import { HealthModule } from '@translator/infrastructure';
+
 import { KeyModule } from './key';
 import { LangModule } from './lang';
 import { PootleModule } from './pootle/pootle.module';
 import { ProjectModule } from './project';
 import { TranslatesModule } from './translates/translates.module';
-import { HealthModule } from '@translator/infrastructure';
 
 @Module({
   imports: [
@@ -32,9 +33,9 @@ import { HealthModule } from '@translator/infrastructure';
       isGlobal: true,
       useFactory: async (configService: ConfigService) => ({
         store: await redisStore({
-          host: configService.getOrThrow('keydb.host'),
-          port: configService.getOrThrow('keydb.port'),
-          db: 1,
+          sentinels: configService.getOrThrow('redis.sentinels'),
+          name: configService.getOrThrow('redis.name'),
+          db: configService.getOrThrow('redis.db'),
         }),
       }),
       inject: [ConfigService],
