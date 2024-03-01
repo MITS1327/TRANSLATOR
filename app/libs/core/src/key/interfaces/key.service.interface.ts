@@ -3,12 +3,12 @@ import { ProjectEntity } from '@translator/core/project';
 import { GetDataWithFilterOutputObject } from '@translator/shared';
 
 import {
+  ConstructTranslatedKeyInputObject,
   CreateKeyInputObject,
   GetKeysWithFilterInputObject,
   UpdateKeyInputObject,
   UpdateTranslatedKeyInputObject,
 } from '../input-objects';
-import { ConstructTranslatedKeyInputObject } from '../input-objects/construct-translated-key.input-object';
 import { GroupedTranslatedKeysByLangName } from '../types';
 import { TranslatedKeyEntity } from './translated-key.entity.interface';
 

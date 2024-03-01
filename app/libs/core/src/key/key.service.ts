@@ -14,12 +14,12 @@ import { LANG_REPOSITORY_PROVIDER, LANG_SERVICE_PROVIDER, LangRepository, LangSe
 import { PROJECT_REPOSITORY_PROVIDER, ProjectEntity, ProjectRepository } from '../project';
 import { CreateKeyKafkaEvent, UpdateKeyKafkaEvent } from './events';
 import {
+  ConstructTranslatedKeyInputObject,
   CreateKeyInputObject,
   GetKeysWithFilterInputObject,
   UpdateKeyInputObject,
   UpdateTranslatedKeyInputObject,
 } from './input-objects';
-import { ConstructTranslatedKeyInputObject } from './input-objects/construct-translated-key.input-object';
 import { KeyService, TranslatedKeyEntity, TranslatedKeyRepository } from './interfaces';
 import { TRANSLATED_KEY_REPOSITORY_PROVIDER } from './key.di-tokens';
 import { GroupedTranslatedKeysByLangName, KeyDataForCreate } from './types';
