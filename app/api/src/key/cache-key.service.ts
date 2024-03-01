@@ -24,6 +24,20 @@ export class CacheKeyService {
     return `${this.PREFIX_FOR_GROUPED_KEYS}:${projectId}`;
   }
 
+  async clearProjectCache(projectId: ProjectEntity['id']): Promise<void> {
+    const deleteDataCommand = await this.inMemoryStorageService.getDeleteCommand(
+      this.getGroupedTranslatedKeysCacheKey(projectId),
+    );
+    const deleteTimestampCommand = await this.inMemoryStorageService.getDeleteCommand(
+      this.getTimestampCacheKey(projectId),
+    );
+    await this.inMemoryStorageService.executeCommandsInTransaction(deleteDataCommand, deleteTimestampCommand);
+  }
+
+  async clearAllCache(): Promise<void> {
+    await this.inMemoryStorageService.clear();
+  }
+
   private async getCacheOrThrow(projectId: ProjectEntity['id']): Promise<Record<string, unknown>> {
     const data = await this.inMemoryStorageService.get<Record<string, unknown>>(
       this.getGroupedTranslatedKeysCacheKey(projectId),

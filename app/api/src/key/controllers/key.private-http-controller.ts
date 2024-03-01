@@ -1,4 +1,18 @@
-import { Body, Controller, Get, Headers, Inject, Param, ParseIntPipe, Patch, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 
 import { UserId } from '@decorators/auth.decorators';
@@ -9,6 +23,7 @@ import { KEY_SERVICE_PROVIDER, KeyService } from '@translator/core/key';
 import { CacheKeyService } from '../cache-key.service';
 import { HEADER_FOR_TIMESTAMP } from '../constants';
 import {
+  ClearCachedKeysDTO,
   CreateKeyDTO,
   GetGroupedKeysDTO,
   GetTranslatedKeysWithFilterDTO,
@@ -59,6 +74,12 @@ export class KeyPrivateHttpController {
 
     response.set({ [HEADER_FOR_TIMESTAMP]: result.cacheTimestamp });
     response.json(result.keys);
+  }
+
+  @Post('translated-keys/grouped/clear-cache')
+  @HttpCode(HttpStatus.OK)
+  async clearCache(@Query() data: ClearCachedKeysDTO) {
+    await this.cacheKeyService.clearProjectCache(data.projectId);
   }
 
   @Patch('translated-keys/:id')

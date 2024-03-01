@@ -24,6 +24,18 @@ export class InMemoryStorageServiceImpl implements InMemoryStorageService {
     return ['set', key, JSON.stringify(data)];
   }
 
+  async delete(key: string): Promise<void> {
+    await this.executeCommand(this.getDeleteCommand(key));
+  }
+
+  getDeleteCommand(key: string): string[] {
+    return ['del', key];
+  }
+
+  async clear(): Promise<void> {
+    await this.executeCommand(['flushdb']);
+  }
+
   async executeCommand(command: StorageCommand): Promise<void> {
     //@ts-expect-error - ioredis types are not up to date
     await this.redisClient.call(...command);
