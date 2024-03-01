@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 
 import { Redis } from 'ioredis';
 import Redlock from 'redlock';
@@ -59,10 +59,14 @@ export class InMemoryStorageServiceImpl implements InMemoryStorageService {
     return `${this.LOCK_PREFIX}:${key}`;
   }
 
-  async isHaveLock(key: string): Promise<boolean> {
+  async isHaveLockOrThrow(key: string): Promise<boolean> {
     const lock = await this.redisClient.get(this.getLockKey(key));
 
-    return !!lock;
+    if (lock) {
+      throw new ConflictException('Lock is already acquired');
+    }
+
+    return false;
   }
 
   wrapInLock<T = unknown>(key: string, callback: () => Promise<T>): Promise<T> {

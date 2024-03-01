@@ -8,9 +8,11 @@ import {
   OutgoingEventTypeEnum,
 } from '@translator/messaging';
 
-import { GetDataWithFilterOutputObject } from '@translator/shared';
+import { CREATION_TRANSLATOR_DATA_KEY_LOCK, GetDataWithFilterOutputObject } from '@translator/shared';
 
-import { LANG_REPOSITORY_PROVIDER, LANG_SERVICE_PROVIDER, LangRepository, LangService } from '../lang';
+import { IN_MEMORY_STORAGE_SERVICE_PROVIDER, InMemoryStorageService } from '@translator/infrastructure';
+
+import { LANG_REPOSITORY_PROVIDER, LangRepository } from '../lang';
 import { PROJECT_REPOSITORY_PROVIDER, ProjectEntity, ProjectRepository } from '../project';
 import { CreateKeyKafkaEvent, UpdateKeyKafkaEvent } from './events';
 import {
@@ -31,7 +33,7 @@ export class KeyServiceImpl implements KeyService {
     @Inject(LANG_REPOSITORY_PROVIDER) private readonly langRepository: LangRepository,
     @Inject(PROJECT_REPOSITORY_PROVIDER) private readonly projectRepository: ProjectRepository,
     @Inject(KAFKA_OUTGOING_EVENT_SERVICE_PROVIDER) private readonly outgoingEventService: BaseOutgoingEventService,
-    @Inject(LANG_SERVICE_PROVIDER) private readonly langService: LangService,
+    @Inject(IN_MEMORY_STORAGE_SERVICE_PROVIDER) private readonly inMemoryStorageService: InMemoryStorageService,
   ) {}
 
   private readonly MAX_LOG_COUNT = 10;
@@ -79,7 +81,7 @@ export class KeyServiceImpl implements KeyService {
 
   @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
   async createKey(data: CreateKeyInputObject): Promise<void> {
-    await this.langService.isLangCreateInProgressOrThrow();
+    await this.inMemoryStorageService.isHaveLockOrThrow(CREATION_TRANSLATOR_DATA_KEY_LOCK);
 
     const project = await this.getProjectOrThrow(data.projectId, true);
     const timestamp = new Date();

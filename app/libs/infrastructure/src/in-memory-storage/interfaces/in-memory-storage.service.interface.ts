@@ -13,5 +13,5 @@ export interface InMemoryStorageService {
   executeCommand(command: StorageCommand): Promise<void>;
   executeCommandsInTransaction(...commands: StorageCommand[]): Promise<void>;
   wrapInLock<T = unknown>(key: string, callback: () => Promise<T>): Promise<T>;
-  isHaveLock(key: string): Promise<boolean>;
+  isHaveLockOrThrow(key: string): Promise<boolean>;
 }

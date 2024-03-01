@@ -7,5 +7,4 @@ export interface LangService {
   getLangs(data: GetLangsWithFilterInputObject): Promise<GetDataWithFilterOutputObject<LangEntity>>;
   createLang(data: CreateLangInputObject): Promise<void>;
   updateLang(data: UpdateLangInputObject): Promise<void>;
-  isLangCreateInProgressOrThrow(): Promise<boolean>;
 }

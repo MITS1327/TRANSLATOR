@@ -9,7 +9,7 @@ import {
   OutgoingEventTypeEnum,
 } from '@translator/messaging';
 
-import { concatStream, GetDataWithFilterOutputObject } from '@translator/shared';
+import { concatStream, CREATION_TRANSLATOR_DATA_KEY_LOCK, GetDataWithFilterOutputObject } from '@translator/shared';
 
 import { IN_MEMORY_STORAGE_SERVICE_PROVIDER, InMemoryStorageService } from '@translator/infrastructure';
 
@@ -20,7 +20,6 @@ import {
   TranslatedKeyRepository,
   UniqueKeyNamesByProject,
 } from '../key';
-import { CREATE_LANG_LOCK_KEY } from './constants';
 import { CreateLangKafkaEvent } from './events';
 import { CreateLangInputObject, GetLangsWithFilterInputObject, UpdateLangInputObject } from './input-objects';
 import { LangEntity, LangRepository, LangService } from './interfaces';
@@ -44,15 +43,6 @@ export class LangServiceImpl implements LangService {
     return this.langRepository.getWithLimitAndOffset(additionalFilter, limit, offset, orderBy, sortBy);
   }
 
-  async isLangCreateInProgressOrThrow(): Promise<boolean> {
-    const isHaveLock = await this.inMemoryStorageService.isHaveLock(CREATE_LANG_LOCK_KEY);
-    if (isHaveLock) {
-      throw new ConflictException('Lang create in progress');
-    }
-
-    return false;
-  }
-
   @Transactional({
     isolationLevel: IsolationLevel.READ_UNCOMMITTED,
   })
@@ -65,7 +55,7 @@ export class LangServiceImpl implements LangService {
       throw new ConflictException('Lang already exist');
     }
 
-    await this.inMemoryStorageService.wrapInLock(CREATE_LANG_LOCK_KEY, async () => {
+    await this.inMemoryStorageService.wrapInLock(CREATION_TRANSLATOR_DATA_KEY_LOCK, async () => {
       const newLangId = await this.langRepository.getNextLangId();
       const keys = await this.translatedKeyRepository.getAllUniqueKeyNamesByProjectStream();
       const timestamp = new Date();
