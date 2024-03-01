@@ -10,7 +10,7 @@ import {
 
 import { GetDataWithFilterOutputObject } from '@translator/shared';
 
-import { LANG_REPOSITORY_PROVIDER, LangRepository } from '../lang';
+import { LANG_REPOSITORY_PROVIDER, LANG_SERVICE_PROVIDER, LangRepository, LangService } from '../lang';
 import { PROJECT_REPOSITORY_PROVIDER, ProjectEntity, ProjectRepository } from '../project';
 import { CreateKeyKafkaEvent, UpdateKeyKafkaEvent } from './events';
 import {
@@ -19,6 +19,7 @@ import {
   UpdateKeyInputObject,
   UpdateTranslatedKeyInputObject,
 } from './input-objects';
+import { ConstructTranslatedKeyInputObject } from './input-objects/construct-translated-key.input-object';
 import { KeyService, TranslatedKeyEntity, TranslatedKeyRepository } from './interfaces';
 import { TRANSLATED_KEY_REPOSITORY_PROVIDER } from './key.di-tokens';
 import { GroupedTranslatedKeysByLangName, KeyDataForCreate } from './types';
@@ -30,6 +31,7 @@ export class KeyServiceImpl implements KeyService {
     @Inject(LANG_REPOSITORY_PROVIDER) private readonly langRepository: LangRepository,
     @Inject(PROJECT_REPOSITORY_PROVIDER) private readonly projectRepository: ProjectRepository,
     @Inject(KAFKA_OUTGOING_EVENT_SERVICE_PROVIDER) private readonly outgoingEventService: BaseOutgoingEventService,
+    @Inject(LANG_SERVICE_PROVIDER) private readonly langService: LangService,
   ) {}
 
   private readonly MAX_LOG_COUNT = 10;
@@ -55,8 +57,30 @@ export class KeyServiceImpl implements KeyService {
     return project;
   }
 
+  constructTranslatedKeyData(data: ConstructTranslatedKeyInputObject): Omit<TranslatedKeyEntity, 'id'> {
+    return {
+      name: data.name,
+      projectId: data.projectId,
+      value: data.value,
+      langId: data.langId,
+      logs: [
+        {
+          newValue: data.value,
+          oldValue: '',
+          userId: data.userId,
+          timestamp: data.timestamp,
+        },
+      ],
+      createdAt: data.timestamp,
+      updatedAt: data.timestamp,
+      comment: data.comment,
+    };
+  }
+
   @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
   async createKey(data: CreateKeyInputObject): Promise<void> {
+    await this.langService.isLangCreateInProgressOrThrow();
+
     const project = await this.getProjectOrThrow(data.projectId, true);
     const timestamp = new Date();
     const langs = await this.langRepository.getAll();
@@ -72,23 +96,19 @@ export class KeyServiceImpl implements KeyService {
     const keys: KeyDataForCreate[] = langs.map((lang) => {
       const keyValue = lang.isTranslatable ? data.name : valuesObject[lang.id] || data.name;
 
-      return {
+      const translatedKeyData = this.constructTranslatedKeyData({
         name: data.name,
         projectId: data.projectId,
-        value: keyValue,
         langId: lang.id,
-        langName: lang.name,
-        logs: [
-          {
-            newValue: keyValue,
-            oldValue: '',
-            userId: data.userId,
-            timestamp,
-          },
-        ],
-        createdAt: timestamp,
-        updatedAt: timestamp,
+        userId: data.userId,
         comment: data.comment,
+        value: keyValue,
+        timestamp,
+      });
+
+      return {
+        ...translatedKeyData,
+        langName: lang.name,
       };
     });
 

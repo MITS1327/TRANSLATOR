@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-import { IsNotEmpty, IsOptional, Matches } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, Matches } from 'class-validator';
 
 import { LOCALE_REGEX } from '../constants';
 
@@ -12,5 +12,6 @@ export class CreateLangDTO {
 
   @ApiPropertyOptional({ default: true })
   @IsOptional()
+  @IsBoolean()
   isTranslatable: boolean = true;
 }
