@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
 
@@ -70,7 +70,7 @@ export class KeyServiceImpl implements KeyService {
       ) || {};
 
     const keys: KeyDataForCreate[] = langs.map((lang) => {
-      const keyValue = valuesObject[lang.id] || data.name;
+      const keyValue = lang.isTranslatable ? data.name : valuesObject[lang.id] || data.name;
 
       return {
         name: data.name,
@@ -162,6 +162,10 @@ export class KeyServiceImpl implements KeyService {
     const key = await this.getTranslatedKeyByIdWithLockOrThrow(data.id);
     const lang = await this.langRepository.getOneById(key.langId);
     const timestamp = new Date();
+
+    if (!lang.isTranslatable) {
+      throw new ConflictException('This language is not translatable');
+    }
 
     await this.translatedKeyRepository.updateOneById(data.id, {
       ...data,

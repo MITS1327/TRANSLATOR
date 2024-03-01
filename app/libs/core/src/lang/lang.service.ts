@@ -35,6 +35,7 @@ export class LangServiceImpl implements LangService {
     await this.outgoingEventService.emitFromPersist(
       new CreateLangKafkaEvent(OutgoingEventTypeEnum.EXTERNAL, {
         langName: data.name,
+        isTranslatable: data.isTranslatable,
       }),
     );
   }

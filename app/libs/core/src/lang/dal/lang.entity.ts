@@ -13,4 +13,7 @@ export class LangEntityImpl implements LangEntity {
   @Index('unq_lang_name', { unique: true })
   @Column('text')
   name: string;
+
+  @Column('boolean', { default: true })
+  isTranslatable: boolean;
 }

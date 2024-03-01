@@ -4,6 +4,7 @@ import { BaseEventImpl, KafkaEvent } from '@translator/messaging';
 
 export type CreateLangClientEventData = {
   langName: LangEntity['name'];
+  isTranslatable: LangEntity['isTranslatable'];
 };
 
 export const CREATE_LANG_EVENT_NAME = 'create_lang';
