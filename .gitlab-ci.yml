@@ -45,8 +45,12 @@ test_lint-and-type-coverage:
 # PROD
 build_prod:
   extends: .build_prod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
 lint_prod:
   extends: .lint_prod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
 deploy_prod:
   extends: .deploy_prod
   rules:
@@ -61,8 +65,12 @@ dismiss_prod:
 # EUPROD
 build_euprod:
   extends: .build_euprod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
 lint_euprod:
   extends: .lint_euprod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
 deploy_euprod:
   extends: .deploy_euprod
   rules:
