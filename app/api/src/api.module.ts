@@ -9,8 +9,10 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import configs from '@translator/shared/configs';
 
-import { HealthModule } from '@translator/infrastructure';
+import { HealthModule, SwaggerDocsGenerator } from '@translator/infrastructure';
 
+import { ApiController } from './api.controller';
+import apiConfigs from './configs';
 import { KeyModule } from './key';
 import { LangModule } from './lang';
 import { PootleModule } from './pootle/pootle.module';
@@ -21,7 +23,7 @@ import { TranslatesModule } from './translates/translates.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: configs,
+      load: [...configs, ...apiConfigs],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -47,5 +49,7 @@ import { TranslatesModule } from './translates/translates.module';
     LangModule,
     KeyModule,
   ],
+  providers: [SwaggerDocsGenerator],
+  controllers: [ApiController],
 })
-export class AppModule {}
+export class ApiModule {}

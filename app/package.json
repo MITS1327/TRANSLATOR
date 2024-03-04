@@ -89,7 +89,7 @@
     "*.ts": [
       "prettier --write",
       "eslint --fix --max-warnings 0",
-      "typescript-coverage-report"
+      "type-coverage"
     ]
   }
 }
