@@ -12,3 +12,7 @@ spec:
   - name: {{ .Chart.Name }}-api
     port: 3000
     protocol: TCP
+  - port: 8080
+    name: {{ .Chart.Name }}-swagger
+    protocol: TCP
+    targetPort: 8080

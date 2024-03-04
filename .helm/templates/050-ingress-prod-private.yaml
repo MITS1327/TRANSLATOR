@@ -9,6 +9,8 @@
     {{- $hosts = append $hosts (printf "%s.%s.%s" ($.Values.APPNAME) (index $hostParts 1) (index $hostParts 0) ) }}
 {{- end }}
 {{- end }}
+
+{{- $apiPrefix := index .Values (.Values.global.env) "apiPrefix"  -}}
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -29,17 +31,10 @@ spec:
     http:
       paths:
       - pathType: Prefix
-        path: /api/private
+        path:  {{ printf "/%s/%s" $apiPrefix "private" }}
         backend:
           service:
-            name:  {{ $.Chart.Name }}-api
-            port:
-              number:  3000
-      - pathType: Prefix
-        path: /api/swagger
-        backend:
-          service:
-            name:  {{ $.Chart.Name }}-api
+            name: {{ $.Chart.Name }}-api
             port:
               number:  3000
   {{- end }}

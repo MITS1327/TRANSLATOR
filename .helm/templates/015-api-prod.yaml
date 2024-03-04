@@ -4,6 +4,11 @@
 {{- $replicaCount := index .Values (.Values.global.env) "replicaCount" -}}
 {{- $kafkaSecrets := index .Values (.Values.global.env) "kafkaSecrets" | default list -}}
 
+
+{{- $apiPrefix := index .Values (.Values.global.env) "apiPrefix"  -}}
+{{- $swaggerPath := index .Values (.Values.global.env) "swaggerPath"  -}}
+{{- $baseUrl := printf "/%s/%s" $apiPrefix $swaggerPath  -}}
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -36,9 +41,35 @@ spec:
                 - {{ .Chart.Name }}-api
             topologyKey: "kubernetes.io/hostname"
       containers:
+      - name: swagger
+        image: swaggerapi/swagger-ui
+        ports:
+        - containerPort: 8080
+        env:
+        - name: BASE_URL
+          value: {{ $baseUrl }}
+        - name: PORT
+          value: "8080"
+        - name: URLS
+          value: "[
+              {
+                \"url\":\"/{{ $apiPrefix }}/protected/{{ $swaggerPath }}\",
+                \"name\":\"protected\"
+              },
+              {
+                \"url\":\"/{{ $apiPrefix }}/private/{{ $swaggerPath }}\",
+                \"name\":\"private\"
+              },
+              {
+                \"url\":\"/{{ $apiPrefix }}/public/{{ $swaggerPath }}\",
+                \"name\":\"public\"
+              },
+            ]"
       - name: {{ .Chart.Name }}-api
         image: {{ index .Values.werf.image $apiChartName }}
         env:
+        - name: ENVNAME
+          value: {{ .Values.global.env }}
         - name: PROJECT
           value: {{ printf "%s-%s" .Chart.Name (.Values.global.env)}}
         {{- range $kafkaSecrets  }}

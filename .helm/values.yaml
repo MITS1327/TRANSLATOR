@@ -1,4 +1,6 @@
 dev:
+  apiPrefix: api
+  swaggerPath: swagger
   replicaCount: 1
   redisHost: redis
   redisPort: 6379
@@ -17,6 +19,8 @@ dev:
   postgresHost: eridanus4.mcn.ru
   postgresPort: 5432
 stage:
+  apiPrefix: api
+  swaggerPath: swagger
   replicaCount: 1
   redisHost: redis
   redisPort: 6379
@@ -35,6 +39,8 @@ stage:
   postgresHost: eridanus4.mcn.ru
   postgresPort: 5432
 spd:
+  apiPrefix: api
+  swaggerPath: swagger
   replicaCount: 1
   redisHost: redis
   redisPort: 6379
@@ -53,6 +59,8 @@ spd:
   postgresHost: eridanus4.mcn.ru
   postgresPort: 5432
 prod:
+  apiPrefix: api
+  swaggerPath: swagger
   replicaCount: 3
   redisHost: redis
   redisPort: 6379
@@ -81,6 +89,8 @@ prod:
   postgresHost: translatordb.veles.mcn.ru
   postgresPort: 54206
 euprod:
+  apiPrefix: api
+  swaggerPath: swagger
   replicaCount: 3
   redisHost: redis
   redisPort: 6379
