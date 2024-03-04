@@ -34,7 +34,7 @@ stages:
 test_lint-and-type-coverage:
   extends: .test
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
       changes:
         - 'app/**/*.ts'
   script:
@@ -78,18 +78,18 @@ dismiss_euprod:
 build_stage:
   extends: .build_stage
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
 lint_stage:
   extends: .lint_stage
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
 deploy_stage:
   extends: .deploy_stage
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
       when: manual
 dismiss_stage:
   extends: .dismiss_stage
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
       when: manual
