@@ -31,22 +31,16 @@ stages:
   stage: test
   allow_failure: true
 
-test_type-coverage:
+test_lint-and-type-coverage:
   extends: .test
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       changes:
         - 'app/**/*.ts'
   script:
-    - cd app/ && npm ci && npm run type-coverage
-test_lint:
-  extends: .test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      changes:
-        - 'app/**/*.ts'
-  script:
-    - cd app/ && npm ci && npm run lint
+    - cd app/ && npm ci
+    - npm run lint
+    - npm run type-coverage
 
 # PROD
 build_prod:
