@@ -7,8 +7,6 @@ if ! [ -f $DIR/.gitclone ]; then
     git clone git@gitlab.mcnloc.ru:platformav2/vpbx_team/translator.git \
     && touch $DIR/.gitclone \
     && cd translator/app \
-    && npm i \
-    && npm i -g @nestjs/cli \
-    && npm i -g npm-check-updates \
-    && npm run build
+    && npm ci \
+    && npm i -g @nestjs/cli
 fi

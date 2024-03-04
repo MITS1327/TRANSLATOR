@@ -66,10 +66,8 @@ $ npm run prettier:fix
 ## Type coverage
 
 ```bash
-# generate type coverage page
+# generate type coverage table
 $ npm run type-coverage
-# print type coverage table to console
-$ npm run type-coverage:console
 ```
 
 Для форматирования кода при нажатии комбинации ctrl + S необходимо добавить в `.vscode/settings.json` следующие свойства:
