@@ -34,7 +34,7 @@ stages:
 test_lint-and-type-coverage:
   extends: .test
   rules:
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE == "true")
       changes:
         - 'app/**/*.ts'
   script:
@@ -50,12 +50,12 @@ lint_prod:
 deploy_prod:
   extends: .deploy_prod
   rules:
-  - if: $CI_COMMIT_REF_NAME == "master"
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
     when: manual
 dismiss_prod:
   extends: .dismiss_prod
   rules:
-  - if: $CI_COMMIT_REF_NAME == "master"
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
     when: manual
 
 # EUPROD
@@ -66,30 +66,30 @@ lint_euprod:
 deploy_euprod:
   extends: .deploy_euprod
   rules:
-  - if: $CI_COMMIT_REF_NAME == "master"
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
     when: manual
 dismiss_euprod:
   extends: .dismiss_euprod
   rules:
-    - if: $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
       when: manual
 
 # STAGE
 build_stage:
   extends: .build_stage
   rules:
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE == "true")
 lint_stage:
   extends: .lint_stage
   rules:
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE == "true")
 deploy_stage:
   extends: .deploy_stage
   rules:
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE == "true")
       when: manual
 dismiss_stage:
   extends: .dismiss_stage
   rules:
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE)
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE == "true")
       when: manual
