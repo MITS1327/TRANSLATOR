@@ -9,6 +9,8 @@ deploy:
 
 {{ $_ := set . "BaseDevNodeImage" "node:20" }}
 {{ $_ := set . "BaseProdNodeImage" "node:20-alpine" }}
+{{ $_ := set . "BaseFrontNodeImage" "node:20" }}
+{{ $_ := set . "BaseNginxImage" "nginx:stable-alpine" }}
 {{ $_ := env "ENVNAME" | set . "env" }}
 ---
 {{ range $path, $content := .Files.Glob ".werf-partial/*.yaml" }}

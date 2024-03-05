@@ -44,6 +44,13 @@ spec:
     http:
       paths:
       - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name:  {{ $.Chart.Name }}-front
+            port:
+              number: 80
+      - pathType: Prefix
         path:  {{ printf "/%s/%s" $apiPrefix "public" }}
         backend:
           service:

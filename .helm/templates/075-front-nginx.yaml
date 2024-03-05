@@ -1,0 +1,82 @@
+{{- if not (eq .Values.global.env "dev") }}
+{{- $dns := index .Values "dns" | default list -}}
+{{- $hosts := list -}}
+{{- $domains := list -}}
+{{- if or (eq .Values.global.env "prod") (eq .Values.global.env "euprod")}}
+{{- range $dns }}
+    {{- $hostParts :=  splitList "." .prod | list | first | reverse -}}
+    {{- $domains = append $domains (printf "%s.%s" (index $hostParts 1) (index $hostParts 0) )}}
+    {{- $hosts = append $hosts (printf "%s.%s.%s" ($.Values.APPNAME) (index $hostParts 1) (index $hostParts 0) ) }}
+{{- end }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-front-nginx-conf
+data:
+  nginx.conf: |
+    user nginx;
+    pid /var/run/nginx.pid;
+    worker_processes  2;
+    error_log /dev/stderr;
+    events {
+      worker_connections 1024;
+    }
+    http {
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+      limit_req_zone $binary_remote_addr zone=by_uri:20m rate=3r/s;
+      limit_req_zone $binary_remote_addr zone=lkip:20m rate=50r/m;
+      proxy_buffer_size   128k;
+      proxy_buffers   4 256k;
+      proxy_busy_buffers_size   256k;
+      log_format combined_plus escape=json '{"time_local": "$time_local", '
+                                          '"remote_addr": "$remote_addr", '
+                                          '"remote_user": "$remote_user", '
+                                          '"request": "$request", '
+                                          '"status": "$status", '
+                                          '"body_bytes_sent": "$body_bytes_sent", '
+                                          '"request_time": "$request_time", '
+                                          '"http_referrer": "$http_referer", '
+                                          '"http_user_agent": "$http_user_agent"}';
+      access_log  /dev/stdout;
+      sendfile on;
+      keepalive_timeout  65;
+      include /etc/nginx/conf.d/*.conf;
+      tcp_nopush on;
+      tcp_nodelay on;
+      set_real_ip_from  10.0.0.0/8;
+      set_real_ip_from  172.0.0.0/8;
+      set_real_ip_from  192.168.0.0/16;
+      real_ip_header X-Real-IP;
+      real_ip_recursive on;
+      gzip  on;
+      gzip_static on;
+      gzip_types text/plain text/css application/json application/javascript application/x-javascript text/javascript;
+      gzip_min_length 1000;
+      gzip_proxied    no-cache no-store private expired auth;
+
+      map $http_upgrade $connection_upgrade {
+          default Upgrade;
+          '' close;
+      }
+
+      server {
+        listen 80;
+
+        server_name  {{ join " " (prepend $hosts .Values.CI_URL) }};
+
+        root /workspace/{{ .Chart.Name }}/front/build;
+        client_max_body_size    6144M;
+        proxy_connect_timeout   600s;
+        proxy_send_timeout      600s;
+        proxy_read_timeout      600s;
+
+        location / {
+          try_files $uri $uri/ index.html ./index.html;
+        }
+      }
+    }
+{{- end }}

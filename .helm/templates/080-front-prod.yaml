@@ -1,0 +1,33 @@
+{{- $frontChartName := printf "%s-front-%s" .Chart.Name .Values.global.env -}}
+{{- $replicaCount := index .Values (.Values.global.env) "replicaCount" -}}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-front
+  labels:
+    app: {{ .Chart.Name }}-front
+spec:
+  replicas: {{ $replicaCount }}
+  selector:
+      matchLabels:
+        app: {{ .Chart.Name }}-front
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-front
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}-front
+        image: {{ index .Values.werf.image $frontChartName }}
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+          name: {{ .Chart.Name }}-front-nginx-conf
+      volumes:
+      - name: {{ .Chart.Name }}-front-nginx-conf
+        configMap:
+          name: {{ .Chart.Name }}-front-nginx-conf

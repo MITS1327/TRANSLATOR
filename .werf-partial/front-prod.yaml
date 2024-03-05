@@ -1,0 +1,47 @@
+{{- if not (eq .env "dev") }}
+---
+artifact: {{ .project }}-front-build
+from: {{ .BaseFrontNodeImage }}
+
+git:
+- add: /
+  to: /workspace/translator
+
+ansible:
+  beforeInstall:
+  - name: Setup workspace
+    file:
+      path: /workspace/translator
+      state: directory
+  - name:  ssh_config for github
+    shell: printf "Host gitlab.mcnloc.ru\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
+  setup:
+  - name: Install deps
+    shell: npm ci
+    args:
+     chdir: /workspace/translator/front
+  - name: Build frontend
+    shell: npm run build -- --env CI_URL={{ env "CI_URL" }} --env ENVNAME={{ env "ENVNAME" }}
+    args:
+     chdir: /workspace/translator/front
+---
+---
+image: {{ .project }}-front-{{ .env }}
+from: {{ .BaseNginxImage }}
+docker:
+  USER: root
+  WORKDIR: /workspace/translator
+  EXPOSE: "80"
+
+import:
+- artifact: {{ .project }}-front-build
+  add: /workspace/translator
+  to: /workspace/translator
+  owner: nginx
+  group: nginx
+  excludePaths:
+  - front/node_modules
+  after: install
+---
+{{- end }}
+
