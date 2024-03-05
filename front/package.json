@@ -1,0 +1,136 @@
+{
+  "name": "web-phone",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": [
+    "*.css",
+    "*.scss"
+  ],
+  "dependencies": {
+    "@alfalab/core-components-collapse": "^4.4.0",
+    "@alfalab/core-components-table": "^2.4.18",
+    "axios": "^1.6.2",
+    "classnames": "^2.3.2",
+    "libphonenumber-js": "^1.10.52",
+    "lodash": "^4.17.21",
+    "lodash.debounce": "^4.0.8",
+    "mcn-ui-components": "git+ssh://git@github.com/welltime/mcn-ui-components.git#502fec4bf3e6486eb0f523096c4a8da3dab864a3",
+    "moment": "^2.29.4",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-bootstrap": "^1.5.0",
+    "react-dadata": "^2.23.1",
+    "react-dom": "^18.2.0",
+    "react-google-autocomplete": "^2.7.3",
+    "react-hook-form": "^7.51.0",
+    "react-redux": "^9.0.4",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
+    "react-simple-keyboard": "^3.7.70",
+    "reselect": "^5.0.1",
+    "sip.js": "^0.21.2",
+    "zustand": "^4.5.2"
+  },
+  "scripts": {
+    "start": "webpack serve --env development --open --config webpack/webpack.custom.config.ts",
+    "start-k8s": "webpack serve --env development --mode=development --open --env isMinikube --config webpack/webpack.custom.config.ts",
+    "build": "webpack --env production --config webpack/webpack.custom.config.ts",
+    "lint-junit": "eslint --ext .js,.jsx,.ts,.tsx ./src/ --fix --max-warnings 0 --config node_modules/mcn-ui-components/.eslintrc-ts",
+    "pootle-validate": "node node_modules/mcn-ui-components/pootleValidate.js ../lang/*",
+    "lint-scss": "prettier --write ./src/**/*.scss && stylelint \"./src/**/*.scss\" --fix --max-warnings 0 --config node_modules/mcn-ui-components/.stylelintrc-scss || echo \"lint faild for some file(s).\"",
+    "translate": "node node_modules/mcn-ui-components/convertDict.js ./lang/*",
+    "prepare-husky": "cd .. && husky install .husky",
+    "prepare-env": "node ./prepareEnv.js --with-gitclone",
+    "update-env": "node  ./prepareEnv.js",
+    "add-key": "node node_modules/mcn-ui-components/addPootleKeys.js",
+    "type-coverage": "typescript-coverage-report",
+    "pre-commit": "lint-staged"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@digitalroute/cz-conventional-changelog-for-jira": "^8.0.1",
+    "@svgr/webpack": "^8.1.0",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@types/react-redux": "^7.1.33",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/redux-logger": "^3.0.12",
+    "@types/tabulator-tables": "^5.5.4",
+    "@types/webpack": "^5.28.5",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "commitizen": "^4.3.0",
+    "compression-webpack-plugin": "^10.0.0",
+    "css-loader": "^6.8.1",
+    "esbuild-loader": "^4.0.2",
+    "eslint": "^8.55.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-no-cyrillic-string": "^1.0.5",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "external-remotes-plugin": "^1.0.0",
+    "file-loader": "^6.2.0",
+    "fork-ts-checker-webpack-plugin": "^9.0.2",
+    "html-webpack-plugin": "^5.5.4",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "postcss-custom-media": "^10.0.2",
+    "postcss-custom-properties": "^13.3.3",
+    "postcss-loader": "^7.3.3",
+    "postcss-nested": "^6.0.1",
+    "postcss-preset-env": "^9.3.0",
+    "prettier": "^3.1.1",
+    "sass": "^1.71.1",
+    "sass-loader": "^13.3.3",
+    "stylelint": "^15.11.0",
+    "stylelint-at-rule-no-children": "^0.3.1",
+    "stylelint-config-recommended": "^13.0.0",
+    "stylelint-declaration-block-no-ignored-properties": "^2.7.0",
+    "stylelint-order": "^6.0.4",
+    "stylelint-scss": "^5.3.1",
+    "stylelint-value-no-unknown-custom-properties": "^5.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "5.3.3",
+    "typescript-coverage-report": "^0.8.0",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-merge": "^5.10.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./commitizen.js"
+    }
+  },
+  "lint-staged": {
+    "*.ts*": [
+      "eslint --fix --max-warnings 0 --config node_modules/mcn-ui-components/.eslintrc-ts",
+      "npm run type-coverage"
+    ],
+    "*.scss": [
+      "prettier --write",
+      "stylelint --fix --max-warnings 0 --config node_modules/mcn-ui-components/.stylelintrc-scss || echo \"lint faild for some file(s).\""
+    ],
+    "../lang/*.po": "npm run pootle-validate"
+  }
+}

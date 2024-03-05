@@ -1,0 +1,32 @@
+@import "@mixins";
+
+.page {
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background: var(--primary);
+
+    .mcn-select {
+      min-width: 150px;
+    }
+
+    .headerItem {
+
+      &:not(:last-child) {
+        margin-right: 20px;
+      }
+    }
+  }
+
+  .table {
+    height: 100%;
+
+    .tableContainer {
+      max-height: 815px;
+      overflow-y: scroll;
+
+      @include custom-scroll;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+@mixin custom-scroll {
+    scrollbar-width: 8px;
+    scrollbar-color: var(--disabled) var(--gray);
+  
+    &::-webkit-scrollbar,
+    &::-webkit-scrollbar-thumb {
+      width: 8px;
+      height: 8px;
+      background-clip: padding-box;
+      border-radius: 8px;
+    }
+  
+    &::-webkit-scrollbar-track {
+      width: 8px;
+      height: 8px;
+      background: var(--gray);
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      background: var(--disabled);
+    }
+}

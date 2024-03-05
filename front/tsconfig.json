@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "jsx": "react-jsx",
+    "target": "ES2022",
+    "module": "ES2022",
+    "noImplicitAny": true,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "api/*": ["./src/api/*"],
+      "shared/*": ["./src/shared/*"],
+      "app/*": ["./src/app/*"],
+      "pages/*": ["./src/pages/*"],
+      "*": ["./src/*"]
+    }
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    },
+    "files": true
+  },
+  "include": ["src", "declarations.d.ts", "webpack"],
+  "exclude": ["node_modules", "build", "mcn-ui-components", "coverage-ts"]
+}

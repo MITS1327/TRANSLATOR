@@ -1,0 +1,21 @@
+.page {
+  .header {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    background: var(--primary);
+
+    .headerItem {
+      margin-right: 10px;
+    }
+  }
+
+  .table {
+    height: 100%;
+
+    .tableContainer {
+      max-height: 815px;
+      overflow-y: scroll;
+    }
+  }
+}
