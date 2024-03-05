@@ -106,7 +106,7 @@ euprod:
   kafkaBrokers: '["mcn-kafka-cluster-eu-kafka-bootstrap.kafka:9092"]'
   kafkaClientId: translator_api
   kafkaGroupId: translator_api
-  postgresHost: translatordb.odin.kompaas.tech
+  postgresHost: translatordb.local.kompaas.tech
   postgresPort: 54101
 dns:
   - prod: translator.myinno.net
