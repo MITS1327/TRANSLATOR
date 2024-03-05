@@ -11,6 +11,9 @@ include:
     file: 'deployv2.shell.gitlab-ci.yml'
   - project: 'ci-cd/templates'
     ref: master
+    file: 'cleanupv2.shell.gitlab-ci.yml'
+  - project: 'ci-cd/templates'
+    ref: master
     file: 'dismiss.shell.gitlab-ci.yml'
 
 .before:
@@ -21,6 +24,7 @@ stages:
   - lint
   - test
   - deploy
+  - cleanup
   - dismiss
 
 # TEST
@@ -56,6 +60,11 @@ deploy_prod:
   rules:
   - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
     when: manual
+cleanup_prod:
+  extends: .cleanup_prod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
+    when: manual
 dismiss_prod:
   extends: .dismiss_prod
   rules:
@@ -73,6 +82,11 @@ lint_euprod:
   - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
 deploy_euprod:
   extends: .deploy_euprod
+  rules:
+  - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
+    when: manual
+cleanup_euprod:
+  extends: .cleanup_euprod
   rules:
   - if: $CI_COMMIT_REF_NAME == "master" && $STAGE_PIPELINE != "true"
     when: manual
@@ -96,6 +110,11 @@ deploy_stage:
   rules:
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE == "true")
       when: manual
+cleanup_stage:
+  extends: .cleanup_stage
+  rules:
+  - if: ($CI_PIPELINE_SOURCE == "merge_request_event" || $STAGE_PIPELINE == "true")
+    when: manual
 dismiss_stage:
   extends: .dismiss_stage
   rules:
