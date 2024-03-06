@@ -33,8 +33,8 @@ data:
     protected-mode no
     port {{ $redisPort }}
     tcp-backlog 511
-    timeout 10
-    tcp-keepalive 30
+    tcp-keepalive 200
+    timeout 300
     daemonize no
     supervised no
     pidfile "/var/run/redis_6379.pid"
@@ -109,6 +109,9 @@ data:
     sentinel parallel-syncs ${REDIS_SENTINEL_MASTER_NAME} 1
     sentinel announce-ip ${HOSTNAME}.${REDIS_SENTINEL_HOST}
     sentinel announce-port ${REDIS_SENTINEL_PORT}
+    tcp-backlog 511
+    tcp-keepalive 200
+    timeout 300
     " > /etc/redis/sentinel.conf
     cat /etc/redis/sentinel.conf
   redis_init.sh: |
