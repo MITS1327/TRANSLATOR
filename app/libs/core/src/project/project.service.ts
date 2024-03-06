@@ -41,6 +41,10 @@ export class ProjectServiceImpl implements ProjectService {
   }
 
   private async parsePootleFile(keys: Record<string, Record<string, string>>, path: string, langId: number) {
+    if (!path) {
+      return;
+    }
+
     const lines = await readFile(path, 'utf-8');
     let key;
     let value;
@@ -76,8 +80,6 @@ export class ProjectServiceImpl implements ProjectService {
         }),
       ),
     );
-
-    return keys;
   }
 
   private async getTranslatedKeysFromLangFiles(
@@ -147,7 +149,7 @@ export class ProjectServiceImpl implements ProjectService {
       return {
         langId: lang.id,
         isTranslatable: lang.isTranslatable,
-        path: langFile.path,
+        path: langFile?.path || null,
       };
     });
 
