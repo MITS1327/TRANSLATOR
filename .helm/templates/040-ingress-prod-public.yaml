@@ -23,6 +23,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 100m
     nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
     ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/cors-allow-headers: "x-products-timestamp"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       if ($http_origin ~ '^https:\/\/(.*)?\.?({{ print (join "|" (prepend $domains (.Values.DOMAIN))) }})$' ) {
         more_set_headers "Access-Control-Allow-Origin: $http_origin";
