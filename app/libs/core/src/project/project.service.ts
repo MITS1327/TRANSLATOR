@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import { readFile } from 'fs/promises';
 import { Readable, Transform } from 'stream';
@@ -140,14 +140,7 @@ export class ProjectServiceImpl implements ProjectService {
       return;
     }
 
-    const langs = await this.langRepository.getManyBy(
-      data.langFiles.reduce((acc, langFile) => {
-        return [...acc, { id: langFile.langId }];
-      }, []),
-    );
-    if (langs.length !== data.langFiles.length) {
-      throw new NotFoundException('Entered langs not found');
-    }
+    const langs = await this.langRepository.getAll();
     const langsWithFiles = langs.map((lang) => {
       const langFile = data.langFiles.find((langFile) => langFile.langId === lang.id);
 
