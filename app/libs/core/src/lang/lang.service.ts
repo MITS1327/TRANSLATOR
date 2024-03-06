@@ -75,6 +75,7 @@ export class LangServiceImpl implements LangService {
                   langId: newLangId,
                   value: chunk.name,
                   userId: data.userId,
+                  isTranslatableLang: data.isTranslatable,
                 }),
               );
             },

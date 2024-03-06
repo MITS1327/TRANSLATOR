@@ -60,14 +60,16 @@ export class KeyServiceImpl implements KeyService {
   }
 
   constructTranslatedKeyData(data: ConstructTranslatedKeyInputObject): Omit<TranslatedKeyEntity, 'id'> {
+    const keyValue = data.isTranslatableLang ? data.value : data.name;
+
     return {
       name: data.name,
       projectId: data.projectId,
-      value: data.value,
+      value: keyValue,
       langId: data.langId,
       logs: [
         {
-          newValue: data.value,
+          newValue: keyValue,
           oldValue: '',
           userId: data.userId,
           timestamp: data.timestamp,
@@ -96,16 +98,15 @@ export class KeyServiceImpl implements KeyService {
       ) || {};
 
     const keys: KeyDataForCreate[] = langs.map((lang) => {
-      const keyValue = lang.isTranslatable ? data.name : valuesObject[lang.id] || data.name;
-
       const translatedKeyData = this.constructTranslatedKeyData({
         name: data.name,
         projectId: data.projectId,
         langId: lang.id,
         userId: data.userId,
         comment: data.comment,
-        value: keyValue,
+        value: valuesObject[lang.id] || data.name,
         timestamp,
+        isTranslatableLang: lang.isTranslatable,
       });
 
       return {

@@ -19,6 +19,7 @@ import { LANG_REPOSITORY_PROVIDER, LangRepository } from '../lang';
 import { CreateProjectInputObject, GetProjectsWithFilterInputObject, UpdateProjectInputObject } from './input-objects';
 import { ProjectEntity, ProjectRepository, ProjectService } from './interfaces';
 import { PROJECT_REPOSITORY_PROVIDER } from './project.di-tokens';
+import { LangWithFile } from './types';
 
 @Injectable()
 export class ProjectServiceImpl implements ProjectService {
@@ -79,30 +80,17 @@ export class ProjectServiceImpl implements ProjectService {
     return keys;
   }
 
-  private async isLangsFilesValidOrThrow(langFiles: CreateProjectInputObject['langFiles']) {
-    const langs = await this.langRepository.getManyBy(
-      langFiles.reduce((acc, langFile) => {
-        return [...acc, { id: langFile.langId }];
-      }, []),
-    );
-    if (langs.length !== langFiles.length) {
-      throw new NotFoundException('Entered langs not found');
-    }
-
-    return true;
-  }
-
   private async getTranslatedKeysFromLangFiles(
     projectId: ProjectEntity['id'],
     timestamp: Date,
     userId: string,
-    langFiles: CreateProjectInputObject['langFiles'],
+    langsWithFiles: LangWithFile[],
   ): Promise<{
     keys: Omit<TranslatedKeyEntity, 'id'>[];
     uniqueKeysCount: number;
   }> {
     const keysFromLangFiles = {};
-    for (const { langId, path } of langFiles) {
+    for (const { langId, path } of langsWithFiles) {
       await this.parsePootleFile(keysFromLangFiles, path, langId);
     }
 
@@ -115,7 +103,7 @@ export class ProjectServiceImpl implements ProjectService {
         new Transform({
           objectMode: true,
           transform: (chunk, _encoding, callback) => {
-            for (const { langId } of langFiles) {
+            for (const { langId, isTranslatable } of langsWithFiles) {
               translatedKeys.push(
                 this.keyService.constructTranslatedKeyData({
                   name: chunk,
@@ -125,6 +113,7 @@ export class ProjectServiceImpl implements ProjectService {
                   langId: +langId,
                   value: keysFromLangFiles[chunk]?.[langId] || chunk,
                   userId: userId,
+                  isTranslatableLang: isTranslatable,
                 }),
               );
             }
@@ -151,7 +140,23 @@ export class ProjectServiceImpl implements ProjectService {
       return;
     }
 
-    await this.isLangsFilesValidOrThrow(data.langFiles);
+    const langs = await this.langRepository.getManyBy(
+      data.langFiles.reduce((acc, langFile) => {
+        return [...acc, { id: langFile.langId }];
+      }, []),
+    );
+    if (langs.length !== data.langFiles.length) {
+      throw new NotFoundException('Entered langs not found');
+    }
+    const langsWithFiles = langs.map((lang) => {
+      const langFile = data.langFiles.find((langFile) => langFile.langId === lang.id);
+
+      return {
+        langId: lang.id,
+        isTranslatable: lang.isTranslatable,
+        path: langFile.path,
+      };
+    });
 
     await this.inMemoryStorageService.wrapInLock(CREATION_TRANSLATOR_DATA_KEY_LOCK, async () => {
       const timestamp = new Date();
@@ -159,7 +164,7 @@ export class ProjectServiceImpl implements ProjectService {
         newProjectId,
         timestamp,
         data.userId,
-        data.langFiles,
+        langsWithFiles,
       );
 
       await this.translatedKeyRepository.createChunkedBulk(keys);
