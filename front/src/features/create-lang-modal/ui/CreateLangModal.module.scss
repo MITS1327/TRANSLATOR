@@ -1,15 +1,21 @@
+.modalFooter {
+  .cancel {
+    margin-right: 10px;
+  }
+}
+
 .form {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .formContainer {
     width: 100%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+    padding: 5px;
+  }
 
-    .formContainer {
-        width: 100%;
-        padding: 5px;
-    }
-
-    .formInput {
-        width: 100%;
-    }
+  .formInput {
+    width: 100%;
+  }
 }

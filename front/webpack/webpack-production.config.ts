@@ -14,6 +14,8 @@ const productionConfig = (env: Env): Configuration => {
   const { ENVNAME, CI_URL } = env;
   delete deps['mcn-ui-components'];
 
+  const topbarHostName = 'topbar@[window.topbarUrl]/remoteEntry.js';
+
   return {
     mode: 'production',
     watch: false,
@@ -26,6 +28,24 @@ const productionConfig = (env: Env): Configuration => {
     devtool: false,
     plugins: [
       new ExternalTemplateRemotesPlugin(),
+      new webpack.container.ModuleFederationPlugin({
+        name: 'translator',
+        filename: 'remoteEntry.js',
+        remotes: {
+          topbar: topbarHostName,
+        },
+        shared: {
+          ...deps,
+          react: {
+            singleton: true,
+            requiredVersion: deps.react,
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: deps['react-dom'],
+          },
+        },
+      }),
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, '../public', ENVNAME === 'euprod' ? 'indexEu.html' : 'indexRu.html'),
         title: 'Production',

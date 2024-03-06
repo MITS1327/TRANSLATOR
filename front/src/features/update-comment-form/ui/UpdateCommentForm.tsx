@@ -39,7 +39,9 @@ export const UpdateCommentForm = (props: Props) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.formContainer}>
-        <TranslatorInput className={styles.formInput} defaultValue={initialValue} name='comment' register={register} />
+        <div className={styles.formInput}>
+          <TranslatorInput defaultValue={initialValue} name='comment' register={register} />
+        </div>
         <Btn type='submit' kind='base-primary' onClick={handleSubmit(onSubmit)}>
           Принять
         </Btn>

@@ -24,6 +24,24 @@ const developmentConfig = (env: Env): Configuration => {
     devtool: 'eval-cheap-module-source-map',
     plugins: [
       new ExternalTemplateRemotesPlugin(),
+      new webpack.container.ModuleFederationPlugin({
+        name: 'translator',
+        filename: 'remoteEntry.js',
+        remotes: {
+          topbar: 'topbar@[window.topbarUrl]/remoteEntry.js',
+        },
+        shared: {
+          ...deps,
+          react: {
+            singleton: true,
+            requiredVersion: deps.react,
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: deps['react-dom'],
+          },
+        },
+      }),
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, '../public', ENVNAME === 'euprod' ? 'indexEu.html' : 'indexRu.html'),
         title: 'Development',

@@ -45,11 +45,13 @@ export const MainPage = () => {
         <Btn className={styles.headerItem} onClick={() => setIsOpenLang(true)} kind='base'>
           Добавить язык
         </Btn>
-        <TranslatorInput
-          className={styles.headerItem}
-          placeholder='Поиск'
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
-        />
+        <div>
+          <TranslatorInput
+            className={styles.headerItem}
+            placeholder='Поиск'
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
+          />
+        </div>
       </div>
       <div className={styles.table}>
         <Table
@@ -72,8 +74,8 @@ export const MainPage = () => {
               <Table.TRow key={project.id}>
                 <Table.TCell>
                   <div>
-                    <Link to={`translator/${project.id}`}>
-                      <div>{project.name}</div>
+                    <Link to={`${project.id}`}>
+                      <div>{project.name.toUpperCase()}</div>
                     </Link>
                   </div>
                 </Table.TCell>

@@ -76,11 +76,6 @@ const devServer = (isMinikube: boolean): Configuration => {
           pathRewrite: { '^/topbar': '/' },
           changeOrigin: true,
         },
-        '/webPhone': {
-          target: 'https://webphone-stage.mcnloc.ru',
-          pathRewrite: { '^/webPhone': '/' },
-          changeOrigin: true,
-        },
       },
     },
   };

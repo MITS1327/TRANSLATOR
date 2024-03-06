@@ -78,13 +78,14 @@ export const CreateKeyModal = (props: Props) => {
       >
         <div className={styles.form}>
           <form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
-            <TranslatorInput
-              className={styles.formInput}
-              name='keyName'
-              placeholder='Название ключа'
-              register={register}
-              validationSchema={{ required: true }}
-            />
+            <div className={styles.formInput}>
+              <TranslatorInput
+                name='keyName'
+                placeholder='Название ключа'
+                register={register}
+                validationSchema={{ required: true }}
+              />
+            </div>
             <div className={styles.multi}>
               {langs?.data.map((el) => (
                 <div className={styles.multiItem}>

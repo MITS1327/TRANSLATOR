@@ -1,3 +1,9 @@
+.modalFooter {
+    .cancel {
+      margin-right: 10px;
+    }
+  }
+
 .form {
     width: 100%;
     display: flex;
@@ -7,16 +13,16 @@
     .formContainer {
         width: 100%;
         padding: 5px;
-    }
 
-    .formInput {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .formSelect {
-        &:not(:last-child) {
+        .formInput {
+            width: 100%;
             margin-bottom: 10px;
+        }
+
+        .formSelect {
+            &:not(:last-child) {
+                margin-bottom: 10px;
+            }
         }
     }
 }

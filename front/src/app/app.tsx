@@ -1,19 +1,22 @@
 import { Redirect, Route, Switch } from 'react-router-dom';
+import Topbar from 'topbar/Topbar';
 import { ProductPage, MainPage } from 'pages';
+import { IS_EU_PROD } from 'shared/config';
 
 const App = () => {
   return (
     <div className='app'>
+      <Topbar isVisibleTopbarProductMenu isNewAccountList isEuropeHost={IS_EU_PROD} />
       <Switch>
-        <Route path='/translator/:productId'>
+        <Route path='/:productId'>
           <ProductPage />
         </Route>
-        <Route path='/translator'>
+        <Route path='/'>
           <MainPage />
         </Route>
 
         <Route>
-          <Redirect to='/translator' />
+          <Redirect to='/' />
         </Route>
       </Switch>
     </div>

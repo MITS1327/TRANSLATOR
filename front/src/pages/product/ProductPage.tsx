@@ -8,6 +8,7 @@ import { Lang, Project, useKeyStore, useLangStore, useProjectStore } from 'entit
 import { useEffect, useMemo, useState } from 'react';
 import { TranslatorInput } from 'shared';
 
+import { Link } from 'react-router-dom';
 import styles from './Product.module.scss';
 
 export const ProductPage = () => {
@@ -75,7 +76,11 @@ export const ProductPage = () => {
     <div className={styles.page}>
       {(isLoadingKeys || isLoadingLangs || isLoadingProjects) && <Preloader typeStyle='base' />}
       <div className={styles.header}>
-        <div className={styles.headerItem}>{currentProduct?.name}</div>
+        <div className={styles.headerItemProject}>
+          <Link to='/'>
+            <div>{currentProduct?.name.toUpperCase()}</div>
+          </Link>
+        </div>
         <Btn className={styles.headerItem} onClick={() => setIsOpen(true)} kind='base'>
           Добавить ключ
         </Btn>
@@ -88,11 +93,12 @@ export const ProductPage = () => {
             onChange={handleChangeSelect}
           />
         </div>
-        <TranslatorInput
-          className={styles.headerItem}
-          placeholder='Поиск'
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
-        />
+        <div className={styles.headerItem}>
+          <TranslatorInput
+            placeholder='Поиск'
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
+          />
+        </div>
       </div>
       <div className={styles.table}>
         <Table

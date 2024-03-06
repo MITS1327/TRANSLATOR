@@ -76,13 +76,14 @@ export const CreateProjectModal = (props: Props) => {
       >
         <div className={styles.form}>
           <form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
-            <TranslatorInput
-              className={styles.formInput}
-              name='project'
-              placeholder='Название проекта'
-              register={register}
-              validationSchema={{ required: true }}
-            />
+            <div className={styles.fromInput}>
+              <TranslatorInput
+                name='project'
+                placeholder='Название проекта'
+                register={register}
+                validationSchema={{ required: true }}
+              />
+            </div>
             {errors.project && <>Заполните</>}
             {files?.map(() => (
               <div className={styles.formSelect}>

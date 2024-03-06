@@ -1,6 +1,6 @@
 .modalFooter {
   .cancel {
-
+    margin-right: 10px;
   }
 }
 
@@ -15,7 +15,7 @@
     padding: 5px;
   }
 
-  .formInput  {
+  .formInput {
     width: 100%;
 
     &:not(:last-child) {
