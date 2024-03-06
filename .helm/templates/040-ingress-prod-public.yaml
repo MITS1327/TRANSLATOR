@@ -23,18 +23,20 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 100m
     nginx.ingress.kubernetes.io/whitelist-source-range: "0.0.0.0/0"
     ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/cors-allow-headers: "x-products-timestamp"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       if ($http_origin ~ '^https:\/\/(.*)?\.?({{ print (join "|" (prepend $domains (.Values.DOMAIN))) }})$' ) {
         more_set_headers "Access-Control-Allow-Origin: $http_origin";
         more_set_headers "Access-Control-Allow-Credentials: true";
         more_set_headers "Access-Control-Expose-Headers: X-Products-Hash";
+        more_set_headers "Access-Control-Expose-Headers: x-products-timestamp";
+        more_set_headers "Access-Control-Allow-Headers: X-Products-Hash";
+        more_set_headers "Access-Control-Allow-Headers: x-products-timestamp";
       }
       if ($request_method = 'OPTIONS') {
         add_header 'Access-Control-Allow-Origin' "$http_origin" always;
         add_header 'Access-Control-Allow-Credentials' "true" always;
         add_header 'Access-Control-Allow-Methods' "GET, PATCH, PUT, POST, DELETE, OPTIONS" always;
-        add_header 'Access-Control-Allow-Headers' "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,X-Products-Hash" always;
+        add_header 'Access-Control-Allow-Headers' "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,X-Products-Hash,x-products-timestamp" always;
         add_header 'Access-Control-Max-Age' 1728000 always;
         return 204;
       }
