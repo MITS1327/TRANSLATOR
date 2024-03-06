@@ -1,13 +1,14 @@
 import { create } from 'zustand';
 import { PaginatedResponseDTO, apiTranslator } from 'shared/api';
 import { CreateProjectPayload } from 'shared/api/translator/types';
-import { Project } from '.';
+import { Project } from './model';
+import { DefaultGetRequestPayload } from 'shared/types';
 
 interface State {
   isLoading: boolean;
   error: string;
   projects: PaginatedResponseDTO<Project>;
-  getProjects: (payload?: any) => void;
+  getProjects: (payload?: Partial<DefaultGetRequestPayload>) => void;
   createProject: (payload: CreateProjectPayload) => void;
 }
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { PaginatedResponseDTO, apiTranslator } from 'shared/api';
-import { Lang } from '.';
+import { Lang } from './model';
 
 interface State {
   isLoading: boolean;

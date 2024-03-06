@@ -1,16 +1,17 @@
 import { create } from 'zustand';
 import { PaginatedResponseDTO, apiTranslator } from 'shared/api';
 import { CreateKeyPayload, UpdateCommentPayload, UpdateKeyValue } from 'shared/api/translator/types';
-import { Key } from '.';
+import { Key } from './model';
+import { DefaultGetRequestPayload } from 'shared/types';
 
 interface State {
   isLoading: boolean;
   error: string;
   keys: PaginatedResponseDTO<Key>;
-  getKeys: (payload: any) => void;
-  updateKeys: (payload: UpdateKeyValue, getKeysPayload: any) => void;
-  createKey: (payload: CreateKeyPayload, getKeysPayload: any) => void;
-  updateComment: (payload: UpdateCommentPayload, getKeysPayload: any) => void;
+  getKeys: (payload: Partial<DefaultGetRequestPayload>) => void;
+  updateKeys: (payload: UpdateKeyValue, getKeysPayload: Partial<DefaultGetRequestPayload>) => void;
+  createKey: (payload: CreateKeyPayload, getKeysPayload: Partial<DefaultGetRequestPayload>) => void;
+  updateComment: (payload: UpdateCommentPayload, getKeysPayload: Partial<DefaultGetRequestPayload>) => void;
 }
 
 export const useKeyStore = create<State>((set, get) => ({

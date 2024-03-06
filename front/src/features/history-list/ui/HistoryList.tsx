@@ -1,5 +1,6 @@
 import { Table } from '@alfalab/core-components-table';
 import { Log } from 'entities';
+import moment from 'moment';
 
 type Props = {
   id: number;
@@ -26,7 +27,7 @@ export const HistoryList = (props: Props) => {
               <div>{log.oldValue}</div>
             </Table.TCell>
             <Table.TCell>
-              <div>{log.timestamp}</div>
+              <div>{moment(log.timestamp).format('YYYY-MM-DD')}</div>
             </Table.TCell>
             <Table.TCell>
               <div>{log.userId ? log.userId : '-'}</div>

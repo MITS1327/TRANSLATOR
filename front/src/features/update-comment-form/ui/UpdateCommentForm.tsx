@@ -1,10 +1,11 @@
 import { Btn } from 'mcn-ui-components';
-import { buildFilterQuery } from 'mcn-ui-components/utils';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useKeyStore } from 'entities';
 import { TranslatorInput } from 'shared';
+import { DefaultGetRequestPayload } from 'shared/types';
 
 import styles from './UpdateCommentForm.module.scss';
+
 
 type FormFields = {
   comment: string;
@@ -14,10 +15,11 @@ type Props = {
   initialValue: string;
   name: string;
   productId: string;
+  getKeysParams: Partial<DefaultGetRequestPayload>;
 };
 
 export const UpdateCommentForm = (props: Props) => {
-  const { initialValue, name, productId } = props;
+  const { initialValue, name, getKeysParams, productId } = props;
   const updateComment = useKeyStore((state) => state.updateComment);
   const {
     register,
@@ -30,10 +32,7 @@ export const UpdateCommentForm = (props: Props) => {
   });
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
-    updateComment(
-      { comment: data.comment, projectId: +productId, name },
-      { filter: buildFilterQuery('projectId', '$eq', [productId]) },
-    );
+    updateComment({ comment: data.comment, projectId: +productId, name }, getKeysParams);
   };
 
   return (

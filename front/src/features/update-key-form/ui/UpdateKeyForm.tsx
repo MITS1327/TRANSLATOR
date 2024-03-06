@@ -1,10 +1,11 @@
 import { Btn } from 'mcn-ui-components';
-import { buildFilterQuery } from 'mcn-ui-components/utils';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useKeyStore } from 'entities';
 import { TranslatorInput } from 'shared';
+import { DefaultGetRequestPayload } from 'shared/types';
 
 import styles from './UpdateKeyForm.module.scss';
+
 
 type FormFields = {
   key: string;
@@ -13,11 +14,11 @@ type FormFields = {
 type Props = {
   initialValue: string;
   keyId: number;
-  productId: string;
+  getKeysParams: Partial<DefaultGetRequestPayload>;
 };
 
 export const UpdateKeyForm = (props: Props) => {
-  const { initialValue, keyId, productId } = props;
+  const { initialValue, keyId, getKeysParams } = props;
   const updateKey = useKeyStore((state) => state.updateKeys);
   const {
     register,
@@ -30,7 +31,7 @@ export const UpdateKeyForm = (props: Props) => {
   });
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
-    updateKey({ id: keyId, value: data.key }, { filter: buildFilterQuery('projectId', '$eq', [productId]) });
+    updateKey({ id: keyId, value: data.key }, getKeysParams);
   };
 
   return (

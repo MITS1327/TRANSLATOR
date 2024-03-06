@@ -29,6 +29,8 @@ export const ProductPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [langValue, setLangValue] = useState(null);
 
+  const [searchField, setSearchField] = useState('name');
+
   const DATA_SIZE = keys?.totalCount;
   const PER_PAGE = 20;
   const [page, setPage] = useState(0);
@@ -41,11 +43,29 @@ export const ProductPage = () => {
       offset: search.length ? 0 : PER_PAGE * page,
       filter: [
         buildFilterQuery('projectId', '$eq', [productId]),
-        buildFilterQuery('name', '$ILike', [search]),
+        buildFilterQuery(searchField, '$ILike', [search]),
         langValue ? buildFilterQuery('langId', '$eq', [langValue]) : null,
       ],
     }),
-    [search, page, langValue],
+    [search, page, langValue, searchField],
+  );
+
+  const searchFieldSelectOptions = useMemo(
+    () => [
+      {
+        label: 'Название',
+        value: 'name',
+      },
+      {
+        label: 'Значение',
+        value: 'value',
+      },
+      {
+        label: 'Комментарий',
+        value: 'comment',
+      },
+    ],
+    [],
   );
 
   useEffect(() => {
@@ -72,6 +92,10 @@ export const ProductPage = () => {
     setLangValue(data?.data.value);
   };
 
+  const handleChangeSearchField = (data: { name: string; data: { label: string; value: string } }) => {
+    setSearchField(data?.data.value);
+  };
+
   return (
     <div className={styles.page}>
       {(isLoadingKeys || isLoadingLangs || isLoadingProjects) && <Preloader typeStyle='base' />}
@@ -91,6 +115,16 @@ export const ProductPage = () => {
             options={langSelectOptions}
             name='lang'
             onChange={handleChangeSelect}
+          />
+        </div>
+        <div className={styles.headerItem}>
+          <Select
+            placeholder='Поле'
+            typeStyle='base'
+            value={searchFieldSelectOptions[0]}
+            options={searchFieldSelectOptions}
+            name='lang'
+            onChange={handleChangeSearchField}
           />
         </div>
         <div className={styles.headerItem}>
@@ -147,11 +181,16 @@ export const ProductPage = () => {
                 </Table.TCell>
 
                 <Table.TCell>
-                  <UpdateKeyForm keyId={key.id} productId={productId} initialValue={key.value} />
+                  <UpdateKeyForm keyId={key.id} getKeysParams={getKeysParams} initialValue={key.value} />
                 </Table.TCell>
 
                 <Table.TCell>
-                  <UpdateCommentForm name={key.name} productId={productId} initialValue={key.comment} />
+                  <UpdateCommentForm
+                    name={key.name}
+                    getKeysParams={getKeysParams}
+                    productId={productId}
+                    initialValue={key.comment}
+                  />
                 </Table.TCell>
               </Table.TExpandableRow>
             ))}
