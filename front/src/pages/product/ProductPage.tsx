@@ -12,8 +12,7 @@ import { Link } from 'react-router-dom';
 import styles from './Product.module.scss';
 
 export const ProductPage = () => {
-  // @ts-ignore
-  const { productId } = useParams();
+  const { productId } = useParams<QueryParams>();
 
   const [search, setSearch] = useState('');
 
@@ -82,7 +81,16 @@ export const ProductPage = () => {
 
   const currentProduct = useMemo(() => products?.data.find((el: Project) => el.id === +productId), [products]);
 
-  const langSelectOptions = useMemo(() => langs?.data.map((el) => ({ label: el.name, value: el.id })), [langs]);
+  const langSelectOptions = useMemo(() => {
+    const selectOptions = langs?.data.map((el) => ({ label: el.name, value: el.id })) || [];
+
+    selectOptions.unshift({
+      label: 'Не выбрано',
+      value: null,
+    });
+
+    return selectOptions;
+  }, [langs]);
 
   const getCurrentLang = (langId: number) => {
     return langs?.data.find((el: Lang) => el.id === langId)?.name;
@@ -113,6 +121,7 @@ export const ProductPage = () => {
             placeholder='Язык'
             typeStyle='base'
             options={langSelectOptions}
+            value={langSelectOptions[0]}
             name='lang'
             onChange={handleChangeSelect}
           />
@@ -166,7 +175,7 @@ export const ProductPage = () => {
                     <Table.TCell colSpan={1} />
                     <Collapse expanded={expanded}>
                       <div>
-                        <HistoryList id={key.id} logs={key.logs} />
+                        <HistoryList logs={key.logs} />
                       </div>
                     </Collapse>
                   </>

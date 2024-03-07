@@ -20,11 +20,7 @@ type Props = {
 export const UpdateCommentForm = (props: Props) => {
   const { initialValue, name, getKeysParams, productId } = props;
   const updateComment = useKeyStore((state) => state.updateComment);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormFields>({
+  const { register, handleSubmit } = useForm<FormFields>({
     defaultValues: {
       comment: initialValue,
     },

@@ -7,6 +7,7 @@
 .form {
   width: 100%;
   display: flex;
+  overflow: hidden;
   align-items: center;
   flex-direction: column;
 
@@ -19,17 +20,24 @@
       margin-bottom: 10px;
     }
 
-    .formMultiController {
-      width: 100%;
-      display: flex;
-      align-items: center;
+    .formMultiContainer {
+      height: 200px;
+      overflow-y: scroll;
 
-      &:not(:last-child) {
-        margin-bottom: 10px;
-      }
+      .formMultiItem {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-      .formSelect {
-        margin-right: 10px;
+        &:not(:last-child) {
+          margin-bottom: 10px;
+        }
+
+        .formSelect {
+          margin-right: 20px;
+          width: 100%
+        }
       }
     }
   }

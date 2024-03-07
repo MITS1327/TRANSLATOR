@@ -19,11 +19,7 @@ type Props = {
 export const UpdateKeyForm = (props: Props) => {
   const { initialValue, keyId, getKeysParams } = props;
   const updateKey = useKeyStore((state) => state.updateKeys);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormFields>({
+  const { register, handleSubmit } = useForm<FormFields>({
     defaultValues: {
       key: initialValue,
     },

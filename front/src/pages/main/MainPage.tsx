@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Btn } from 'mcn-ui-components';
+import { Btn, Preloader } from 'mcn-ui-components';
 import { buildFilterQuery } from 'mcn-ui-components/utils';
 import { Table } from '@alfalab/core-components-table';
 import { Link } from 'react-router-dom';
@@ -12,6 +12,7 @@ import styles from './Main.module.scss';
 export const MainPage = () => {
   const getProjects = useProjectStore((state) => state.getProjects);
   const projects = useProjectStore((state) => state.projects);
+  const isLoading = useProjectStore((state) => state.isLoading);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenLang, setIsOpenLang] = useState(false);
@@ -38,6 +39,7 @@ export const MainPage = () => {
 
   return (
     <div className={styles.page}>
+      {isLoading && <Preloader typeStyle='base' />}
       <div className={styles.header}>
         <Btn className={styles.headerItem} onClick={() => setIsOpen(true)} kind='base'>
           Добавить проект
@@ -45,9 +47,8 @@ export const MainPage = () => {
         <Btn className={styles.headerItem} onClick={() => setIsOpenLang(true)} kind='base'>
           Добавить язык
         </Btn>
-        <div>
+        <div className={styles.headerItem}>
           <TranslatorInput
-            className={styles.headerItem}
             placeholder='Поиск'
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
           />

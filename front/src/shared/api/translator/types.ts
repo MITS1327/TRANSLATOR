@@ -37,5 +37,5 @@ export type UpdateCommentPayload = {
 export type CreateProjectPayload = {
   name: string;
   langsIdsToFilesAssociations: string[];
-  pootleFiles: string[];
+  pootleFiles: File[];
 };

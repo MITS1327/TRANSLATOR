@@ -9,3 +9,13 @@ export interface DefaultGetRequestPayload {
   orderBy: string;
   sortBy: string;
 }
+
+interface SelectOptions<T> {
+  label: string;
+  value: T;
+}
+
+export interface SelectData<T> {
+  name: string;
+  data: SelectOptions<T>;
+}

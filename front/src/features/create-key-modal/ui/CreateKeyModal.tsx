@@ -88,7 +88,7 @@ export const CreateKeyModal = (props: Props) => {
             </div>
             <div className={styles.multi}>
               {langs?.data.map((el) => (
-                <div className={styles.multiItem}>
+                <div key={el.id} className={styles.multiItem}>
                   <div className={styles.multiItemName}>{el.name}</div>
                   <TranslatorInput
                     className={styles.multiInput}

@@ -3,12 +3,12 @@ import { Log } from 'entities';
 import moment from 'moment';
 
 type Props = {
-  id: number;
   logs: Log[];
 };
 
 export const HistoryList = (props: Props) => {
-  const { logs, id } = props;
+  const { logs } = props;
+
   return (
     <Table>
       <Table.THead>
@@ -19,7 +19,7 @@ export const HistoryList = (props: Props) => {
       </Table.THead>
       <Table.TBody>
         {logs.map((log) => (
-          <Table.TRow key={id}>
+          <Table.TRow key={log.timestamp}>
             <Table.TCell>
               <div>{log.newValue}</div>
             </Table.TCell>

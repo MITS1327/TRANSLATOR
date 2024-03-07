@@ -109,14 +109,6 @@ declare global {
     [Property in keyof T]: string;
   }>;
 
-  // interface DefaultReadParams {
-  //   limit?: number;
-  //   offset?: number;
-  //   filter?: string | string[];
-  //   orderBy?: SortOrderEnum;
-  //   sortBy?: string;
-  // }
-
   interface DefaultSelectOption<TLabel, TValue> {
     label: TLabel;
     value: TValue;
@@ -132,5 +124,8 @@ declare global {
     add: boolean;
     isNotRemove: boolean;
   }
+
+  export interface QueryParams {
+    productId: string;
+  }
 }
-/* eslint-enable no-unused-vars */

@@ -9,7 +9,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const TranslatorInput = (props: Props) => {
-  const { className, register, name, validationSchema, ...rest } = props;
+  const { register, name, validationSchema, ...rest } = props;
   return register ? (
     <input className={classNames(`${styles.input}`)} {...register(name, validationSchema)} {...rest} />
   ) : (
