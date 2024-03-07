@@ -1,28 +1,36 @@
 .modalFooter {
-    .cancel {
-      margin-right: 10px;
-    }
+  .cancel {
+    margin-right: 10px;
   }
+}
 
 .form {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .formContainer {
     width: 100%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+    padding: 5px;
 
-    .formContainer {
-        width: 100%;
-        padding: 5px;
-
-        .formInput {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .formSelect {
-            &:not(:last-child) {
-                margin-bottom: 10px;
-            }
-        }
+    .formInput {
+      width: 100%;
+      margin-bottom: 10px;
     }
+
+    .formMultiController {
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      &:not(:last-child) {
+        margin-bottom: 10px;
+      }
+
+      .formSelect {
+        margin-right: 10px;
+      }
+    }
+  }
 }

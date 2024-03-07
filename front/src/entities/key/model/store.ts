@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { PaginatedResponseDTO, apiTranslator } from 'shared/api';
 import { CreateKeyPayload, UpdateCommentPayload, UpdateKeyValue } from 'shared/api/translator/types';
-import { Key } from './model';
 import { DefaultGetRequestPayload } from 'shared/types';
+import { Key } from './model';
 
 interface State {
   isLoading: boolean;

@@ -6,7 +6,6 @@ import { DefaultGetRequestPayload } from 'shared/types';
 
 import styles from './UpdateKeyForm.module.scss';
 
-
 type FormFields = {
   key: string;
 };

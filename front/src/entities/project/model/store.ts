@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { PaginatedResponseDTO, apiTranslator } from 'shared/api';
 import { CreateProjectPayload } from 'shared/api/translator/types';
-import { Project } from './model';
 import { DefaultGetRequestPayload } from 'shared/types';
+import { Project } from './model';
 
 interface State {
   isLoading: boolean;

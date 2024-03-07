@@ -6,7 +6,6 @@ import { DefaultGetRequestPayload } from 'shared/types';
 
 import styles from './UpdateCommentForm.module.scss';
 
-
 type FormFields = {
   comment: string;
 };
