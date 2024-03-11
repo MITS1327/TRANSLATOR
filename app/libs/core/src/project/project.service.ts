@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
-import { readFile } from 'fs/promises';
+import { createReadStream } from 'fs';
+import { createInterface } from 'node:readline/promises';
 import { Readable, Transform } from 'stream';
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
 
@@ -45,41 +46,41 @@ export class ProjectServiceImpl implements ProjectService {
       return;
     }
 
-    const lines = await readFile(path, 'utf-8');
-    let key;
-    let value;
-    await concatStream(
-      Readable.from(lines.split('\n')).pipe(
-        new Transform({
-          objectMode: true,
-          transform(chunk, _encoding, callback) {
-            if (chunk.startsWith('msgid')) {
-              key = chunk.substring(7, chunk.length - 1);
+    return new Promise((resolve) => {
+      const fileStream = createReadStream(path, 'utf-8');
 
-              return callback(null, chunk);
-            }
-            if (chunk.startsWith('"') && !value) {
-              key += chunk.substring(1, chunk.length - 1);
+      let key = null;
+      let value = null;
 
-              return callback(null, chunk);
-            }
-            if (chunk.startsWith('msgstr') && key) {
-              value = chunk.substring(8, chunk.length - 1);
-            }
-            if (chunk.startsWith('"') && key) {
-              value += chunk.substring(1, chunk.length - 1);
-            }
+      const rl = createInterface({
+        input: fileStream,
+        crlfDelay: Infinity,
+      });
 
-            if (!chunk.length && key && value) {
-              keys[key] = keys[key] || {};
-              keys[key][langId] = value;
-            }
+      rl.on('line', (chunk) => {
+        if (chunk.startsWith('msgid')) {
+          key = chunk.substring(7, chunk.length - 1);
+        }
+        if (chunk.startsWith('"') && value === null) {
+          key += chunk.substring(1, chunk.length - 1);
+        }
+        if (chunk.startsWith('msgstr') && key !== null) {
+          value = chunk.substring(8, chunk.length - 1);
+        }
+        if (chunk.startsWith('"') && key !== null) {
+          value += chunk.substring(1, chunk.length - 1);
+        }
 
-            return callback(null, chunk);
-          },
-        }),
-      ),
-    );
+        if (!chunk.length && key && value) {
+          keys[key] = keys[key] || {};
+          keys[key][langId] = value;
+          key = null;
+          value = null;
+        }
+      });
+
+      rl.on('close', () => resolve(null));
+    });
   }
 
   private async getTranslatedKeysFromLangFiles(
