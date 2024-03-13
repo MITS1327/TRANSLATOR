@@ -42,7 +42,7 @@ export const ProductPage = () => {
       offset: search.length ? 0 : PER_PAGE * page,
       filter: [
         buildFilterQuery('projectId', '$eq', [productId]),
-        buildFilterQuery(searchField, '$ILike', [search]),
+        buildFilterQuery(searchField, '$like', [search]),
         langValue ? buildFilterQuery('langId', '$eq', [langValue]) : null,
       ],
     }),
