@@ -63,7 +63,7 @@ export class TranslatedKeyRepositoryImpl
     return this.translatedKeyRepository
       .createQueryBuilder('translated_key')
       .where('translated_key.project_id = :projectId AND translated_key.lang_id = :langId', { projectId, langId })
-      .select(['name', 'value', 'comment'])
+      .select(['translated_key_id AS id', 'name', 'value', 'comment'])
       .stream();
   }
 }

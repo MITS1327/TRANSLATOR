@@ -193,8 +193,8 @@ export abstract class BaseRepositoryImpl<T extends BaseEntity> implements BaseRe
 
         return operands[0].value === 'null' ? IsNull() : filterOperator;
       },
-      [FilterConditionEnum.$LIKE]: (operands) => Like(`%${operands[0]}%`),
-      [FilterConditionEnum.$ILIKE]: (operands) => ILike(`%${operands[0]}%`),
+      [FilterConditionEnum.$LIKE]: (operands) => Like(`%${operands[0].value}%`),
+      [FilterConditionEnum.$ILIKE]: (operands) => ILike(`%${operands[0].value}%`),
       [FilterConditionEnum.$IN]: (operands) => In(operands.map((operand) => operand.value)),
       [FilterConditionEnum.$NOT_EQ]: (operands) => {
         const filterOperator =

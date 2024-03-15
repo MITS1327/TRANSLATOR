@@ -1,6 +1,12 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
+import { createReadStream } from 'fs';
 import { Stream, Transform } from 'stream';
+import { pipeline } from 'stream/promises';
+import { parser } from 'stream-json';
+import { streamArray } from 'stream-json/streamers/StreamArray';
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
 
 import {
@@ -13,7 +19,7 @@ import { CREATION_TRANSLATOR_DATA_KEY_LOCK, GetDataWithFilterOutputObject } from
 
 import { IN_MEMORY_STORAGE_SERVICE_PROVIDER, InMemoryStorageService } from '@translator/infrastructure';
 
-import { LANG_REPOSITORY_PROVIDER, LangRepository } from '../lang';
+import { LANG_REPOSITORY_PROVIDER, LangEntity, LangRepository } from '../lang';
 import { PROJECT_REPOSITORY_PROVIDER, ProjectEntity, ProjectRepository } from '../project';
 import { JSON_MIME_TYPE } from './constants';
 import { CreateKeyKafkaEvent, UpdateKeyKafkaEvent } from './events';
@@ -22,10 +28,12 @@ import {
   CreateKeyInputObject,
   ExportToJSONInputObject,
   GetKeysWithFilterInputObject,
+  ImportFromJSONInputObject,
+  JsonUpdateKeyObject,
   UpdateKeyInputObject,
   UpdateTranslatedKeyInputObject,
 } from './input-objects';
-import { KeyService, TranslatedKeyEntity, TranslatedKeyRepository } from './interfaces';
+import { KeyService, TranslatedKeyEntity, TranslatedKeyLog, TranslatedKeyRepository } from './interfaces';
 import { TRANSLATED_KEY_REPOSITORY_PROVIDER } from './key.di-tokens';
 import { GroupedTranslatedKeysByLangName, KeyDataForCreate } from './types';
 
@@ -183,38 +191,68 @@ export class KeyServiceImpl implements KeyService {
     );
   }
 
-  @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
-  async updateKeyTranslate(data: UpdateTranslatedKeyInputObject): Promise<void> {
-    const key = await this.getTranslatedKeyByIdWithLockOrThrow(data.id);
-    const lang = await this.langRepository.getOneById(key.langId);
-    const timestamp = new Date();
+  private getNewLogsArray(
+    oldLogs: TranslatedKeyLog[],
+    oldValue: TranslatedKeyEntity['value'],
+    newValue: TranslatedKeyEntity['value'],
+    userId: TranslatedKeyLog['userId'],
+    timestamp: TranslatedKeyLog['timestamp'],
+  ) {
+    return [
+      {
+        newValue,
+        oldValue,
+        userId,
+        timestamp,
+      },
+      ...(oldLogs.slice(0, this.MAX_LOG_COUNT - 1) || []),
+    ];
+  }
 
-    if (!lang.isTranslatable) {
+  private async getTranslatableLangOrThrow(langId: TranslatedKeyEntity['langId']) {
+    const lang = await this.langRepository.getOneById(langId);
+
+    if (!lang?.isTranslatable) {
       throw new ConflictException('This language is not translatable');
     }
 
-    await this.translatedKeyRepository.updateOneById(data.id, {
+    return lang;
+  }
+
+  @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
+  private async updateKeyWithEvent(
+    langName: LangEntity['name'],
+    key: TranslatedKeyEntity,
+    data: {
+      value: TranslatedKeyEntity['value'];
+      userId: TranslatedKeyLog['userId'];
+      comment?: TranslatedKeyEntity['comment'];
+    },
+    timestamp: Date,
+  ) {
+    const newLogs = this.getNewLogsArray(key.logs, key.value, data.value, data.userId, timestamp);
+    await this.translatedKeyRepository.updateOneByIdWithoutCheck(key.id, {
       ...data,
-      logs: [
-        {
-          newValue: data.value,
-          oldValue: key.value,
-          userId: data.userId,
-          timestamp,
-        },
-        ...(key.logs.slice(0, this.MAX_LOG_COUNT - 1) || []),
-      ],
+      logs: newLogs,
       updatedAt: timestamp,
     });
 
     await this.outgoingEventService.emitFromPersist(
       new UpdateKeyKafkaEvent(OutgoingEventTypeEnum.EXTERNAL, {
         keyName: key.name,
-        langName: lang.name,
+        langName: langName,
         keyValue: data.value,
         projectId: key.projectId,
       }),
     );
+  }
+
+  @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
+  async updateKeyTranslate(data: UpdateTranslatedKeyInputObject): Promise<void> {
+    const key = await this.getTranslatedKeyByIdWithLockOrThrow(data.id);
+    const lang = await this.getTranslatableLangOrThrow(key.langId);
+
+    await this.updateKeyWithEvent(lang.name, key, { value: data.value, userId: data.userId }, new Date());
   }
 
   async exportToJSON(inputObject: ExportToJSONInputObject): Promise<{ mimeType: string; stream: Stream }> {
@@ -234,7 +272,7 @@ export class KeyServiceImpl implements KeyService {
         return callback(null, ',' + JSON.stringify(chunk));
       },
       flush(callback) {
-        callback(null, ']');
+        callback(null, isStreamWritten ? ']' : null);
       },
       objectMode: true,
     });
@@ -243,5 +281,52 @@ export class KeyServiceImpl implements KeyService {
       mimeType: JSON_MIME_TYPE,
       stream: stream.pipe(tranformStreamToValidArray),
     };
+  }
+
+  @Transactional({ isolationLevel: IsolationLevel.READ_UNCOMMITTED })
+  async importFromJSON(inputObject: ImportFromJSONInputObject): Promise<void> {
+    const lang = await this.getTranslatableLangOrThrow(inputObject.langId);
+    await this.getProjectOrThrow(inputObject.projectId, false);
+
+    const timestamp = new Date();
+
+    await pipeline(
+      createReadStream(inputObject.filePath),
+      parser(),
+      streamArray(),
+      new Transform({
+        transform: async (chunk, _encoding, callback) => {
+          const value = chunk.value;
+          const errors = await validate(plainToClass(JsonUpdateKeyObject, value));
+          if (errors.length) {
+            const message = errors
+              .map(
+                (error) =>
+                  `Failed validate chunk - ${JSON.stringify(value)}; Error: ${error.constraints[Object.keys(error.constraints)[0]]}`,
+              )
+              .join(',');
+            callback(new Error(message));
+          }
+          callback(null, value);
+        },
+        objectMode: true,
+      }),
+      new Transform({
+        transform: async (data, _encoding, callback) => {
+          const key = await this.getTranslatedKeyByIdWithLockOrThrow(data.id);
+
+          await this.updateKeyWithEvent(
+            lang.name,
+            key,
+            { value: data.value, comment: data.comment, userId: data.userId },
+            timestamp,
+          );
+          callback(null);
+        },
+        objectMode: true,
+      }),
+    ).catch((e) => {
+      throw new BadRequestException(e.message);
+    });
   }
 }

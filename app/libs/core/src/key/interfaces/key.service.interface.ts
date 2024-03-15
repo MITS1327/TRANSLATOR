@@ -9,6 +9,7 @@ import {
   CreateKeyInputObject,
   ExportToJSONInputObject,
   GetKeysWithFilterInputObject,
+  ImportFromJSONInputObject,
   UpdateKeyInputObject,
   UpdateTranslatedKeyInputObject,
 } from '../input-objects';
@@ -22,6 +23,7 @@ export interface KeyService {
     mimeType: string;
     stream: Stream;
   }>;
+  importFromJSON(inputObject: ImportFromJSONInputObject): Promise<void>;
   constructTranslatedKeyData(data: ConstructTranslatedKeyInputObject): Omit<TranslatedKeyEntity, 'id'>;
   createKey(data: CreateKeyInputObject): Promise<void>;
   updateKeyTranslate(data: UpdateTranslatedKeyInputObject): Promise<void>;

@@ -1,30 +1,40 @@
 import {
   Body,
   Controller,
+  FileTypeValidator,
   Get,
   HttpCode,
   HttpStatus,
   Inject,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   ParseIntPipe,
   Patch,
   Post,
   Query,
   Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 
 import { UserId } from '@decorators/auth.decorators';
 import { Response } from 'express';
+import { rm } from 'fs/promises';
+import { diskStorage } from 'multer';
 
 import { KEY_SERVICE_PROVIDER, KeyService } from '@translator/core/key';
 
 import { CacheKeyService } from '../cache-key.service';
+import { FILE_TYPE, MAX_FILE_SIZE } from '../constants';
 import {
   ClearCachedKeysDTO,
   CreateKeyDTO,
   ExportToJSONDTO,
   GetTranslatedKeysWithFilterDTO,
+  ImportFromJSONDTO,
   UpdateKeyDTO,
   UpdateKeyTranslateDTO,
 } from '../dtos';
@@ -78,5 +88,37 @@ export class KeyPrivateHttpController {
     });
 
     result.stream.pipe(res);
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @Post('translated-keys/import')
+  @UseInterceptors(
+    FileInterceptor('translatedFile', {
+      storage: diskStorage({
+        destination: '/tmp/translated_files',
+      }),
+    }),
+  )
+  async importFromJSON(
+    @UserId() userId: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE }),
+          new FileTypeValidator({ fileType: FILE_TYPE }),
+        ],
+      }),
+    )
+    translatedFile: Express.Multer.File,
+    @Body() data: ImportFromJSONDTO,
+  ) {
+    await this.coreKeyService.importFromJSON({
+      projectId: data.projectId,
+      langId: data.langId,
+      userId,
+      filePath: translatedFile.path,
+    });
+
+    await rm(translatedFile.path);
   }
 }
