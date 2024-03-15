@@ -18,27 +18,35 @@ import {
 } from '../key';
 import { LANG_REPOSITORY_PROVIDER, LangRepository } from '../lang';
 import { CreateProjectInputObject, GetProjectsWithFilterInputObject, UpdateProjectInputObject } from './input-objects';
-import { ProjectEntity, ProjectRepository, ProjectService } from './interfaces';
-import { PROJECT_REPOSITORY_PROVIDER } from './project.di-tokens';
+import {
+  ProjectEntity,
+  ProjectRepository,
+  ProjectService,
+  QueryProjectEntity,
+  QueryProjectRepository,
+} from './interfaces';
+import { PROJECT_REPOSITORY_PROVIDER, QUERY_PROJECT_REPOSITORY_PROVIDER } from './project.di-tokens';
 import { LangWithFile } from './types';
 
 @Injectable()
 export class ProjectServiceImpl implements ProjectService {
   constructor(
     @Inject(PROJECT_REPOSITORY_PROVIDER) private readonly projectRepository: ProjectRepository,
+    @Inject(QUERY_PROJECT_REPOSITORY_PROVIDER) private readonly queryProjectRepository: QueryProjectRepository,
     @Inject(LANG_REPOSITORY_PROVIDER) private readonly langRepository: LangRepository,
-
     @Inject(forwardRef(() => KEY_SERVICE_PROVIDER)) private readonly keyService: KeyService,
     @Inject(forwardRef(() => TRANSLATED_KEY_REPOSITORY_PROVIDER))
     private readonly translatedKeyRepository: TranslatedKeyRepository,
     @Inject(IN_MEMORY_STORAGE_SERVICE_PROVIDER) private readonly inMemoryStorageService: InMemoryStorageService,
   ) {}
 
-  async getProjects(data: GetProjectsWithFilterInputObject): Promise<GetDataWithFilterOutputObject<ProjectEntity>> {
+  async getProjects(
+    data: GetProjectsWithFilterInputObject,
+  ): Promise<GetDataWithFilterOutputObject<QueryProjectEntity>> {
     const { limit, offset, sortBy, orderBy, filter } = data;
     const additionalFilter = this.projectRepository.filterBuilder(filter);
 
-    return this.projectRepository.getWithLimitAndOffset(additionalFilter, limit, offset, orderBy, sortBy);
+    return this.queryProjectRepository.getWithLimitAndOffset(additionalFilter, limit, offset, orderBy, sortBy);
   }
 
   private async parsePootleFile(keys: Record<string, Record<string, string>>, path: string, langId: number) {

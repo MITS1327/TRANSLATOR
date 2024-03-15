@@ -5,10 +5,14 @@ import { InMemoryStorageModule } from '@translator/infrastructure';
 
 import { KeyModule } from '../key';
 import { LangModule } from '../lang';
-import { ProjectEntityImpl } from './dal';
+import { ProjectEntityImpl, QueryProjectEntityImpl } from './dal';
 import { PROVIDERS } from './project.providers';
 
-const imports = [TypeOrmModule.forFeature([ProjectEntityImpl]), LangModule, InMemoryStorageModule];
+const imports = [
+  TypeOrmModule.forFeature([ProjectEntityImpl, QueryProjectEntityImpl]),
+  LangModule,
+  InMemoryStorageModule,
+];
 
 @Module({
   imports: [...imports, forwardRef(() => KeyModule)],
