@@ -47,6 +47,8 @@ export class LangServiceImpl implements LangService {
     isolationLevel: IsolationLevel.READ_UNCOMMITTED,
   })
   async createLang(data: CreateLangInputObject): Promise<void> {
+    await this.inMemoryStorageService.isHaveLockOrThrow(CREATION_TRANSLATOR_DATA_KEY_LOCK);
+
     const existLangCount = await this.langRepository.countBy({
       name: data.name,
     });

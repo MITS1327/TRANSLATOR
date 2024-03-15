@@ -10,10 +10,12 @@ import {
   Patch,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { UserId } from '@decorators/auth.decorators';
+import { Response } from 'express';
 
 import { KEY_SERVICE_PROVIDER, KeyService } from '@translator/core/key';
 
@@ -21,6 +23,7 @@ import { CacheKeyService } from '../cache-key.service';
 import {
   ClearCachedKeysDTO,
   CreateKeyDTO,
+  ExportToJSONDTO,
   GetTranslatedKeysWithFilterDTO,
   UpdateKeyDTO,
   UpdateKeyTranslateDTO,
@@ -64,5 +67,16 @@ export class KeyPrivateHttpController {
     @Body() data: UpdateKeyTranslateDTO,
   ) {
     return this.coreKeyService.updateKeyTranslate({ ...data, userId, id });
+  }
+
+  @Post('translated-keys/export')
+  async exportToJSON(@Body() data: ExportToJSONDTO, @Res() res: Response) {
+    const result = await this.coreKeyService.exportToJSON(data);
+
+    res.set({
+      'Content-Type': result.mimeType,
+    });
+
+    result.stream.pipe(res);
   }
 }

@@ -55,4 +55,15 @@ export class TranslatedKeyRepositoryImpl
       .distinctOn(['name', 'project_id'])
       .stream();
   }
+
+  getAllByLangIdAndProjectIdStream(
+    projectId: TranslatedKeyEntity['projectId'],
+    langId: TranslatedKeyEntity['langId'],
+  ): Promise<Readable> {
+    return this.translatedKeyRepository
+      .createQueryBuilder('translated_key')
+      .where('translated_key.project_id = :projectId AND translated_key.lang_id = :langId', { projectId, langId })
+      .select(['name', 'value', 'comment'])
+      .stream();
+  }
 }

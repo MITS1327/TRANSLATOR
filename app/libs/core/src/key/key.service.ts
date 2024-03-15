@@ -1,5 +1,6 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
+import { Stream, Transform } from 'stream';
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
 
 import {
@@ -14,10 +15,12 @@ import { IN_MEMORY_STORAGE_SERVICE_PROVIDER, InMemoryStorageService } from '@tra
 
 import { LANG_REPOSITORY_PROVIDER, LangRepository } from '../lang';
 import { PROJECT_REPOSITORY_PROVIDER, ProjectEntity, ProjectRepository } from '../project';
+import { JSON_MIME_TYPE } from './constants';
 import { CreateKeyKafkaEvent, UpdateKeyKafkaEvent } from './events';
 import {
   ConstructTranslatedKeyInputObject,
   CreateKeyInputObject,
+  ExportToJSONInputObject,
   GetKeysWithFilterInputObject,
   UpdateKeyInputObject,
   UpdateTranslatedKeyInputObject,
@@ -212,5 +215,33 @@ export class KeyServiceImpl implements KeyService {
         projectId: key.projectId,
       }),
     );
+  }
+
+  async exportToJSON(inputObject: ExportToJSONInputObject): Promise<{ mimeType: string; stream: Stream }> {
+    const stream = await this.translatedKeyRepository.getAllByLangIdAndProjectIdStream(
+      inputObject.projectId,
+      inputObject.langId,
+    );
+    let isStreamWritten = false;
+    const tranformStreamToValidArray = new Transform({
+      transform: (chunk, _encoding, callback) => {
+        if (!isStreamWritten) {
+          isStreamWritten = true;
+
+          return callback(null, '[' + JSON.stringify(chunk));
+        }
+
+        return callback(null, ',' + JSON.stringify(chunk));
+      },
+      flush(callback) {
+        callback(null, ']');
+      },
+      objectMode: true,
+    });
+
+    return {
+      mimeType: JSON_MIME_TYPE,
+      stream: stream.pipe(tranformStreamToValidArray),
+    };
   }
 }

@@ -40,7 +40,7 @@ export class GetDataWithFilterDTO<T extends BaseEntity> implements GetDataWithFi
   @Transform(({ value }: { value: string | string[] }) => transformToFilterQueryDTO<T>(value))
   @IsDefined()
   @IsOptional()
-  filter: FilterQueryDTO<T>[] = [];
+  filter: FilterQueryDTO<T>[][] = [];
 
   @ApiPropertyOptional({ type: String })
   @IsString()

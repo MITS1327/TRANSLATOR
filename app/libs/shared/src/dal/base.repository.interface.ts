@@ -24,7 +24,7 @@ export interface BaseRepository<T extends BaseEntity> {
   updateOneById(id: T['id'], data: OptionalDeepPartial<T>): Promise<void>;
   replaceById(id: T['id'], data: DeepPartial<T>): Promise<void>;
 
-  filterBuilder(data: FilterQueryInputObject<T>[]): FilterOptions<T>;
+  filterBuilder(data: FilterQueryInputObject<T>[][]): FilterOptions<T>;
 
   deleteBy(filter: FilterOptions<T>): Promise<void>;
   deleteById(id: T['id'] | T['id'][]): Promise<void>;

@@ -6,6 +6,7 @@ import {
   EntityManager,
   EntityTarget,
   Equal,
+  FindOperator,
   FindOptionsOrder,
   FindOptionsOrderValue,
   FindOptionsWhere,
@@ -14,6 +15,7 @@ import {
   IsNull,
   Like,
   Not,
+  Raw,
   Repository,
 } from 'typeorm';
 import { IsolationLevel, Transactional } from 'typeorm-transactional';
@@ -27,7 +29,8 @@ import {
 } from '../../core';
 import { MAX_QUERY_LIMIT } from '../../core/constants';
 import { BaseRepository } from '../base.repository.interface';
-import { DeepPartial, FilterOptions, OptionalDeepPartial } from '../types';
+import { OperandTypeEnum } from '../enums';
+import { DeepPartial, FilterOptions, Operand, OptionalDeepPartial } from '../types';
 
 export abstract class BaseRepositoryImpl<T extends BaseEntity> implements BaseRepository<T> {
   protected repo: Repository<T>;
@@ -36,11 +39,13 @@ export abstract class BaseRepositoryImpl<T extends BaseEntity> implements BaseRe
   protected DEFAULT_ORDER_BY: keyof T = 'id';
   protected DEFAULT_SORT_DIRECTION: OrderValue = 'ASC';
 
+  private readonly fields = [];
   constructor(
     private target: EntityTarget<T>,
     private manager: EntityManager,
   ) {
     this.repo = manager.getRepository(target);
+    this.fields = [...this.repo.metadata.columns.map((columnMetadata) => columnMetadata.propertyPath)];
   }
 
   async getOneById(id: T['id']): Promise<T> {
@@ -144,46 +149,81 @@ export abstract class BaseRepositoryImpl<T extends BaseEntity> implements BaseRe
     await this.deleteBy({ id } as FilterOptions<T>);
   }
 
-  filterBuilder(data: FilterQueryInputObject<T>[]): FilterOptions<T> {
-    if (!data) {
-      return {};
+  private isColumnExistOrThrow(column: string): boolean {
+    if (!this.fields.includes(column.toString())) {
+      throw new BadRequestException(`Property '${column.toString()}' was not found in '${this.repo.metadata.name}'`);
     }
-    const fields = [...this.repo.metadata.columns.map((columnMetadata) => columnMetadata.propertyPath)];
 
-    const result = {};
-    data.forEach((item) => {
-      if (!fields.includes(item.field.toString())) {
-        throw new BadRequestException(
-          `Property '${item.field.toString()}' was not found in '${this.repo.metadata.name}'`,
-        );
+    return true;
+  }
+
+  private getColumnAliasByPropertyPath(path: string) {
+    const columnMetadata = this.repo.metadata.findColumnsWithPropertyPath(path)[0];
+
+    if (!columnMetadata) {
+      throw new BadRequestException(`Field by path ${path} not found`);
+    }
+
+    return `"${columnMetadata.entityMetadata.name}"."${columnMetadata.propertyAliasName}"`;
+  }
+
+  private getTypeOrmFindOperator(operands: string[], operator: FilterConditionEnum) {
+    const OPERAND_REFERENCED_TO_COLUMN_PREFIX = '$';
+    const mappedOperands = operands.map((operand) => {
+      if (operand.startsWith(OPERAND_REFERENCED_TO_COLUMN_PREFIX)) {
+        return {
+          type: OperandTypeEnum.COLUMN,
+          value: this.getColumnAliasByPropertyPath(operand.replace(OPERAND_REFERENCED_TO_COLUMN_PREFIX, '')),
+        };
       }
-      const field = item.field;
 
-      const operands = item.operands;
-
-      switch (item.operator) {
-        case FilterConditionEnum.$BETWEEN:
-          lodash.set(result, field, Between(operands[0], operands[1]));
-          break;
-        case FilterConditionEnum.$EQ:
-          lodash.set(result, field, operands[0] === 'null' ? IsNull() : Equal(operands[0]));
-          break;
-        case FilterConditionEnum.$LIKE:
-          lodash.set(result, field, Like(`%${operands[0]}%`));
-          break;
-        case FilterConditionEnum.$ILIKE:
-          lodash.set(result, field, ILike(`%${operands[0]}%`));
-          break;
-        case FilterConditionEnum.$IN:
-          lodash.set(result, field, In(operands));
-          break;
-        case FilterConditionEnum.$NOT_EQ:
-          lodash.set(result, field, operands[0] === 'null' ? Not(IsNull()) : Not(operands[0]));
-          break;
-      }
+      return {
+        type: OperandTypeEnum.VALUE,
+        value: operand,
+      };
     });
 
-    return result;
+    const plainOperatorToOrmOperator: Record<FilterConditionEnum, (operands: Operand[]) => FindOperator<unknown>> = {
+      [FilterConditionEnum.$BETWEEN]: (operands) => Between(operands[0].value, operands[1].value),
+      [FilterConditionEnum.$EQ]: (operands) => {
+        const filterOperator =
+          operands[0].type === 'value'
+            ? Equal(operands[0].value)
+            : Raw((columnAlias) => `${columnAlias} = ${operands[0].value}`);
+
+        return operands[0].value === 'null' ? IsNull() : filterOperator;
+      },
+      [FilterConditionEnum.$LIKE]: (operands) => Like(`%${operands[0]}%`),
+      [FilterConditionEnum.$ILIKE]: (operands) => ILike(`%${operands[0]}%`),
+      [FilterConditionEnum.$IN]: (operands) => In(operands.map((operand) => operand.value)),
+      [FilterConditionEnum.$NOT_EQ]: (operands) => {
+        const filterOperator =
+          operands[0].type === 'value'
+            ? Not(operands[0].value)
+            : Raw((columnAlias) => `${columnAlias} != ${operands[0].value}`);
+
+        return operands[0].value === 'null' ? IsNull() : filterOperator;
+      },
+    };
+
+    return plainOperatorToOrmOperator[operator](mappedOperands);
+  }
+
+  filterBuilder(filter: FilterQueryInputObject<T>[][]): FilterOptions<T> {
+    if (!filter) {
+      return {};
+    }
+
+    return filter.map((filterItem) => {
+      const result = {};
+
+      filterItem.map((item) => {
+        this.isColumnExistOrThrow(item.field.toString());
+        lodash.set(result, item.field, this.getTypeOrmFindOperator(item.operands, item.operator));
+      });
+
+      return result;
+    });
   }
 
   async countBy(filter: FilterOptions<T>): Promise<number> {

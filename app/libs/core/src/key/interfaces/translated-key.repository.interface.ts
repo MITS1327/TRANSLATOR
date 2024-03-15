@@ -12,5 +12,9 @@ export interface TranslatedKeyRepository extends BaseRepository<TranslatedKeyEnt
   ): Promise<void>;
   getOneByIdAndLock(id: TranslatedKeyEntity['id']): Promise<TranslatedKeyEntity>;
   getAllUniqueKeyNamesByProjectStream(): Promise<Readable>;
+  getAllByLangIdAndProjectIdStream(
+    projectId: TranslatedKeyEntity['projectId'],
+    langId: TranslatedKeyEntity['langId'],
+  ): Promise<Readable>;
   createChunkedBulk(data: DeepPartial<TranslatedKeyEntity>[], chunkSize?: number): Promise<void>;
 }
