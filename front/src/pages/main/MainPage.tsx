@@ -1,17 +1,25 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, ReactElement } from 'react';
 import { Btn, Preloader } from 'mcn-ui-components';
 import { buildFilterQuery } from 'mcn-ui-components/utils';
+import { TextAlignProperty } from '@alfalab/core-components-table/typings';
 import { Table } from '@alfalab/core-components-table';
 import { Link } from 'react-router-dom';
-import { useProjectStore } from '../../entities';
+import { TCellProps, TCell } from '@alfalab/core-components-table/components';
+import { useLangStore, useProjectStore } from '../../entities';
 import { CreateLangModal, CreateProjectModal } from '../../features';
 import { TranslatorInput } from '../../shared';
 
 import styles from './Main.module.scss';
 
+type TableHeading = {
+  name: string,
+  textAlign: TextAlignProperty
+}
+
 export const MainPage = () => {
   const getProjects = useProjectStore((state) => state.getProjects);
   const projects = useProjectStore((state) => state.projects);
+  const langs = useLangStore((state) => state.langs);
   const isLoading = useProjectStore((state) => state.isLoading);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +44,15 @@ export const MainPage = () => {
   useEffect(() => {
     getProjects(getProjectsParams);
   }, [getProjectsParams]);
+
+  const tableHeadings = useMemo<TableHeading[]>(
+    () => [
+      { name: 'Название', textAlign: 'left'},
+      ...(langs?.data ? langs.data.map<TableHeading>((el) => ({ name: el.name, textAlign: 'center'})) : []),
+      { name: 'Всего', textAlign: 'right'},
+    ],
+    [langs],
+  );
 
   return (
     <div className={styles.page}>
@@ -67,8 +84,9 @@ export const MainPage = () => {
           }
         >
           <Table.THead>
-            <Table.THeadCell>Название</Table.THeadCell>
-            <Table.THeadCell textAlign='right'>Всего</Table.THeadCell>
+            {tableHeadings.map((el) => (
+              <Table.THeadCell textAlign={el.textAlign}>{el.name}</Table.THeadCell>
+            ))}
           </Table.THead>
           <Table.TBody>
             {projects?.data.map((project) => (
@@ -80,6 +98,14 @@ export const MainPage = () => {
                     </Link>
                   </div>
                 </Table.TCell>
+
+                {
+                  Object.values(project.untranslatedKeysByLang).map((el) => (
+                    <Table.TCell key={el}>
+                      <div>{el}</div>
+                    </Table.TCell>
+                  )) as unknown as ReactElement<TCellProps, typeof TCell>
+                }
 
                 <Table.TCell>
                   <div>
