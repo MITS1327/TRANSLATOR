@@ -1,13 +1,13 @@
-import { Modal, Btn } from "mcn-ui-components";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { useLayoutEffect, useMemo, useState } from "react";
-import { TranslatorInput, FileUploader } from "shared";
-import { SelectData } from "shared/types";
-import { useLangStore, useProjectStore } from "entities";
-import { FileFormItem } from "./FileFormItem";
+import { Modal, Btn } from 'mcn-ui-components';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { useLayoutEffect, useMemo, useState } from 'react';
+import { TranslatorInput, FileUploader } from 'shared';
+import { SelectData } from 'shared/types';
+import { useLangStore, useProjectStore } from 'entities';
+import { CreateProjectPayload } from 'shared/api/translator/types';
+import { FileFormItem } from './FileFormItem';
 
-import styles from "./CreateProjectModal.module.scss";
-import { CreateProjectPayload } from "shared/api/translator/types";
+import styles from './CreateProjectModal.module.scss';
 
 type Props = {
   isOpen: boolean;
@@ -38,10 +38,7 @@ export const CreateProjectModal = (props: Props) => {
     getLangs();
   }, []);
 
-  const langSelectOptions = useMemo(
-    () => langs?.data.map((el) => ({ label: el.name, value: el.id })),
-    [langs]
-  );
+  const langSelectOptions = useMemo(() => langs?.data.map((el) => ({ label: el.name, value: el.id })), [langs]);
 
   const {
     register,
@@ -56,17 +53,14 @@ export const CreateProjectModal = (props: Props) => {
     const submitData = filesArr.reduce<CreateProjectPayload>(
       (acc, el) => ({
         ...acc,
-        langsIdsToFilesAssociations: [
-          ...acc.langsIdsToFilesAssociations,
-          el.lang.toString(),
-        ],
+        langsIdsToFilesAssociations: [...acc.langsIdsToFilesAssociations, el.lang.toString()],
         pootleFiles: [...acc.pootleFiles, el.file],
       }),
       {
         name: data.project,
         langsIdsToFilesAssociations: [],
         pootleFiles: [],
-      }
+      },
     );
 
     createProject(submitData);
@@ -111,39 +105,28 @@ export const CreateProjectModal = (props: Props) => {
   return (
     isOpen && (
       <Modal
-        typeStyle="base"
+        typeStyle='base'
         toggle={toggle}
         isOpen={isOpen}
         onClose={clearFiles}
-        title="Добавить проект"
+        title='Добавить проект'
         renderFooter={() => (
           <div className={styles.modalFooter}>
-            <Btn
-              className={styles.cancel}
-              kind="base-secondary"
-              onClick={clearFiles}
-            >
+            <Btn className={styles.cancel} kind='base-secondary' onClick={clearFiles}>
               Отмена
             </Btn>
-            <Btn
-              type="submit"
-              kind="base-primary"
-              onClick={handleSubmit(onSubmit)}
-            >
+            <Btn type='submit' kind='base-primary' onClick={handleSubmit(onSubmit)}>
               Принять
             </Btn>
           </div>
         )}
       >
         <div className={styles.form}>
-          <form
-            className={styles.formContainer}
-            onSubmit={handleSubmit(onSubmit)}
-          >
+          <form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
             <div className={styles.formInput}>
               <TranslatorInput
-                name="project"
-                placeholder="Название проекта"
+                name='project'
+                placeholder='Название проекта'
                 register={register}
                 validationSchema={{ required: true }}
               />

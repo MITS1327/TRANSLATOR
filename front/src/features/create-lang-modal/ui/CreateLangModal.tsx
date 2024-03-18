@@ -50,13 +50,14 @@ export const CreateLangModal = (props: Props) => {
       >
         <div className={styles.form}>
           <form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
-            <TranslatorInput
-              className={styles.formInput}
-              name='lang'
-              placeholder='Название языка'
-              register={register}
-              validationSchema={{ required: true }}
-            />
+            <div className={styles.formInput}>
+              <TranslatorInput
+                name='lang'
+                placeholder='Название языка'
+                register={register}
+                validationSchema={{ required: true }}
+              />
+            </div>
             {errors.lang && <>Заполните</>}
           </form>
         </div>

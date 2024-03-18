@@ -5,21 +5,21 @@ import { TextAlignProperty } from '@alfalab/core-components-table/typings';
 import { Table } from '@alfalab/core-components-table';
 import { Link } from 'react-router-dom';
 import { TCellProps, TCell } from '@alfalab/core-components-table/components';
-import { useLangStore, useProjectStore } from '../../entities';
+import { Navbar } from 'widgets';
+import { useProjectStore } from '../../entities';
 import { CreateLangModal, CreateProjectModal } from '../../features';
 import { TranslatorInput } from '../../shared';
 
 import styles from './Main.module.scss';
 
 type TableHeading = {
-  name: string,
-  textAlign: TextAlignProperty
-}
+  name: string;
+  textAlign: TextAlignProperty;
+};
 
 export const MainPage = () => {
   const getProjects = useProjectStore((state) => state.getProjects);
   const projects = useProjectStore((state) => state.projects);
-  const langs = useLangStore((state) => state.langs);
   const isLoading = useProjectStore((state) => state.isLoading);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -47,15 +47,21 @@ export const MainPage = () => {
 
   const tableHeadings = useMemo<TableHeading[]>(
     () => [
-      { name: 'Название', textAlign: 'left'},
-      ...(langs?.data ? langs.data.map<TableHeading>((el) => ({ name: el.name, textAlign: 'center'})) : []),
-      { name: 'Всего', textAlign: 'right'},
+      { name: 'Название', textAlign: 'left' },
+      ...(projects?.data
+        ? Object.keys(projects.data[0].untranslatedKeysByLang).map<TableHeading>((el) => ({
+            name: el,
+            textAlign: 'center',
+          }))
+        : []),
+      { name: 'Всего', textAlign: 'right' },
     ],
-    [langs],
+    [projects],
   );
 
   return (
     <div className={styles.page}>
+      <Navbar />
       {isLoading && <Preloader typeStyle='base' />}
       <div className={styles.header}>
         <Btn className={styles.headerItem} onClick={() => setIsOpen(true)} kind='base'>
@@ -93,7 +99,7 @@ export const MainPage = () => {
               <Table.TRow key={project.id}>
                 <Table.TCell>
                   <div>
-                    <Link to={`${project.id}`}>
+                    <Link to={`projects/${project.id}`}>
                       <div>{project.name.toUpperCase()}</div>
                     </Link>
                   </div>

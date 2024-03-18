@@ -8,15 +8,17 @@ const App = () => {
     <div className='app'>
       <Topbar isVisibleTopbarProductMenu isNewAccountList isEuropeHost={IS_EU_PROD} />
       <Switch>
-        <Route path='/:productId'>
+        <Route path='/projects/:projectId'>
           <ProductPage />
         </Route>
-        <Route path='/'>
+        <Route path='/all'>
+          <ProductPage />
+        </Route>
+        <Route path='/projects'>
           <MainPage />
         </Route>
-
         <Route>
-          <Redirect to='/' />
+          <Redirect to='/projects' />
         </Route>
       </Switch>
     </div>

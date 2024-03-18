@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  padding: 10px;
+  background: gray;
+  height: var(--navbar-height);
+
+  .item {
+    padding: 1px;
+    &:not(:last-child) {
+      margin-right: 20px;
+    }
+  }
+
+  .activeItem {
+    border-bottom: 2px solid var(--foreground);
+  }
+}

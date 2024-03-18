@@ -126,6 +126,6 @@ declare global {
   }
 
   export interface QueryParams {
-    productId: string;
+    projectId: string;
   }
 }

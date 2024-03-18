@@ -7,12 +7,13 @@ import { CreateKeyModal, UpdateKeyForm, UpdateCommentForm, HistoryList } from 'f
 import { Lang, Project, useKeyStore, useLangStore, useProjectStore } from 'entities';
 import { useEffect, useMemo, useState } from 'react';
 import { TranslatorInput } from 'shared';
-
 import { Link } from 'react-router-dom';
+import { Navbar } from 'widgets/index';
+
 import styles from './Product.module.scss';
 
 export const ProductPage = () => {
-  const { productId } = useParams<QueryParams>();
+  const { projectId } = useParams<QueryParams>();
 
   const [search, setSearch] = useState('');
 
@@ -41,7 +42,7 @@ export const ProductPage = () => {
       limit: PER_PAGE,
       offset: search.length ? 0 : PER_PAGE * page,
       filter: [
-        buildFilterQuery('projectId', '$eq', [productId]),
+        projectId ? buildFilterQuery('projectId', '$eq', [projectId]) : null,
         buildFilterQuery(searchField, '$like', [search]),
         langValue ? buildFilterQuery('langId', '$eq', [langValue]) : null,
       ],
@@ -79,7 +80,7 @@ export const ProductPage = () => {
     getProducts();
   }, []);
 
-  const currentProduct = useMemo(() => products?.data.find((el: Project) => el.id === +productId), [products]);
+  const currentProduct = useMemo(() => products?.data.find((el: Project) => el.id === +projectId), [products]);
 
   const langSelectOptions = useMemo(() => {
     const selectOptions = langs?.data.map((el) => ({ label: el.name, value: el.id })) || [];
@@ -104,13 +105,16 @@ export const ProductPage = () => {
     setSearchField(data?.data.value);
   };
 
+  const pageTitle = !projectId ? 'Все ключи' : currentProduct?.name;
+
   return (
     <div className={styles.page}>
+      <Navbar />
       {(isLoadingKeys || isLoadingLangs || isLoadingProjects) && <Preloader typeStyle='base' />}
       <div className={styles.header}>
         <div className={styles.headerItemProject}>
-          <Link to='/'>
-            <div>{currentProduct?.name.toUpperCase()}</div>
+          <Link to='/projects'>
+            <div>{pageTitle.toUpperCase()}</div>
           </Link>
         </div>
         <Btn className={styles.headerItem} onClick={() => setIsOpen(true)} kind='base'>
@@ -197,7 +201,7 @@ export const ProductPage = () => {
                   <UpdateCommentForm
                     name={key.name}
                     getKeysParams={getKeysParams}
-                    productId={productId}
+                    productId={projectId}
                     initialValue={key.comment}
                   />
                 </Table.TCell>
@@ -206,7 +210,7 @@ export const ProductPage = () => {
           </Table.TBody>
         </Table>
       </div>
-      <CreateKeyModal isOpen={isOpen} projectId={productId} toggle={setIsOpen} />
+      <CreateKeyModal isOpen={isOpen} projectId={projectId} toggle={setIsOpen} />
     </div>
   );
 };
