@@ -5,6 +5,7 @@ import { AddKeyEntity1709140847716 } from './1709140847716-AddKeyEntity';
 import { ChangeKeyEntity1709228990080 } from './1709228990080-ChangeKeyEntity';
 import { AddIsTranslatableToLang1709291263798 } from './1709291263798-AddIsTranslatableToLang';
 import { AddQueryProject1710511777182 } from './1710511777182-AddQueryProject';
+import { FixCountUntranslatedKeys1710762593943 } from './1710762593943-FixCountUntranslatedKeys';
 
 export const MIGRATIONS = [
   AddOutgoingEvent1709114757916,
@@ -14,4 +15,5 @@ export const MIGRATIONS = [
   ChangeKeyEntity1709228990080,
   AddIsTranslatableToLang1709291263798,
   AddQueryProject1710511777182,
+  FixCountUntranslatedKeys1710762593943,
 ];
