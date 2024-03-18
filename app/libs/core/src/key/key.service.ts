@@ -232,7 +232,8 @@ export class KeyServiceImpl implements KeyService {
   ) {
     const newLogs = this.getNewLogsArray(key.logs, key.value, data.value, data.userId, timestamp);
     await this.translatedKeyRepository.updateOneByIdWithoutCheck(key.id, {
-      ...data,
+      ...(data.comment ? { comment: data.comment } : {}),
+      value: data.value,
       logs: newLogs,
       updatedAt: timestamp,
     });
