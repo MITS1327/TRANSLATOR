@@ -4,22 +4,21 @@ artifact: {{ .project }}-front-build
 from: {{ .BaseFrontNodeImage }}
 
 git:
-- add: /
-  to: /workspace/translator
-
+- add: /front/
+  to: /workspace/translator/front
+  stageDependencies:
+    setup:
+    - "*/**"
+    install:
+    - "package.json"
+    - "package-lock.json"
 ansible:
-  beforeInstall:
-  - name: Setup workspace
-    file:
-      path: /workspace/translator
-      state: directory
-  - name:  ssh_config for github
-    shell: printf "Host gitlab.mcnloc.ru\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> /etc/ssh/ssh_config
-  setup:
+  install:
   - name: Install deps
     shell: npm ci
     args:
      chdir: /workspace/translator/front
+  setup:
   - name: Build frontend
     shell: npm run build -- --env CI_URL={{ env "CI_URL" }} --env ENVNAME={{ env "ENVNAME" }}
     args:
