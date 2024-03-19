@@ -47,13 +47,13 @@ export const ProductPage = () => {
         langValue ? buildFilterQuery('langId', '$eq', [langValue]) : null,
       ],
     }),
-    [search, page, langValue, searchField],
+    [search, page, langValue, searchField, projectId],
   );
 
   const searchFieldSelectOptions = useMemo(
     () => [
       {
-        label: 'Название',
+        label: 'Ключ',
         value: 'name',
       },
       {
@@ -114,7 +114,7 @@ export const ProductPage = () => {
       <div className={styles.header}>
         <div className={styles.headerItemProject}>
           <Link to='/projects'>
-            <div>{pageTitle.toUpperCase()}</div>
+            <div>{pageTitle?.toUpperCase()}</div>
           </Link>
         </div>
         <Btn className={styles.headerItem} onClick={() => setIsOpen(true)} kind='base'>
