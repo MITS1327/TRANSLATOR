@@ -23,7 +23,7 @@ const productionConfig = (env: Env): Configuration => {
       path: output,
       filename: '[name].[contenthash].js',
       chunkFilename: '[name].[contenthash].chunk.js',
-      publicPath: 'auto',
+      publicPath: '/',
     },
     devtool: false,
     plugins: [
