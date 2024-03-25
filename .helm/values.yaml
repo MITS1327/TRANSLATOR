@@ -54,8 +54,8 @@ spd:
   graylogHost: glogvoip2.mcn.ru
   graylogPort: 12201
   kafkaBrokers: '["bootstrap-k8s-kafka-stage.mcnloc.ru:444"]'
-  kafkaClientId: translator_api_spd1
-  kafkaGroupId: translator_api_spd1
+  kafkaClientId: translator_api_spd
+  kafkaGroupId: translator_api_spd
   postgresHost: eridanus4.mcn.ru
   postgresPort: 5432
 prod:
