@@ -48,7 +48,7 @@ export const MainPage = () => {
   const tableHeadings = useMemo<TableHeading[]>(
     () => [
       { name: 'Название', textAlign: 'left' },
-      ...(projects?.data
+      ...(!!projects?.data.length
         ? Object.keys(projects.data[0].untranslatedKeysByLang).map<TableHeading>((el) => ({
             name: el,
             textAlign: 'center',
