@@ -1,19 +1,25 @@
+import { Link } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router';
 import { Preloader, Btn, Select } from 'mcn-ui-components';
 import { buildFilterQuery } from 'mcn-ui-components/utils';
-import { useParams } from 'react-router';
 import { Table } from '@alfalab/core-components-table';
 import { Collapse } from '@alfalab/core-components-collapse';
 import { CreateKeyModal, UpdateKeyForm, UpdateCommentForm, HistoryList } from 'features';
 import { Lang, Project, useKeyStore, useLangStore, useProjectStore } from 'entities';
 import { useEffect, useMemo, useState } from 'react';
 import { TranslatorInput } from 'shared';
-import { Link } from 'react-router-dom';
 import { Navbar } from 'widgets/index';
+import { KeyTypeEnum } from 'shared/types';
+import { Params } from './types';
 
 import styles from './Product.module.scss';
 
 export const ProductPage = () => {
-  const { projectId } = useParams<QueryParams>();
+  const { projectId } = useParams<Params>();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const keyType = searchParams.get('keyType');
+  const langId = searchParams.get('langId');
 
   const [search, setSearch] = useState('');
 
@@ -27,7 +33,7 @@ export const ProductPage = () => {
   const isLoadingProjects = useProjectStore((state) => state.isLoading);
   const isLoadingLangs = useLangStore((state) => state.isLoading);
   const [isOpen, setIsOpen] = useState(false);
-  const [langValue, setLangValue] = useState(null);
+  const [langValue, setLangValue] = useState(+langId);
 
   const [searchField, setSearchField] = useState('name');
 
@@ -45,6 +51,7 @@ export const ProductPage = () => {
         projectId ? buildFilterQuery('projectId', '$eq', [projectId]) : null,
         buildFilterQuery(searchField, '$like', [search]),
         langValue ? buildFilterQuery('langId', '$eq', [langValue]) : null,
+        keyType === KeyTypeEnum.UNTRANSLATED ? buildFilterQuery('name', '$eq', '$value') : null,
       ],
     }),
     [search, page, langValue, searchField, projectId],
@@ -125,7 +132,7 @@ export const ProductPage = () => {
             placeholder='Язык'
             typeStyle='base'
             options={langSelectOptions}
-            value={langSelectOptions[0]}
+            value={langSelectOptions.find((el) => el.value === langValue) || langSelectOptions[0]}
             name='lang'
             onChange={handleChangeSelect}
           />

@@ -124,8 +124,4 @@ declare global {
     add: boolean;
     isNotRemove: boolean;
   }
-
-  export interface QueryParams {
-    projectId: string;
-  }
 }

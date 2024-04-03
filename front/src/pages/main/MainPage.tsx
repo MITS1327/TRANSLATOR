@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, ReactElement } from 'react';
+import { useMemo, useState, useEffect, ReactElement, useLayoutEffect } from 'react';
 import { Btn, Preloader } from 'mcn-ui-components';
 import { buildFilterQuery } from 'mcn-ui-components/utils';
 import { TextAlignProperty } from '@alfalab/core-components-table/typings';
@@ -6,7 +6,8 @@ import { Table } from '@alfalab/core-components-table';
 import { Link } from 'react-router-dom';
 import { TCellProps, TCell } from '@alfalab/core-components-table/components';
 import { Navbar } from 'widgets';
-import { useProjectStore } from '../../entities';
+import { KeyTypeEnum } from 'shared/types';
+import { useLangStore, useProjectStore } from '../../entities';
 import { CreateLangModal, CreateProjectModal } from '../../features';
 import { TranslatorInput } from '../../shared';
 
@@ -20,6 +21,8 @@ type TableHeading = {
 export const MainPage = () => {
   const getProjects = useProjectStore((state) => state.getProjects);
   const projects = useProjectStore((state) => state.projects);
+  const getLangs = useLangStore((state) => state.getLangs);
+  const langs = useLangStore((state) => state.langs);
   const isLoading = useProjectStore((state) => state.isLoading);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -45,10 +48,14 @@ export const MainPage = () => {
     getProjects(getProjectsParams);
   }, [getProjectsParams]);
 
+  useLayoutEffect(() => {
+    getLangs();
+  }, []);
+
   const tableHeadings = useMemo<TableHeading[]>(
     () => [
       { name: 'Название', textAlign: 'left' },
-      ...(!!projects?.data.length
+      ...(projects?.data.length
         ? Object.keys(projects.data[0].untranslatedKeysByLang).map<TableHeading>((el) => ({
             name: el,
             textAlign: 'center',
@@ -58,6 +65,10 @@ export const MainPage = () => {
     ],
     [projects],
   );
+
+  const getLangIdByName = (langName: string) => {
+    return langs?.data.find((el) => el.name === langName).id;
+  };
 
   return (
     <div className={styles.page}>
@@ -106,9 +117,18 @@ export const MainPage = () => {
                 </Table.TCell>
 
                 {
-                  Object.values(project.untranslatedKeysByLang).map((el) => (
-                    <Table.TCell key={el}>
-                      <div>{el}</div>
+                  Object.entries(project.untranslatedKeysByLang).map(([langName, keysCount]) => (
+                    <Table.TCell key={keysCount}>
+                      <div>
+                        <Link
+                          to={{
+                            pathname: `projects/${project.id}`,
+                            search: `?keyType=${KeyTypeEnum.UNTRANSLATED}&langId=${getLangIdByName(langName)}`,
+                          }}
+                        >
+                          {keysCount}
+                        </Link>
+                      </div>
                     </Table.TCell>
                   )) as unknown as ReactElement<TCellProps, typeof TCell>
                 }
