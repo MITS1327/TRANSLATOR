@@ -1,15 +1,17 @@
 import { useMemo, useState, useEffect, ReactElement, useLayoutEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Table } from '@alfalab/core-components-table';
+import { TextAlignProperty } from '@alfalab/core-components-table/typings';
+import { TCellProps, TCell } from '@alfalab/core-components-table/components';
+
 import { Btn, Preloader } from 'mcn-ui-components';
 import { buildFilterQuery } from 'mcn-ui-components/utils';
-import { TextAlignProperty } from '@alfalab/core-components-table/typings';
-import { Table } from '@alfalab/core-components-table';
-import { Link } from 'react-router-dom';
-import { TCellProps, TCell } from '@alfalab/core-components-table/components';
+
 import { Navbar } from 'widgets';
 import { KeyTypeEnum } from 'shared/types';
-import { useLangStore, useProjectStore } from '../../entities';
-import { CreateLangModal, CreateProjectModal } from '../../features';
-import { TranslatorInput } from '../../shared';
+import { useLangStore, useProjectStore } from 'entities';
+import { CreateLangModal, CreateProjectModal } from 'features';
+import { DEFAULT_CURRENT_PAGE, DEFAULT_LIMIT_PER_PAGE, TranslatorInput } from 'shared';
 
 import styles from './Main.module.scss';
 
@@ -28,20 +30,22 @@ export const MainPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenLang, setIsOpenLang] = useState(false);
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
+  const [limitPerPage, setLimitPerPage] = useState(DEFAULT_LIMIT_PER_PAGE);
 
   const DATA_SIZE = projects?.totalCount;
-  const PER_PAGE = 20;
-  const [page, setPage] = useState(0);
-  const handlePageChange = (pageIndex: number) => setPage(pageIndex);
-  const pagesCount = Math.ceil(DATA_SIZE / PER_PAGE);
+  const pagesCount = Math.ceil(DATA_SIZE / limitPerPage);
+
+  const handleCurrentPageChange = (pageIndex: number) => setCurrentPage(pageIndex);
+  const handleLimitPerPageChange = (perPage: number) => setLimitPerPage(perPage);
 
   const getProjectsParams = useMemo(
     () => ({
-      limit: PER_PAGE,
-      offset: search.length ? 0 : PER_PAGE * page,
+      limit: limitPerPage,
+      offset: search.length ? 0 : limitPerPage * currentPage,
       filter: [buildFilterQuery('name', '$ILike', [search])],
     }),
-    [search, page],
+    [search, currentPage, limitPerPage],
   );
 
   useEffect(() => {
@@ -93,10 +97,11 @@ export const MainPage = () => {
           className={styles.tableContainer}
           pagination={
             <Table.Pagination
-              perPage={PER_PAGE}
-              currentPageIndex={page}
               pagesCount={pagesCount}
-              onPageChange={handlePageChange}
+              perPage={limitPerPage}
+              onPerPageChange={handleLimitPerPageChange}
+              currentPageIndex={currentPage}
+              onPageChange={handleCurrentPageChange}
             />
           }
         >

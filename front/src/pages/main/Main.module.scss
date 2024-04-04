@@ -1,4 +1,10 @@
 .page {
+  :global {
+    .r-preloader {
+      position: fixed;
+    }
+  }
+
   .header {
     padding: 10px;
     height: var(--header-height);

@@ -1,4 +1,10 @@
 .page {
+  :global {
+    .r-preloader {
+      position: fixed;
+    }
+  }
+
   .header {
     display: flex;
     height: var(--header-height);

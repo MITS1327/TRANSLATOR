@@ -1,15 +1,18 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocation, useParams } from 'react-router';
-import { Preloader, Btn, Select } from 'mcn-ui-components';
-import { buildFilterQuery } from 'mcn-ui-components/utils';
 import { Table } from '@alfalab/core-components-table';
 import { Collapse } from '@alfalab/core-components-collapse';
-import { CreateKeyModal, UpdateKeyForm, UpdateCommentForm, HistoryList } from 'features';
-import { Lang, Project, useKeyStore, useLangStore, useProjectStore } from 'entities';
-import { useEffect, useMemo, useState } from 'react';
-import { TranslatorInput } from 'shared';
-import { Navbar } from 'widgets/index';
+
+import { Preloader, Btn, Select } from 'mcn-ui-components';
+import { buildFilterQuery } from 'mcn-ui-components/utils';
+
+import { Navbar } from 'widgets';
 import { KeyTypeEnum } from 'shared/types';
+import { DEFAULT_CURRENT_PAGE, DEFAULT_LIMIT_PER_PAGE, TranslatorInput } from 'shared';
+import { Lang, Project, useKeyStore, useLangStore, useProjectStore } from 'entities';
+import { CreateKeyModal, UpdateKeyForm, UpdateCommentForm, HistoryList } from 'features';
+
 import { Params } from './types';
 
 import styles from './Product.module.scss';
@@ -21,8 +24,6 @@ export const ProductPage = () => {
   const keyType = searchParams.get('keyType');
   const langId = searchParams.get('langId');
 
-  const [search, setSearch] = useState('');
-
   const getKeys = useKeyStore((state) => state.getKeys);
   const keys = useKeyStore((state) => state.keys);
   const products = useProjectStore((state) => state.projects);
@@ -32,21 +33,24 @@ export const ProductPage = () => {
   const isLoadingKeys = useKeyStore((state) => state.isLoading);
   const isLoadingProjects = useProjectStore((state) => state.isLoading);
   const isLoadingLangs = useLangStore((state) => state.isLoading);
+
   const [isOpen, setIsOpen] = useState(false);
   const [langValue, setLangValue] = useState(+langId);
-
+  const [search, setSearch] = useState('');
   const [searchField, setSearchField] = useState('name');
+  const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
+  const [limitPerPage, setLimitPerPage] = useState(DEFAULT_LIMIT_PER_PAGE);
 
   const DATA_SIZE = keys?.totalCount;
-  const PER_PAGE = 20;
-  const [page, setPage] = useState(0);
-  const handlePageChange = (pageIndex: number) => setPage(pageIndex);
-  const pagesCount = Math.ceil(DATA_SIZE / PER_PAGE);
+  const pagesCount = Math.ceil(DATA_SIZE / limitPerPage);
+
+  const handleCurrentPageChange = (pageIndex: number) => setCurrentPage(pageIndex);
+  const handleLimitPerPageChange = (perPage: number) => setLimitPerPage(perPage);
 
   const getKeysParams = useMemo(
     () => ({
-      limit: PER_PAGE,
-      offset: search.length ? 0 : PER_PAGE * page,
+      limit: limitPerPage,
+      offset: search.length ? 0 : limitPerPage * currentPage,
       filter: [
         projectId ? buildFilterQuery('projectId', '$eq', [projectId]) : null,
         buildFilterQuery(searchField, '$like', [search]),
@@ -54,7 +58,7 @@ export const ProductPage = () => {
         keyType === KeyTypeEnum.UNTRANSLATED ? buildFilterQuery('name', '$eq', '$value') : null,
       ],
     }),
-    [search, page, langValue, searchField, projectId],
+    [search, currentPage, langValue, searchField, projectId, limitPerPage],
   );
 
   const searchFieldSelectOptions = useMemo(
@@ -159,10 +163,11 @@ export const ProductPage = () => {
           className={styles.tableContainer}
           pagination={
             <Table.Pagination
-              perPage={PER_PAGE}
-              currentPageIndex={page}
               pagesCount={pagesCount}
-              onPageChange={handlePageChange}
+              perPage={limitPerPage}
+              onPerPageChange={handleLimitPerPageChange}
+              currentPageIndex={currentPage}
+              onPageChange={handleCurrentPageChange}
             />
           }
         >
