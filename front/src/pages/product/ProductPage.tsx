@@ -8,12 +8,14 @@ import { Preloader, Btn, Select } from 'mcn-ui-components';
 import { buildFilterQuery } from 'mcn-ui-components/utils';
 
 import { Navbar } from 'widgets';
-import { KeyTypeEnum } from 'shared/types';
-import { DEFAULT_CURRENT_PAGE, DEFAULT_LIMIT_PER_PAGE, TranslatorInput } from 'shared';
+import { ConcatFilterDelimitersEnum, KeyTypeEnum } from 'shared/types';
+import { DEFAULT_CURRENT_PAGE, DEFAULT_LIMIT_PER_PAGE, TranslatorInput, concatFiltersWithDelimiter } from 'shared';
 import { Lang, Project, useKeyStore, useLangStore, useProjectStore } from 'entities';
 import { CreateKeyModal, UpdateKeyForm, UpdateCommentForm, HistoryList } from 'features';
 
 import { Params } from './types';
+import { DEFAULT_PRODUCT_SEARCH_FIELDS_SELECT_OPTIONS, PRODUCT_SEARCH_FIELDS_SELECT_OPTIONS } from './utils';
+
 
 import styles from './Product.module.scss';
 
@@ -36,8 +38,8 @@ export const ProductPage = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [langValue, setLangValue] = useState(+langId);
-  const [search, setSearch] = useState('');
-  const [searchField, setSearchField] = useState('name');
+  const [searchValue, setSearchValue] = useState('');
+  const [searchFieldOptions, setSearchFieldOptions] = useState(DEFAULT_PRODUCT_SEARCH_FIELDS_SELECT_OPTIONS);
   const [currentPage, setCurrentPage] = useState(DEFAULT_CURRENT_PAGE);
   const [limitPerPage, setLimitPerPage] = useState(DEFAULT_LIMIT_PER_PAGE);
 
@@ -47,36 +49,27 @@ export const ProductPage = () => {
   const handleCurrentPageChange = (pageIndex: number) => setCurrentPage(pageIndex);
   const handleLimitPerPageChange = (perPage: number) => setLimitPerPage(perPage);
 
+  const commonFilters = useMemo(() => [
+    ...(projectId ? [buildFilterQuery('projectId', '$eq', [projectId])] : []),
+    ...(langValue ? [buildFilterQuery('langId', '$eq', [langValue])] : []),
+    ...(keyType === KeyTypeEnum.UNTRANSLATED ? [buildFilterQuery('name', '$eq', '$value')] : []),
+  ], [searchValue, currentPage, langValue, projectId, limitPerPage]);
+
+  const searchFilters = useMemo(() => {
+    if (!searchFieldOptions || !searchValue) {
+      return [];
+    }
+
+    return searchFieldOptions.map((field) => buildFilterQuery(field.value, '$ILike', searchValue));
+  }, [searchFieldOptions, searchValue]);
+
   const getKeysParams = useMemo(
     () => ({
       limit: limitPerPage,
-      offset: search.length ? 0 : limitPerPage * currentPage,
-      filter: [
-        projectId ? buildFilterQuery('projectId', '$eq', [projectId]) : null,
-        buildFilterQuery(searchField, '$like', [search]),
-        langValue ? buildFilterQuery('langId', '$eq', [langValue]) : null,
-        keyType === KeyTypeEnum.UNTRANSLATED ? buildFilterQuery('name', '$eq', '$value') : null,
-      ],
+      offset: searchValue.length ? 0 : limitPerPage * currentPage,
+      filter: concatFiltersWithDelimiter(searchFilters, ConcatFilterDelimitersEnum.OR, commonFilters),
     }),
-    [search, currentPage, langValue, searchField, projectId, limitPerPage],
-  );
-
-  const searchFieldSelectOptions = useMemo(
-    () => [
-      {
-        label: 'Ключ',
-        value: 'name',
-      },
-      {
-        label: 'Значение',
-        value: 'value',
-      },
-      {
-        label: 'Комментарий',
-        value: 'comment',
-      },
-    ],
-    [],
+    [limitPerPage, currentPage, searchValue, searchFilters, commonFilters],
   );
 
   useEffect(() => {
@@ -108,13 +101,21 @@ export const ProductPage = () => {
     return langs?.data.find((el: Lang) => el.id === langId)?.name;
   };
 
-  const handleChangeSelect = (data: { name: string; data: { label: string; value: number } }) => {
-    setLangValue(data?.data.value);
+  const handleChangeSelect = (event: SelectEvent<DefaultSelectOption<string, number>>) => {
+    setLangValue(event.data.value);
   };
 
-  const handleChangeSearchField = (data: { name: string; data: { label: string; value: string } }) => {
-    setSearchField(data?.data.value);
+  const handleChangeSearchField = (event: SelectEvent<DefaultSelectOption<string, string>[]>) => {
+    setSearchFieldOptions(event.data);
   };
+
+  const handleChangeSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!searchFieldOptions.length) {
+      setSearchFieldOptions(DEFAULT_PRODUCT_SEARCH_FIELDS_SELECT_OPTIONS)
+    }
+
+    setSearchValue(event.target.value);
+  }
 
   const pageTitle = !projectId ? 'Все ключи' : currentProduct?.name;
 
@@ -143,10 +144,13 @@ export const ProductPage = () => {
         </div>
         <div className={styles.headerItem}>
           <Select
+            isMulti
+            isSearchable={false}
+            closeMenuOnSelect={false}
             placeholder='Поле'
             typeStyle='base'
-            value={searchFieldSelectOptions[0]}
-            options={searchFieldSelectOptions}
+            value={searchFieldOptions}
+            options={Object.values(PRODUCT_SEARCH_FIELDS_SELECT_OPTIONS)}
             name='lang'
             onChange={handleChangeSearchField}
           />
@@ -154,7 +158,7 @@ export const ProductPage = () => {
         <div className={styles.headerItem}>
           <TranslatorInput
             placeholder='Поиск'
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
+            onChange={handleChangeSearchInput}
           />
         </div>
       </div>

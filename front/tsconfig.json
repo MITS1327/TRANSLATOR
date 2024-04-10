@@ -14,13 +14,29 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "api/*": ["./src/api/*"],
-      "shared/*": ["./src/shared/*"],
-      "app/*": ["./src/app/*"],
-      "pages/*": ["./src/pages/*"],
-      "*": ["./src/*"]
+      "app": ["./app"],
+      "app/*": ["./app/*"],
+
+      "entities": ["./entities"],
+      "entities/*": ["./entities/*"],
+
+
+      "features": ["./features"],
+      "features/*": ["./features/*"],
+
+
+      "pages": ["./pages"],
+      "pages/*": ["./pages/*"],
+
+
+      "shared": ["./shared"],
+      "shared/*": ["./shared/*"],
+
+
+      "widgets": ["./widgets"],
+      "widgets/*": ["./widgets/*"],
     }
   },
   "ts-node": {

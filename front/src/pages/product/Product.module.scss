@@ -27,9 +27,17 @@
 
     .headerItem {
       height: 40px;
-      width: 150px;
+      min-width: 170px;
       &:not(:last-child) {
         margin-right: 20px;
+      }
+
+      :global {
+        .mcn-select {
+          &__control {
+            height: 40px;
+          }
+        }
       }
     }
   }

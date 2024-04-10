@@ -1,6 +1,9 @@
 import { Redirect, Route, Switch } from 'react-router-dom';
+
 import Topbar from 'topbar/Topbar';
-import { ProductPage, MainPage } from 'pages';
+
+import { MainPage } from 'pages/main';
+import { ProductPage } from 'pages/product';
 import { IS_EU_PROD } from 'shared/config';
 
 const App = () => {
